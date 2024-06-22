@@ -4,7 +4,7 @@
 	"printWidth": 160,
 	"singleQuote": false,
 	"trailingComma": "all",
-	"importOrder": ["<THIRD_PARTY_MODULES>", "^./_api/(.*)$", "^./_hooks/(.*)$", "^./_model/(.*)$", "^./_components/(.*)$", "^./utilities/(.*)$", "^[./]"],
+	"importOrder": ["<THIRD_PARTY_MODULES>", "^./_api/(.*)$", "^./_hooks/(.*)$", "^./_models/(.*)$", "^./_components/(.*)$", "^./utilities/(.*)$", "^[./]"],
 	"importOrderSeparation": true,
 	"importOrderSortSpecifiers": true,
 	"plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"]
