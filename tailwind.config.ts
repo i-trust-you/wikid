@@ -1,20 +1,46 @@
-import type { Config } from "tailwindcss";
-
-const config: Config = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
-  theme: {
-    extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
-    },
-  },
-  plugins: [],
+/** @type {import("tailwindcss").Config} */
+export default {
+	content: ["./pages/**/*.{js,ts,jsx,tsx,mdx}", "./components/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}"],
+	theme: {
+		screens: {
+			tablet: "768px",
+			desktop: "1200px",
+		},
+		fontSize: {
+			"5xl": ["48px", "46px"],
+			"4xl": ["40px", "42px"],
+			"3xl": ["32px", "42px"],
+			"2xl": ["24px", "32px"],
+			xl: ["20px", "32px"],
+			"2lg": ["18px", "26px"],
+			lg: ["16px", "26px"],
+			md: ["14px", "24px"],
+			sm: ["13px", "22px"],
+			xs: ["12px", "18px"],
+		},
+		colors: {
+			transparent: "transparent",
+			black: "#000000",
+			white: "#FFFFFF",
+			primary: {
+				100: "#EEF9F6",
+				200: "#4CBFA4",
+				300: "#32A68A",
+			},
+			gray: {
+				100: "#F7F7FA",
+				200: "#E4E5F0",
+				300: "#C6CADA",
+				400: "#8F95B2",
+				500: "#474D66",
+				600: "#3B415B",
+			},
+			red: {
+				100: "#FBEDED",
+				200: "#D14343",
+			},
+			purple: "#8E66FF",
+			yellow: "#FDD181",
+		},
+	},
 };
-export default config;
