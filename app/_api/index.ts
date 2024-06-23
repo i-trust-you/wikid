@@ -118,7 +118,7 @@ export default abstract class API {
 
 	public static readonly ["{teamId}/profiles"] = new (class extends API {
 		public override POST({ teamId = "6-11", ...query }: { teamId: string }, body: CreateProfileBody) {
-			return API.POST<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles?${API.query(query)}`, body);
+			return API.POST<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles`, body);
 		}
 
 		public override GET({ teamId = "6-11", ...query }: { teamId: string; name: string; page: number; pageSize: number }) {
