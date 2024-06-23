@@ -2,20 +2,13 @@ import { Overlay } from "@/_utilities/Overlay";
 import Image from "next/image";
 
 export default class Modal extends Overlay {
-	private readonly onClickOutSide: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 	private timeout?: NodeJS.Timeout;
 
 	constructor(
 		protected readonly children: JSX.Element,
-		onClickOutSide: (modal: Modal) => void,
+		protected readonly onClickOutSide: (modal: Modal) => void,
 	) {
 		super(children);
-
-		this.onClickOutSide = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-			if (event.target === event.currentTarget) {
-				onClickOutSide(this);
-			}
-		};
 	}
 
 	override selector() {
@@ -23,7 +16,7 @@ export default class Modal extends Overlay {
 	}
 
 	public shake() {
-		const puppet = document.querySelector("#puppet");
+		const puppet = document.querySelector(this.selector())?.querySelector("[data-puppet]");
 
 		if (!puppet) throw new Error();
 
@@ -59,9 +52,14 @@ export default class Modal extends Overlay {
 	}
 
 	override render() {
+		const handle = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+			if (event.target === event.currentTarget) {
+				this.onClickOutSide(this);
+			}
+		};
 		return (
-			<div className="fixed inset-0 flex items-center justify-center bg-[#474D664D]" onClick={this.onClickOutSide}>
-				<div id="puppet" className="bg-white w-[335px] rounded-[10px] border-[1.5px] border-solid px-[20px] py-[20px] shadow-lg tablet:w-[395px]">
+			<div className="fixed inset-0 flex items-center justify-center bg-[#474D664D]" onClick={handle}>
+				<div data-puppet className="w-[335px] rounded-[10px] border-[1.5px] border-solid bg-white px-[20px] py-[20px] shadow-lg tablet:w-[395px]">
 					<div className="flex flex-row-reverse">
 						<Image
 							className="aspect-square rounded-full px-[2.5px] py-[2.5px]"
