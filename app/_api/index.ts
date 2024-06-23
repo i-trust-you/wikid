@@ -381,6 +381,8 @@ interface SignInRequestBody {
 }
 
 interface SignInResponse {
+	accessToken: string;
+	refreshToken: string;
 	user: {
 		id: number;
 		name: string;
