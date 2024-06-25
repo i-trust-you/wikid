@@ -77,7 +77,7 @@ Pagination.Jump = function $(props: Readonly<React.PropsWithChildren & { to: "fi
 	useEffect(() => {
 		// prettier-ignore
 		return set_disabled( props.to === "first" || props.to === "prev" ? ctx.state.page() === 0 : props.to === "next" || props.to === "last" ? ctx.state.page() === ctx.props.length - 1 : ctx.state.page() === props.to);
-	}, [ctx.state, props.to]);
+	}, [ctx.props, ctx.state, props.to]);
 
 	const handle = useCallback(() => {
 		switch (props.to) {
