@@ -2,13 +2,26 @@ import { Overlay } from "@/_utilities/Overlay";
 import Image from "next/image";
 
 export default class Modal extends Overlay {
+	// :3
 	private timeout?: NodeJS.Timeout;
 
-	constructor(
-		protected readonly children: JSX.Element,
-		protected readonly onClickOutSide: (modal: Modal) => void,
-	) {
+	// prettier-ignore
+	constructor(protected readonly children: JSX.Element, protected readonly onClickOutSide: (modal: Modal) => void) {
 		super(children);
+	}
+
+	protected declare static instance?: Modal;
+
+	public static shake() {
+		this.instance?.shake();
+	}
+
+	public static open() {
+		this.instance?.open();
+	}
+
+	public static close() {
+		this.instance?.close();
 	}
 
 	override selector() {
@@ -40,12 +53,14 @@ export default class Modal extends Overlay {
 	}
 
 	override open() {
+		// ..!
 		super.open();
 		// prevent scroll
 		document.body.style.setProperty("overflow", "hidden");
 	}
 
 	override close() {
+		// ..!
 		super.close();
 		// allow scroll
 		document.body.style.setProperty("overflow", null);
@@ -68,7 +83,7 @@ export default class Modal extends Overlay {
 							width={30}
 							height={30}
 							onClick={this.close}
-						></Image>
+						/>
 					</div>
 					<div className="mt-[20px]">{this.children}</div>
 				</div>

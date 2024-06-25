@@ -8,25 +8,14 @@ export abstract class Overlay {
 	// Overlay container
 	private static container?: ReactDOM.Root;
 	// current Overlay
-	private static instance?: Overlay;
+	protected static instance?: Overlay;
 
 	static {
 		// @ts-ignore
 		Overlay.lifecycle.addEventListener(SECRET, (event: CustomEvent) => {
-			// render magic!
-			(Overlay.container ??=
-				(Overlay.instance = event.detail as typeof Overlay.instance) && ReactDOM.createRoot(document.querySelector(Overlay.instance.selector())!!))?.render(
-				(Overlay.instance = event.detail as typeof Overlay.instance)?.render(),
-			);
+			// prettier-ignore
+			(Overlay.container ??= (Overlay.instance = event.detail as typeof Overlay.instance) && ReactDOM.createRoot(document.querySelector(Overlay.instance.selector())!!))?.render((Overlay.instance = event.detail as typeof Overlay.instance)?.render());
 		});
-	}
-
-	public static open() {
-		Overlay.instance?.open();
-	}
-
-	public static close() {
-		Overlay.instance?.close();
 	}
 
 	constructor(protected readonly children: JSX.Element) {
