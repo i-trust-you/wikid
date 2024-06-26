@@ -30,4 +30,6 @@ const Option = forwardRef<HTMLButtonElement, OptionProps>(({ value, onSelect, ch
 	);
 });
 
+Option.displayName = "Option";
+
 export default Option;
