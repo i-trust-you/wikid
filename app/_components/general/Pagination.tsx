@@ -2,6 +2,7 @@ import capsule from "@/_utilities/capsule";
 import Image from "next/image";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
+
 interface Props {
 	page: number;
 	clamp: number;
@@ -37,8 +38,8 @@ export default function Pagination(props: Readonly<React.PropsWithChildren & Pro
 					<Image src="/icons/arrow_left.svg" alt="prev" width={24} height={24} />
 				</Pagination.Jump>
 				<Pagination.Generator>
-					{(key, page) => (
-						<Pagination.Jump key={key} to={page}>
+					{(page) => (
+						<Pagination.Jump key={page} to={page}>
 							{page + 1}
 						</Pagination.Jump>
 					)}
@@ -111,24 +112,14 @@ Pagination.Jump = function $(props: Readonly<React.PropsWithChildren & { to: "fi
 	);
 };
 
-Pagination.Generator = function $(props: Readonly<{ children: (key: number, page: number) => JSX.Element }>) {
+Pagination.Generator = function $(props: Readonly<{ children: (page: number) => JSX.Element }>) {
 	const ctx = useCTX();
+
+	const offset = Math.floor(ctx.state.page() / (ctx.props.clamp)) * ctx.props.clamp;
 
 	return (
 		<>
-			{new Array(Math.min(ctx.props.length, ctx.props.clamp)).fill(null).map((_, index) => {
-				// TODO: optimize logic & reuse cached value
-				const page =
-					index +
-					(ctx.state.page() > Math.floor(ctx.props.clamp / 2) && ctx.props.length > ctx.props.clamp
-						? Math.abs(ctx.state.page() - Math.floor(ctx.props.clamp / 2)) +
-							(ctx.props.clamp + Math.abs(ctx.state.page() - Math.floor(ctx.props.clamp / 2)) > ctx.props.length
-								? ctx.props.length - (ctx.props.clamp + Math.abs(ctx.state.page() - Math.floor(ctx.props.clamp / 2)))
-								: 0)
-						: 0);
-
-				return props.children(index, page);
-			})}
+			{new Array(Math.min(ctx.props.clamp, ctx.props.length - offset)).fill(null).map((_, index) => props.children(index + offset))}
 		</>
 	);
 };
