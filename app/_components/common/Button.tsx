@@ -4,13 +4,18 @@ import { MouseEvent, PropsWithChildren } from "react";
 interface ButtonProps extends PropsWithChildren {
 	href?: string;
 	type?: "button" | "submit" | "reset";
-	style?: string;
 	onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
 	disabled?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({ children, href, type, onClick, style, disabled }) => {
-	let baseStyles = "relative h-full w-full gap-[10px] rounded-[10px] text-md font-semibold border disabled:cursor-not-allowed";
+const Button: React.FC<ButtonProps> = ({ children, href, type, onClick, disabled }) => {
+	let baseStyles =
+		"relative h-full w-full gap-[10px] rounded-[10px] text-md font-semibold border disabled:cursor-not-allowed disabled:bg-gray-300 disabled:border-none";
+	let linkStyles =
+		children === "목록으로"
+			? baseStyles + " flex items-center justify-center border-primary-200 bg-white text-primary-200"
+			: baseStyles + " flex items-center justify-center";
+
 	switch (type) {
 		case "button":
 		case "submit":
@@ -22,12 +27,13 @@ const Button: React.FC<ButtonProps> = ({ children, href, type, onClick, style, d
 		default:
 			baseStyles += " bg-red-200 text-white";
 	}
+
 	return href ? (
-		<Link href={href} className={`${baseStyles} flex items-center justify-center ${style}`}>
+		<Link href={href} className={`${linkStyles}`}>
 			{children}
 		</Link>
 	) : (
-		<button type={type} onClick={onClick} className={`${baseStyles} ${style}`} disabled={disabled}>
+		<button type={type} onClick={onClick} className={`${baseStyles}`} disabled={disabled}>
 			{children}
 		</button>
 	);
