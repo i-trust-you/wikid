@@ -62,18 +62,18 @@ interface TriggerProps {
 	children: (value: string) => JSX.Element;
 }
 
-function Trigger({ defaultValue, children }: TriggerProps) {
+Dropdown.Trigger = function ({ defaultValue, children }: TriggerProps) {
 	const { options, selectedOption, toggleOptions } = useDropdownContext();
 	const value = selectedOption?.content ?? defaultValue ?? options[0].content;
 
 	return <button onClick={toggleOptions}>{children(value)}</button>;
-}
+};
 
 interface GeneratorProps {
 	children: (content: string) => JSX.Element;
 }
 
-function Generator({ children }: GeneratorProps) {
+Dropdown.Generator = function ({ children }: GeneratorProps) {
 	const { options, isOpen, handleSelect } = useDropdownContext();
 
 	return (
@@ -83,7 +83,7 @@ function Generator({ children }: GeneratorProps) {
 			</EventHandler>
 		)
 	);
-}
+};
 
 function EventHandler({ children }: React.PropsWithChildren) {
 	// 외부 영역 클릭 시, option들 닫기
@@ -137,6 +137,3 @@ function EventHandler({ children }: React.PropsWithChildren) {
 		<>{Children.map(children, (child, index) => cloneElement(child as React.ReactElement, { ref: (el: HTMLElement) => (optionsRef.current[index] = el) }))}</>
 	);
 }
-
-Dropdown.Trigger = Trigger;
-Dropdown.Generator = Generator;
