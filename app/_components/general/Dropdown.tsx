@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Children, cloneElement, createContext, useContext, useEffect, useRef, useState } from "react";
+import { Children, cloneElement, createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 interface Option {
 	value: string;
@@ -35,18 +35,18 @@ export default function Dropdown({ options, onSelect, children }: DropdownProps 
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [selectedOption, setSelectedOption] = useState<Option>();
 
-	const toggleOptions = () => {
+	const toggleOptions = useCallback(() => {
 		setIsOpen((prev) => !prev);
-	};
-	const hideOptions = () => {
+	}, []);
+	const hideOptions = useCallback(() => {
 		setIsOpen(false);
-	};
+	}, []);
 
-	const handleSelect = (option: Option) => {
+	const handleSelect = useCallback((option: Option) => {
 		setSelectedOption(option);
 		onSelect(option.value, option.content);
 		hideOptions();
-	};
+	}, []);
 
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
