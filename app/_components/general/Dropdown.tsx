@@ -57,16 +57,17 @@ export default function Dropdown({ options, onSelect, children }: DropdownProps 
 	);
 }
 
-interface TriggerProps {
-	defaultValue?: string;
-	children: (value: string) => JSX.Element;
-}
+Dropdown.Trigger = function ({ children }: React.PropsWithChildren) {
+	const { toggleOptions } = useDropdownContext();
 
-Dropdown.Trigger = function ({ defaultValue, children }: TriggerProps) {
-	const { options, selectedOption, toggleOptions } = useDropdownContext();
-	const value = selectedOption?.content ?? defaultValue ?? options[0].content;
+	return <button onClick={toggleOptions}>{children}</button>;
+};
 
-	return <button onClick={toggleOptions}>{children(value)}</button>;
+Dropdown.Current = function () {
+	const { options, selectedOption } = useDropdownContext();
+	const value = selectedOption?.content ?? options[0].content;
+
+	return value;
 };
 
 interface GeneratorProps {
