@@ -1,16 +1,45 @@
-import { Overlay } from "@/_utilities/Overlay";
 import Image from "next/image";
+import ReactDOM from "react-dom/client";
 
-export default class Modal extends Overlay {
-	// :3
-	private timeout?: NodeJS.Timeout;
+export default class Modal {
+	private static timeout?: NodeJS.Timeout;
+	private static instance?: Modal;
+	protected static dom?: HTMLElement;
+	protected static root?: ReactDOM.Root;
 
-	// prettier-ignore
-	constructor(protected readonly children: JSX.Element, protected readonly onClickOutSide: (modal: Modal) => void) {
-		super(children);
+	private static render(children: Readonly<React.PropsWithChildren["children"]>) {
+		// prettier-ignore
+		(this.root ??= ReactDOM.createRoot(this.dom ??= document.querySelector("#modal")!!))?.render(children);
 	}
 
-	protected declare static instance?: Modal;
+	protected readonly children: React.PropsWithChildren["children"];
+
+	constructor(children: JSX.Element, onClickOutSide: (modal: Modal) => void) {
+		this.children = (
+			<div
+				className="fixed inset-0 flex h-screen w-screen items-center justify-center bg-[#474D664D]"
+				onClick={(event) => {
+					if (event?.target === event?.currentTarget) {
+						onClickOutSide(this);
+					}
+				}}
+			>
+				<div data-puppet className="w-[335px] rounded-[10px] border-[1.5px] border-solid bg-white px-[20px] py-[20px] shadow-lg tablet:w-[395px]">
+					<div className="flex flex-row-reverse">
+						<Image
+							className="aspect-square rounded-full px-[2.5px] py-[2.5px]"
+							src="/icons/close.svg"
+							alt="close"
+							width={30}
+							height={30}
+							onClick={() => this.close()}
+						/>
+					</div>
+					<div className="mt-[20px]">{children}</div>
+				</div>
+			</div>
+		);
+	}
 
 	public static shake() {
 		this.instance?.shake();
@@ -24,16 +53,14 @@ export default class Modal extends Overlay {
 		this.instance?.close();
 	}
 
-	override selector() {
-		return "#modal";
-	}
-
 	public shake() {
-		const puppet = document.querySelector(this.selector())?.querySelector("[data-puppet]");
+		if (Modal.instance !== this) return;
+
+		const puppet = Modal.dom?.querySelector("[data-puppet]");
 
 		if (!puppet) throw new Error();
 
-		this.timeout = clearTimeout(this.timeout) as undefined;
+		Modal.timeout = clearTimeout(Modal.timeout) as undefined;
 
 		puppet.animate(
 			[
@@ -49,45 +76,22 @@ export default class Modal extends Overlay {
 			{ duration: 500, iterations: Infinity },
 		);
 
-		this.timeout = setTimeout(() => puppet.getAnimations().forEach((animation) => animation.cancel()), 750);
+		Modal.timeout = setTimeout(() => puppet.getAnimations().forEach((animation) => animation.cancel()), 750);
 	}
 
-	override open() {
-		// ..!
-		super.open();
+	public open() {
+		Modal.instance = this;
+
+		Modal.render(this.children);
 		// prevent scroll
 		document.body.style.setProperty("overflow", "hidden");
 	}
 
-	override close() {
-		// ..!
-		super.close();
+	public close() {
+		if (Modal.instance !== this) return;
+
+		Modal.render(null);
 		// allow scroll
 		document.body.style.setProperty("overflow", null);
-	}
-
-	override render() {
-		const handle = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-			if (event.target === event.currentTarget) {
-				this.onClickOutSide(this);
-			}
-		};
-		return (
-			<div className="fixed inset-0 flex items-center justify-center bg-[#474D664D]" onClick={handle}>
-				<div data-puppet className="w-[335px] rounded-[10px] border-[1.5px] border-solid bg-white px-[20px] py-[20px] shadow-lg tablet:w-[395px]">
-					<div className="flex flex-row-reverse">
-						<Image
-							className="aspect-square rounded-full px-[2.5px] py-[2.5px]"
-							src="/icons/close.svg"
-							alt="close"
-							width={30}
-							height={30}
-							onClick={this.close}
-						/>
-					</div>
-					<div className="mt-[20px]">{this.children}</div>
-				</div>
-			</div>
-		);
 	}
 }
