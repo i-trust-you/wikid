@@ -36,16 +36,23 @@ export default function Page() {
 			setProfiles(response.list);
 		};
 
-		getProfiles(name);
+		if (name !== "") {
+			getProfiles(name);
+		} else {
+			setProfiles([]);
+			setTotalProfiles(0);
+		}
 	}, [name]);
 
 	return (
 		<main className="flex h-full min-h-screen justify-center px-[21px] py-[80px] tablet:px-6">
 			<div className="flex w-full max-w-[860px] flex-col">
 				<SearchBar onChange={handleSearchBar} />
-				{profiles === undefined || profiles.length < 1 ? (
+				{!profiles || totalProfiles < 1 ? (
 					<div className="flex grow flex-col items-center justify-center">
-						<p className="text-2lg font-medium text-gray-400">"{name}"과 일치하는 검색 결과가 없어요.</p>
+						<p className="text-2lg font-medium text-gray-400">
+							{!profiles || name === "" ? "원하는 위키를 검색해주세요." : `"${name}"과 일치하는 검색 결과가 없어요.`}
+						</p>
 						<Image src="/images/search.png" width={108} height={108} alt="검색 사진" className="mt-[35px] tablet:h-[144px] tablet:w-[144px]" />
 					</div>
 				) : (
