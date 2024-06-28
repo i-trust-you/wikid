@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Children, cloneElement, createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 interface Option {
