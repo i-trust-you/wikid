@@ -58,7 +58,7 @@ export default function Page() {
 				) : (
 					<>
 						<p className="mt-4 text-md font-normal text-gray-400">
-							"{name}"님을 총 <span className="text-primary-300">{totalProfiles}</span>명 찾았습니다.
+							&quot;{name}&quot;님을 총 <span className="text-primary-300">{totalProfiles}</span>명 찾았습니다.
 						</p>
 						<div className="mt-10 flex flex-col gap-6 tablet:mt-[57px]">
 							{profiles?.map((profile) => <ProfileCard key={profile.id} profile={profile} />)}
