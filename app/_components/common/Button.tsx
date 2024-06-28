@@ -3,37 +3,36 @@ import { MouseEvent, PropsWithChildren } from "react";
 
 interface ButtonProps extends PropsWithChildren {
 	href?: string;
-	type?: "button" | "submit" | "reset";
+	buttonStyle?: "basic" | "outline" | "cancel";
 	onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
 	disabled?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({ children, href, type, onClick, disabled }) => {
-	let baseStyles =
-		"relative h-full w-full gap-[10px] rounded-[10px] text-md font-semibold border disabled:cursor-not-allowed disabled:bg-gray-300 disabled:border-none";
-	let linkStyles =
-		children === "목록으로"
-			? baseStyles + " flex items-center justify-center border-primary-200 bg-white text-primary-200"
-			: baseStyles + " flex items-center justify-center";
-
-	switch (type) {
-		case "button":
-		case "submit":
-			baseStyles += " bg-primary-200 text-white";
+const Button: React.FC<ButtonProps> = ({ children, href, buttonStyle = "", onClick, disabled }) => {
+	switch (buttonStyle) {
+		case "outline":
+			buttonStyle = "bg-white border-primary-200 text-primary-200";
 			break;
-		case "reset":
-			baseStyles += " bg-white border-primary-200 text-primary-200";
+		case "cancel":
+			buttonStyle = "bg-red-200 text-white";
 			break;
 		default:
-			baseStyles += " bg-red-200 text-white";
+			buttonStyle = "bg-primary-200 text-white";
 	}
 
 	return href ? (
-		<Link href={href} className={`${linkStyles}`}>
+		<Link
+			href={href}
+			className={`${buttonStyle} absolute flex h-full w-full cursor-pointer items-center justify-center rounded-[10px] border text-md font-semibold disabled:border-none disabled:bg-gray-300`}
+		>
 			{children}
 		</Link>
 	) : (
-		<button type={type} onClick={onClick} className={`${baseStyles}`} disabled={disabled}>
+		<button
+			onClick={onClick}
+			className={`${buttonStyle} absolute h-full w-full cursor-pointer rounded-[10px] border text-md font-semibold disabled:border-none disabled:bg-gray-300`}
+			disabled={disabled}
+		>
 			{children}
 		</button>
 	);
