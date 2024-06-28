@@ -6,6 +6,8 @@ export default function Layout({ children }: Readonly<React.PropsWithChildren>) 
 			<body>
 				{children}
 				<div id="toast" />
+				<div id="alert" />
+				<div id="modal" />
 			</body>
 		</html>
 	);
