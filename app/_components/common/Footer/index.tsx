@@ -1,8 +1,8 @@
 export default function Footer() {
 	return (
-		<footer className="mb-[10px] bg-[#3B415B] p-[40px_20px] text-white tablet:p-[60px_48px] desktop:p-[80px]">
+		<footer className="bg-gray-600 p-[40px_20px] text-white tablet:p-[60px_48px] desktop:p-[80px]">
 			<span className="text-[10px] font-bold tablet:text-lg">Copyright &copy; Wikied. All Rights Reserved</span>
-			<p className="text-[8px] tablet:text-md">
+			<p className="mt-[10px] text-[8px] leading-[10px] tablet:text-[14px] tablet:leading-[17px]">
 				사업자등록번호 000-00-00000 | 통신판매신고 제2020-서울-00000호 | 대표 : 이지은 <br /> 서울특별시 중구 청계천로 123, 위키드빌딩
 			</p>
 			<ul className="mt-[20px] flex gap-[30px] text-[8px] tablet:mt-[30px] tablet:text-md">
