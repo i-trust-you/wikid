@@ -26,7 +26,7 @@ function useCTX() {
 
 // TODO: pass id, class, style
 export default function Pagination(props: Readonly<React.PropsWithChildren & Props>) {
-	const [page, set_page] = useState(props.page);
+	const [page, setPage] = useState(props.page);
 
 	const children = useMemo(() => {
 		// early return
@@ -61,7 +61,7 @@ export default function Pagination(props: Readonly<React.PropsWithChildren & Pro
 				},
 				state: {
 					// prettier-ignore
-					page: capsule(() => page, (value: number) => set_page(Math.min(Math.max(0, value), props.length - 1))),
+					page: capsule(() => page, (value: number) => setPage(Math.min(Math.max(0, value), props.length - 1))),
 				},
 			}}
 		>
@@ -73,11 +73,11 @@ export default function Pagination(props: Readonly<React.PropsWithChildren & Pro
 Pagination.Jump = function $(props: Readonly<React.PropsWithChildren & { to: "first" | "prev" | number | "next" | "last" }>) {
 	const ctx = useCTX();
 
-	const [disabled, set_disabled] = useState(false);
+	const [disabled, setDisabled] = useState(false);
 
 	useEffect(() => {
 		// prettier-ignore
-		return set_disabled( props.to === "first" || props.to === "prev" ? ctx.state.page() === 0 : props.to === "next" || props.to === "last" ? ctx.state.page() === ctx.props.length - 1 : ctx.state.page() === props.to);
+		return setDisabled( props.to === "first" || props.to === "prev" ? ctx.state.page() === 0 : props.to === "next" || props.to === "last" ? ctx.state.page() === ctx.props.length - 1 : ctx.state.page() === props.to);
 	}, [ctx.props, ctx.state, props.to]);
 
 	const handle = useCallback(() => {
