@@ -23,7 +23,7 @@ const Button: React.FC<ButtonProps> = ({ children, href, buttonStyle = "", onCli
 	return href ? (
 		<Link
 			href={href}
-			className={`${buttonStyle} absolute flex h-full w-full cursor-pointer items-center justify-center rounded-[10px] border text-md font-semibold disabled:border-none disabled:bg-gray-300`}
+			className={`${disabled ? `bg-gray-300 text-white` : `${buttonStyle}`} absolute flex h-full w-full cursor-pointer items-center justify-center rounded-[10px] border text-md font-semibold`}
 		>
 			{children}
 		</Link>
