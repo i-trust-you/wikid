@@ -1,8 +1,7 @@
-/** @type {import('postcss-load-config').Config} */
-const config = {
+/* eslint-disable import/no-anonymous-default-export */
+/** @type {import("postcss-load-config").Config} */
+export default {
 	plugins: {
 		tailwindcss: {},
 	},
 };
-
-export default config;
