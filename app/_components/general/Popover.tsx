@@ -1,77 +1,114 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { cloneElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 
 export default function Popover(
 	props: Readonly<
 		React.PropsWithChildren & {
 			gap: number;
-			placement: "top" | "left" | "right" | "bottom";
-			element: React.PropsWithChildren["children"];
+			trigger: "click" | "hover";
+			position: "top" | "left" | "right" | "bottom";
+			overlay: JSX.Element;
 		}
 	>,
 ) {
-	const [width, setWidth] = useState(0);
-	const [height, setHeight] = useState(0);
+	const pop = useRef<HTMLDivElement>(null);
+	const over = useRef<HTMLDivElement>(null);
 
-	const overlay = useRef<HTMLDivElement>(null);
+	const [popWidth, setPopWidth] = useState(0);
+	const [popHeight, setPopHeight] = useState(0);
 
-		const [toggle, setToggle] = useState(false);
+	const [overWidth, setOverWidth] = useState(0);
+	const [overHeight, setOverHeight] = useState(0);
+
+	const [toggle, setToggle] = useState(false);
 
 	useLayoutEffect(() => {
-		const rect = overlay.current?.getBoundingClientRect();
-		setWidth(rect?.width ?? 0);
-		setHeight(rect?.height ?? 0);
+		if (toggle) {
+			const rect = pop.current?.getBoundingClientRect();
+			setPopWidth(rect?.width ?? 0);
+			setPopHeight(rect?.height ?? 0);
+		}
+	}, [toggle, props.children]);
+
+	useLayoutEffect(() => {
+		if (toggle) {
+			const rect = over.current?.getBoundingClientRect();
+			setOverWidth(rect?.width ?? 0);
+			setOverHeight(rect?.height ?? 0);
+		}
 	}, [toggle, props.children]);
 
 	const getTop = useCallback(() => {
-		switch (props.placement) {
+		switch (props.position) {
 			case "top": {
-				return -height - props.gap;
+				return -overHeight - props.gap;
 			}
 			case "left":
 			case "right": {
-				return "25%";
+				return (popHeight - overHeight) / 2;
 			}
 		}
-	}, [props.gap, props.placement, height]);
+	}, [props.gap, props.position, overHeight, popHeight]);
 
 	const getLeft = useCallback(() => {
-		switch (props.placement) {
+		switch (props.position) {
 			case "top":
 			case "bottom": {
-				return "25%";
+				return (popWidth - overWidth) / 2;
 			}
 			case "left": {
-				return -width - props.gap;
+				return -overWidth - props.gap;
 			}
 		}
-	}, [props.gap, props.placement, width]);
+	}, [props.gap, props.position, popWidth, overWidth]);
 
 	const getRight = useCallback(() => {
-		switch (props.placement) {
+		switch (props.position) {
 			case "right": {
-				return -width - props.gap;
+				return -overWidth - props.gap;
 			}
 		}
-	}, [props.gap, props.placement, width]);
+	}, [props.gap, props.position, overWidth]);
 
 	const getBottom = useCallback(() => {
-		switch (props.placement) {
+		switch (props.position) {
 			case "bottom": {
-				return -height - props.gap;
+				return -overHeight - props.gap;
 			}
 		}
-	}, [props.gap, props.placement, height]);
+	}, [props.gap, props.position, overHeight]);
+
+	useEffect(() => {
+		if (toggle) {
+			switch (props.trigger) {
+				case "click": {
+					const handle = () =>
+					{
+						setToggle(false);
+					};
+					document.addEventListener("click", handle);
+					return () => document.removeEventListener("click", handle);
+					break;
+				}
+			}
+		}
+	}, [toggle, props.trigger]);
 
 	return (
-		<div className="relative" onClick={() => setToggle(!toggle)}>
+		<div
+			ref={pop}
+			className="relative"
+			onClick={() => props.trigger === "click" && setToggle(!toggle)}
+			onMouseEnter={() => props.trigger === "hover" && setToggle(true)}
+			onMouseLeave={() => props.trigger === "hover" && setToggle(false)}
+		>
 			{props.children}
-			{/* @ts-ignore */}
-			<div ref={overlay} className="absolute" style={{ display: !toggle && "none", top: getTop(), left: getLeft(), right: getRight(), bottom: getBottom() }}>
-				{props.element}
-			</div>
+			{cloneElement(props.overlay, {
+				ref: over,
+				style: { position: "absolute", display: !toggle && "none", top: getTop(), left: getLeft(), right: getRight(), bottom: getBottom() },
+			})}
 		</div>
 	);
 }
