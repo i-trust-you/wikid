@@ -1,32 +1,10 @@
-import API from "@/_api";
 import Image from "next/image";
 
 import DeleteIcon from "../../../../public/icons/DeleteIcon";
 import EditIcon from "../../../../public/icons/EditIcon";
 import ProfileImage from "../../../../public/icons/profile.svg";
+import { getCommentData } from "../page";
 import EmptyState from "./EmptyState";
-
-interface CommentType {
-	content: string;
-	createdAt: string;
-	id: number;
-	updatedAt: string;
-	writer: {
-		id: number;
-		name: string;
-		image: string;
-	};
-}
-
-interface CommentListRes {
-	nextCursor: number;
-	list: CommentType[];
-}
-
-export const getCommentData = async (articleId: number) => {
-	const res = await API["{teamId}/articles/{articleId}/comments"].GET({ articleId: 2, limit: 4 });
-	return res.list;
-};
 
 // TODO:무한 스크롤
 const Comment = async ({ articleId }: { articleId: number }) => {
