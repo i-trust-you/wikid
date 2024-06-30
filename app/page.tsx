@@ -1,39 +1,40 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import React from "react";
-
 import Button from "./_components/common/Button";
 
 export default function Page() {
-	const router = useRouter();
-	const handleClick = () => {
-		alert("회원가입됐습니다");
-		router.push("/login");
-	};
-
-	const isSubmitted = "" || "" || !"";
-
 	return (
-		<div className="flex flex-col gap-[10px]">
-			<div className="w-50 relative h-10">
-				<Button href="/board" buttonStyle="outline">
-					목록으로
-				</Button>
-			</div>
-			<div className="w-50 relative h-10">
-				<Button onClick={handleClick}>회원가입</Button>
-			</div>
-			<div className="w-50 relative h-10">
-				<Button disabled={isSubmitted} buttonStyle="basic">
-					로그인
-				</Button>
-			</div>
-			<div className="w-50 relative h-10">
-				<Button href="/board" buttonStyle="cancel">
-					취소
-				</Button>
-			</div>
+		<div className="m-auto mt-8 flex w-[500px] flex-col gap-2">
+			<Button style="basic">버튼 basic</Button>
+			<Button style="outline">버튼 outline</Button>
+			<Button style="cancel">버튼 cancel</Button>
+			<Button style="basic" disabled>
+				버튼 basic disabled
+			</Button>
+			<Button style="outline" disabled>
+				버튼 outline disabled
+			</Button>
+			<Button style="cancel" disabled>
+				버튼 cancel disabled
+			</Button>
+			<Button href="" style="basic">
+				링크 basic
+			</Button>
+			<Button href="" style="outline">
+				링크 outline
+			</Button>
+			<Button href="" style="cancel">
+				링크 cancel
+			</Button>
+			<Button href="" disabled style="basic">
+				링크 basic disabled
+			</Button>
+			<Button href="" disabled style="outline">
+				링크 outline disabled
+			</Button>
+			<Button href="" disabled style="cancel">
+				링크 cancel disabled
+			</Button>
 		</div>
 	);
 }
