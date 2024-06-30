@@ -1,29 +1,49 @@
 import Image from "next/image";
 
-import Heart from "../../../../public/icons/heart.svg";
+import Button from "@/_components/common/Button";
 
-const Article = async () => {
+import HeartIcon from "../../../../public/icons/HeartIcon";
+import { getArticleData } from "../page";
+
+const Article = async ({ articleId }: { articleId: number }) => {
+	const articleData = await getArticleData(articleId);
+	const date: Date = new Date(articleData.createdAt);
+	const formattedDate: string = date.toLocaleString("ko-KR", {
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+	});
+
 	return (
-		<div className="shadow-basic flex w-[1060px] flex-col gap-4 rounded-[10px] border">
-			<div className="flex w-[1000px] flex-col">
-				<div className="flex justify-between">
-					<h1>게시물 제목입니다.</h1>
-					<div className="flex justify-between gap-[14px]">
-						<button>수정하기</button>
-						<button>삭제하기</button>
+		<div className="w-[335px] rounded-[10px] py-5 shadow-basic tablet:w-[624px] tablet:py-10 desktop:w-[1060px]">
+			<div className="m-auto flex w-[295px] flex-col tablet:w-[564px] tablet:gap-3 desktop:w-[1000px]">
+				<div className="flex flex-col justify-between gap-[14px]">
+					<div className="flex justify-between">
+						<h1 className="text-2xl font-semibold text-gray-500 tablet:text-3xl">{articleData.title}</h1>
+						<div className="flex gap-3 desktop:gap-[14px]">
+							{/* // TODO: 모바일 일때는 이미지로 변경 - 편집: 22, 삭제: 24*/}
+							<div className="tablet:h-[45px] tablet:w-[120px] desktop:w-[140px]">
+								<Button>수정하기</Button>
+							</div>
+							<div className="tablet:h-[45px] tablet:w-[120px] desktop:w-[140px]">
+								<Button>삭제하기</Button>
+							</div>
+						</div>
+					</div>
+					<div className="flex justify-between">
+						<div className="flex gap-[10px] text-xs text-gray-400 tablet:text-md">
+							<span>{articleData.writer.name}</span>
+							<span>{formattedDate}</span>
+						</div>
+						<div className="flex h-[18px] items-center gap-1 text-xs font-normal text-gray-400 tablet:h-6 tablet:text-md">
+							{/* // TODO: 이미지가 일그러짐, 기기 크기에 따른 사이즈 변화 필요, 클릭시 카운트 업  */}
+							<HeartIcon height="16" width="16" />
+							<span>{articleData.likeCount}</span>
+						</div>
 					</div>
 				</div>
-				<div className="flex justify-between">
-					<div className="flex gap-[10px]">
-						<span>이름</span>
-						<span>날짜</span>
-					</div>
-					<div className="flex items-center gap-[2px]">
-						<Image src={Heart} className="h-[18px] w-[18px]" alt="좋아요 버튼" />
-						<span>좋아요 count</span>
-					</div>
-				</div>
-				<Image src={Heart} alt="이미지 받아오기" height={300} width={500} />
+				<Image src={articleData.image} width={500} height={300} alt="게시글 사진" />
+				<div className="text-md font-normal text-gray-500 tablet:text-lg">{articleData.content}</div>
 			</div>
 		</div>
 	);
