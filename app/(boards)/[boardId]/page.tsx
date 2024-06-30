@@ -1,33 +1,39 @@
-"use client";
+import API from "@/_api";
+import React from "react";
 
-import { useState } from "react";
+import Button from "@/_components/common/Button";
 
 import Article from "./components/Article";
 import Comment from "./components/Comment";
 
 interface paramsProps {
-	params: { id: string };
+	params: { articleId: number };
 }
 
-const BoardDetail = ({ params: { id } }: paramsProps) => {
-	const [commentCount, setCommentsCount] = useState(0);
+// TODO: articleId 동적으로 받아오게끔
+export const getArticleData = async (articleId: number) => {
+	const res = await API["{teamId}/articles/{articleId}"].GET({ teamId: "6-11", articleId: 16 });
+	return res;
+};
+
+export const getCommentData = async (articleId: number) => {
+	const res = await API["{teamId}/articles/{articleId}/comments"].GET({ articleId: 14, limit: 4 });
+	return res.list;
+};
+
+const BoardPage = async ({ params: { articleId } }: paramsProps) => {
 	return (
-		<div className="m-auto flex w-[1060px] flex-col gap-5">
-			<Article />
-
-			<div className="relative flex h-[45px] w-[140ox] justify-center">버튼</div>
-
-			<div className="flex flex-col gap-2">
-				<div className="text-2lg font-semibold text-gray-500">
-					댓글 <span className="text-primary-200">{commentCount}</span>
-				</div>
-				{/* <Form /> */}
-				Form 컴포넌트
+		<div className="m-auto flex w-[335px] flex-col items-center gap-10 tablet:w-[624px] desktop:w-[1060px]">
+			<Article articleId={articleId} />
+			<div className="h-[45px] w-[140px]">
+				<Button href="boards" style="outline">
+					목록으로
+				</Button>
 			</div>
 
-			<Comment />
+			<Comment articleId={articleId} />
 		</div>
 	);
 };
 
-export default BoardDetail;
+export default BoardPage;
