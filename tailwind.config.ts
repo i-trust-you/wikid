@@ -43,7 +43,7 @@ export default {
 			yellow: "#FDD181",
 		},
 		boxShadow: {
-			basic: '0px 4px 20px 0px rgba(0, 0, 0, 0.14)',
+			basic: '0px 4px 20px 0px rgba(0, 0, 0, 0.08)',
 		}
 	},
 };
