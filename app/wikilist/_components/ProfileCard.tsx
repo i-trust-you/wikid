@@ -1,3 +1,4 @@
+import WikiLink from "@/wikilist/_components/WikiLink";
 import Image from "next/image";
 
 type ProfileCardProps = {
@@ -26,7 +27,7 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
 				alt="프로필 사진"
 				className="h-[60px] rounded-full object-cover tablet:h-[85px] tablet:w-[85px]"
 			/>
-			<div className="ml-5 flex grow flex-col gap-[14px] tablet:flex-row tablet:items-end">
+			<div className="ml-5 flex min-h-[94px] grow flex-col justify-between gap-[14px] tablet:h-[94px] tablet:min-h-[auto] tablet:flex-row tablet:items-start">
 				<div>
 					<h3 className="mb-[10px] text-2xl font-semibold text-gray-500 tablet:mb-[14px]">{name}</h3>
 					<p className="text-md font-normal text-gray-400">
@@ -35,8 +36,9 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
 					</p>
 					<p className="text-md font-normal text-gray-400">{job}</p>
 				</div>
-				{/* TODO: url을 Backlink 컴포넌트로 변경 */}
-				<div className="grow text-right">{code}</div>
+				<div className="flex h-full items-end">
+					<WikiLink code={code} />
+				</div>
 			</div>
 		</div>
 	);
