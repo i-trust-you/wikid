@@ -31,9 +31,10 @@ export default function Page() {
 
 	useEffect(() => {
 		const getProfiles = async (keyword: string) => {
-			const response = await API["{teamId}/profiles"].GET({ teamId: "6-11", page: 1, pageSize: 3, name: keyword });
-			setTotalProfiles(response.totalCount);
-			setProfiles(response.list);
+			await API["{teamId}/profiles"].GET({ teamId: "6-11", page: 1, pageSize: 3, name: keyword }).then((response) => {
+				setTotalProfiles(response.totalCount);
+				setProfiles(response.list);
+			});
 		};
 
 		if (name !== "") {
