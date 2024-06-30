@@ -3,7 +3,12 @@ import "./globals.css";
 export default function Layout({ children }: Readonly<React.PropsWithChildren>) {
 	return (
 		<html lang="ko">
-			<body>{children}</body>
+			<body>
+				{children}
+				<div id="toast" />
+				<div id="alert" />
+				<div id="modal" />
+			</body>
 		</html>
 	);
 }
