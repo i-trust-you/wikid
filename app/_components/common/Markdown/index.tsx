@@ -146,9 +146,10 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 							></textarea>
 						</Switch.Case>
 						<Switch.Case of="viewer">
-							<div className="h-full min-h-[100px] w-full rounded-[10px] border border-gray-300 px-[10px] py-[10px] text-lg font-normal text-gray-500">
-								{Parser.run(Scanner.run(data)).parse()}
-							</div>
+							<div
+								className="h-full min-h-[100px] w-full rounded-[10px] border border-gray-300 px-[10px] py-[10px] text-lg font-normal text-gray-500"
+								dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(data)).parse() }}
+							/>
 						</Switch.Case>
 					</div>
 				</div>

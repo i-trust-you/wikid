@@ -1,7 +1,7 @@
 import Scanner, { Token } from "./scanner";
 
 abstract class AST {
-	public abstract parse(): JSX.Element;
+	public abstract parse(): string;
 }
 
 abstract class Branch extends AST {
@@ -31,7 +31,7 @@ abstract class Leaf<T> extends AST {
 //
 class BREAK extends Leaf<never> {
 	override parse() {
-		return <br />;
+		return "<br />";
 	}
 }
 //
@@ -39,67 +39,43 @@ class BREAK extends Leaf<never> {
 //
 class H1 extends Branch {
 	override parse() {
-		return (
-			<h1 className="border-b border-gray-200 pb-[8px] text-xl tablet:text-2xl pt-[32px] tablet:pt-[64px] first-of-type:pt-0">
-				{this.children.map((child) => child.parse())}
-			</h1>
-		);
+		return `<h1>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</h1>`;
 	}
 }
 
 class H2 extends Branch {
 	override parse() {
-		return (
-			<h2 className="border-b border-gray-200 pb-[8px] text-xl tablet:text-2xl pt-[32px] tablet:pt-[64px] first-of-type:pt-0">
-				{this.children.map((child) => child.parse())}
-			</h2>
-		);
+		return `<h2>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</h2>`;
 	}
 }
 
 class H3 extends Branch {
 	override parse() {
-		return (
-			<h3 className="border-b border-gray-200 pb-[8px] text-xl tablet:text-2xl pt-[32px] tablet:pt-[64px] first-of-type:pt-0">
-				{this.children.map((child) => child.parse())}
-			</h3>
-		);
+		return `<h3>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</h3>`;
 	}
 }
 
 class H4 extends Branch {
 	override parse() {
-		return (
-			<h4 className="border-b border-gray-200 pb-[8px] text-xl tablet:text-2xl pt-[32px] tablet:pt-[64px] first-of-type:pt-0">
-				{this.children.map((child) => child.parse())}
-			</h4>
-		);
+		return `<h4>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</h4>`;
 	}
 }
 
 class H5 extends Branch {
 	override parse() {
-		return (
-			<h5 className="border-b border-gray-200 pb-[8px] text-xl tablet:text-2xl pt-[32px] tablet:pt-[64px] first-of-type:pt-0">
-				{this.children.map((child) => child.parse())}
-			</h5>
-		);
+		return `<h5>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</h5>`;
 	}
 }
 
 class H6 extends Branch {
 	override parse() {
-		return (
-			<h6 className="border-b border-gray-200 pb-[8px] text-xl tablet:text-2xl pt-[32px] tablet:pt-[64px] first-of-type:pt-0">
-				{this.children.map((child) => child.parse())}
-			</h6>
-		);
+		return `<h6>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</h6>`;
 	}
 }
 
 class HR extends Branch {
 	override parse() {
-		return <hr />;
+		return "<hr />";
 	}
 }
 //
@@ -107,25 +83,25 @@ class HR extends Branch {
 //
 class BQ extends Branch {
 	override parse() {
-		return <blockquote className="border-l-[5px] border-gray-500 pl-[20px]">{this.children.map((child) => child.parse())}</blockquote>;
+		return `<blockquote>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</blockquote>`;
 	}
 }
 
 class OL extends Branch {
 	override parse() {
-		return <ol>{this.children.map((child) => child.parse())}</ol>;
+		return `<ol>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</ol>`;
 	}
 }
 
 class UL extends Branch {
 	override parse() {
-		return <ul>{this.children.map((child) => child.parse())}</ul>;
+		return `<ul>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</ul>`;
 	}
 }
 
 class LI extends Branch {
 	override parse() {
-		return <li>{this.children.map((child) => child.parse())}</li>;
+		return `<li>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</li>`;
 	}
 }
 //
@@ -133,12 +109,12 @@ class LI extends Branch {
 //
 class TEXT extends Leaf<{ value: string; bold?: boolean; italic?: boolean; underline?: boolean; strikethrough?: boolean }> {
 	override parse() {
-		let buffer = <>{this.data.value}</>;
+		let buffer = this.data.value;
 
-		if (this.data.bold) buffer = <strong>{buffer}</strong>;
-		if (this.data.italic) buffer = <i>{buffer}</i>;
-		if (this.data.underline) buffer = <u>{buffer}</u>;
-		if (this.data.strikethrough) buffer = <s>{buffer}</s>;
+		if (this.data.bold) buffer = `<strong>${buffer}</strong>`;
+		if (this.data.italic) buffer = `<i>${buffer}</i>`;
+		if (this.data.underline) buffer = `<u>${buffer}</u>`;
+		if (this.data.strikethrough) buffer = `<s>${buffer}</s>`;
 
 		return buffer;
 	}
@@ -147,9 +123,9 @@ class TEXT extends Leaf<{ value: string; bold?: boolean; italic?: boolean; under
 class CHECKBOX extends Leaf<boolean> {
 	override parse() {
 		if (!this.data) {
-			return <input type="checkbox" readOnly />;
+			return '<input type="checkbox" readOnly />';
 		} else {
-			return <input type="checkbox" checked readOnly/>;
+			return '<input type="checkbox" checked readOnly />';
 		}
 	}
 }
@@ -158,7 +134,7 @@ export default class Parser {
 	public static run(tokens: ReturnType<typeof Scanner.run>) {
 		const origin = new (class ROOT extends Branch {
 			override parse() {
-				return <article className="text-md font-normal text-gray-500 tablet:text-lg">{this.children.map((child) => child.parse())}</article>;
+				return `<article class="md text-md font-normal text-gray-500 tablet:text-lg">${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</article>`;
 			}
 		})(null as never);
 
