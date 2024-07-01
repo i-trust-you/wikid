@@ -92,7 +92,16 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 				inline(Token.UNDERLINE);
 				break;
 			}
+			case "ol": {
+				stack(Token.OL);
+				break;
+			}
+			case "ul": {
+				stack(Token.UL);
+				break;
+			}
 		}
+
 		input.current.focus();
 		setData(input.current.value);
 	}, []);
@@ -146,12 +155,12 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
 										<AlignRightIcon width="25" height="25" />
 									</button> */}
-									{/* <button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
+									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("ul")}>
 										<BulletIcon width="25" height="25" />
 									</button>
-									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
+									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("ol")}>
 										<NumberingIcon width="25" height="25" />
-									</button> */}
+									</button>
 								</div>
 							</div>
 						</Switch.Case>
