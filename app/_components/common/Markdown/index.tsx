@@ -45,6 +45,25 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 			}
 		}
 
+		function stack(token: Token) {
+			let insert = false;
+
+			test: for (let i = 0; i < token.grammar.length; i++) {
+				if (token.grammar[token.grammar.length - i - 1] !== text[start - i - 1]) {
+					insert = true;
+					break test;
+				}
+			}
+
+			if (insert) {
+				input.current!!.value = text.slice(0, start) + token.grammar + text.slice(start);
+				input.current!!.setSelectionRange(start + token.grammar.length, end + token.grammar.length);
+			} else {
+				input.current!!.value = text.slice(0, start - token.grammar.length) + text.slice(start);
+				input.current!!.setSelectionRange(start - token.grammar.length, end - token.grammar.length);
+			}
+		}
+
 		switch (type) {
 			case "bold": {
 				inline(Token.BOLD);
@@ -58,7 +77,16 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 				inline(Token.UNDERLINE);
 				break;
 			}
+			case "ol": {
+				stack(Token.OL);
+				break;
+			}
+			case "ul": {
+				stack(Token.UL);
+				break;
+			}
 		}
+
 		input.current.focus();
 		setData(input.current.value);
 	}, []);
@@ -112,12 +140,12 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
 										<AlignRightIcon width="25" height="25" />
 									</button> */}
-									{/* <button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
+									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("ul")}>
 										<BulletIcon width="25" height="25" />
 									</button>
-									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
+									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("ol")}>
 										<NumberingIcon width="25" height="25" />
-									</button> */}
+									</button>
 								</div>
 							</div>
 						</Switch.Case>
