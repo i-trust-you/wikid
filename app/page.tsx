@@ -1,46 +1,60 @@
-import Popover from "@/_components/general/Popover";
+"use client";
+
+import Markdown from "@/_components/common/Markdown";
+
+const test = `
+# ???
+
+˚∧＿∧   +        —̳͟͞͞💗
+(  •‿• )つ  —̳͟͞͞ 💗         —̳͟͞͞💗 +
+(つ　 <                —̳͟͞͞💗
+ | _つ      +  —̳͟͞͞💗         —̳͟͞͞💗 ˚
+\`し\´
+
+[x] 눌러주세요
+
+- A
+- B
+	- C
+	- D
+		- E
+		- F
+		[x] <== 눌러주세요
+	[x] <== 눌러주세요
+[x] <== 눌러주세요
+
+# 01. 개요
+
+코드잇의 콘텐츠 프로듀서이자, 프론트엔드 엔지니어. 포도마켓의 프론트엔드 엔지니어 출신이다.
+
+# 02. 취미
+
+식물을 키우는 것을 좋아한다. 바질이나 로즈마리 같은 허브류부터, 파, 당근 같은 채소류까지 다양하게 키우는 것으로 알려져 있다. 이렇게 키운 식물들을 직접 요리에 활용하기도 한다는데, 실제로 집에 방문한 사람들에 의하면 요리 실력 또한 상당하다고 한다.
+
+이렇게 키운 식물들을 직접 요리에 활용하기도 한다는데, 실제로 집에 방문한 사람들에 의하면 요리 실력 또한 상당하다고 한다.
+
+> 여기는 Block Quote를 나타내는 영역이에요.
+> 이런 식으로 텍스트가 늘어나면 영역도 같이 늘어나게 됩니다.
+
+# 03. 여담
+
+걸어다니는 사전이라고 불릴 정도로 다양한 분야의 지식을 두루 소유하고 있다. 특히 새로운 서비스 출시 관련 소식을 아주 잘 알고 있는데, 얘기를 들어보면 다양하게 구독하고 있는 뉴스레터들이 큰 도움을 준다고 한다.
+
+# 04. 취향
+
+가위바위보를 좋아한다. 후식을 먹는다거나, 점심에 추가 금액을 내야 한다거나, 편의점에서 뭘 사 와야 하는 경우, 거의 항상 가위바위보를 제안한다. 제안을 많이 하다 보니 자신이 걸리는 경우도 꽤 많은데, 크게 개의치 않아 하는 것 같다.
+
+영국에서 살았던 영향인지, 근본을 중시하는 것으로 보인다. 예를 들어 피자는 근본 토핑으로만 이루어진 피자(치즈 피자, 페퍼로니 피자)를 가장 선호한다. 근본에 어울리지 않는 토핑(불고기, 파인애플, 새우 등)이 추가된 피자는 선호하지 않는다.
+`;
 
 export default function Page() {
-	const overlay = (
-		<div className="flex w-[120px] flex-col items-center border border-red-200 bg-white shadow-lg">
-			<div>위키목록</div>
-			<div>자유게시판</div>
-			<div>알림</div>
-			<div>마이페이지</div>
-		</div>
-	);
 	return (
-		<main className="flex h-screen flex-col items-center justify-center gap-[10px]">
-			<Popover gap={5} trigger="click" position="top-right-top-left" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="top-right-bottom-left" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="bottom-right-top-left" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="bottom-right-bottom-left" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="top-left-top-right" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="top-left-bottom-right" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="bottom-left-top-right" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="bottom-left-bottom-right" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="top-left-bottom-left" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="top-right-bottom-right" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
+		<main className="flex justify-center px-[10px] py-[10px]">
+			<div className="w-[800px]">
+				<Markdown>
+					{test}
+				</Markdown>
+			</div>
 		</main>
 	);
 }
