@@ -6,8 +6,10 @@ import { useEffect, useState } from "react";
 
 import ExpandedMenu from "@/_components/common/Header/ExpandedMenu";
 
+import Alarm from "../../../../public/icons/Alarm";
 import Logo from "../../../../public/icons/Logo";
 import MenuIcon from "../../../../public/icons/MenuIcon";
+import Profile from "../../../../public/icons/Profile";
 
 interface HeaderProps {
 	loggedIn: boolean;
@@ -75,8 +77,8 @@ const Header: React.FC<HeaderProps> = ({ loggedIn }) => {
 				) : (
 					<>
 						<li className="ml-auto hidden items-center gap-[24px] tablet:flex">
-							<Image src="/public/icons/alarm.svg" alt="알림" width={32} height={32} />
-							<Image src="/public/icons/profile.svg" alt="프로필" width={32} height={32} />
+							<Alarm height="32" width="32" />
+							<Profile height="32" width="32" />
 						</li>
 						<li onClick={handleExpandedMenu} className="ml-auto inline-block cursor-pointer tablet:hidden">
 							<MenuIcon width="24" height="24" />
