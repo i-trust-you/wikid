@@ -89,34 +89,34 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 								</div>
 								<div className="mx-[10px] flex items-center gap-[3.5px]">
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("bold")}>
-										<BoldIcon width={25} height={25} />
+										<BoldIcon width="25" height="25" />
 									</button>
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("italic")}>
-										<ItalicIcon width={25} height={25} />
+										<ItalicIcon width="25" height="25" />
 									</button>
 									<button
 										className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300"
 										onClick={() => style("underline")}
 									>
-										<UnderlineIcon width={25} height={25} />
+										<UnderlineIcon width="25" height="25" />
 									</button>
 									{/* <button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<ColoringIcon width={25} height={25} />
+										<ColoringIcon width="25" height="25" />
 									</button>
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<AlignLeftIcon width={25} height={25} />
+										<AlignLeftIcon width="25" height="25" />
 									</button>
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<AlignCenterIcon width={25} height={25} />
+										<AlignCenterIcon width="25" height="25" />
 									</button>
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<AlignRightIcon width={25} height={25} />
+										<AlignRightIcon width="25" height="25" />
 									</button> */}
 									{/* <button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<BulletIcon width={25} height={25} />
+										<BulletIcon width="25" height="25" />
 									</button>
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<NumberingIcon width={25} height={25} />
+										<NumberingIcon width="25" height="25" />
 									</button> */}
 								</div>
 							</div>
