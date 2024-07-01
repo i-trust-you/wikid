@@ -38,7 +38,7 @@ function Overlay(props: Readonly<React.PropsWithChildren>) {
 
 	useEffect(() => {
 		clearTimeout(timeout);
-		self.current?.style.setProperty("transform", "translateY(100px)");
+		setTimeout(() => self.current?.style.setProperty("transform", "translateY(100px)"))
 		timeout = setTimeout(() => self.current?.style.setProperty("transform", "translateY(-100px)"), 1000);
 	}, [props]);
 
