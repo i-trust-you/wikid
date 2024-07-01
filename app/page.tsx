@@ -38,7 +38,13 @@ export default function Page() {
 							</div>
 						</div>
 						<div className="h-[250px] w-[192px] shrink-0 tablet:h-[479px] tablet:w-[365px] desktop:h-[681px] desktop:w-[520px]">
-							<Image src="/images/promotion.png" width={681} height={510} alt="프로모션 이미지" className="h-[250px] w-[192px] shrink-0 tablet:h-[479px] tablet:w-[365px] desktop:h-[681px] desktop:w-[520px]"/>
+							<Image
+								src="/images/promotion.png"
+								width={681}
+								height={510}
+								alt="프로모션 이미지"
+								className="h-[250px] w-[192px] shrink-0 tablet:h-[479px] tablet:w-[365px] desktop:h-[681px] desktop:w-[520px]"
+							/>
 						</div>
 					</div>
 				</section>
@@ -82,13 +88,14 @@ export default function Page() {
 							친구들이 달아준 <br /> 내용을 확인해 봐요
 						</p>
 						<div className="mt-[40px] flex flex-col gap-[10px] tablet:mt-[80px] tablet:gap-[22px] desktop:mt-[120px] desktop:gap-[40px]">
-							<Image src="/images/review.png"  alt="자기소개 이미지"  layout="fill" objectFit="contain"/>
+							<Image src="/images/review.png" alt="자기소개 이미지" layout="fill" objectFit="contain" />
 							<div className="flex justify-between gap-[10px] tablet:gap-[22px] desktop:gap-[40px]">
 								<Image
 									className="w-[102px] rounded-[10px] bg-purple tablet:w-[198px] tablet:rounded-[20px] desktop:w-[280px]"
 									src="/images/bell.png"
 									alt="종 이미지"
-									layout="fill" objectFit="contain"
+									layout="fill"
+									objectFit="contain"
 								/>
 								<Image src="/images/alarm.png" className="w-[223px] tablet:w-[428px] desktop:w-[604px]" alt="알림 이미지" layout="fill" objectFit="contain" />
 							</div>
