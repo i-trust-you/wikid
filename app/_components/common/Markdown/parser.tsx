@@ -39,37 +39,37 @@ class BREAK extends Leaf<never> {
 //
 class H1 extends Branch {
 	override parse() {
-		return `<h1>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</h1>`;
+		return `<h1>${this.children.map((child) => child.parse()).join("")}</h1>`;
 	}
 }
 
 class H2 extends Branch {
 	override parse() {
-		return `<h2>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</h2>`;
+		return `<h2>${this.children.map((child) => child.parse()).join("")}</h2>`;
 	}
 }
 
 class H3 extends Branch {
 	override parse() {
-		return `<h3>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</h3>`;
+		return `<h3>${this.children.map((child) => child.parse()).join("")}</h3>`;
 	}
 }
 
 class H4 extends Branch {
 	override parse() {
-		return `<h4>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</h4>`;
+		return `<h4>${this.children.map((child) => child.parse()).join("")}</h4>`;
 	}
 }
 
 class H5 extends Branch {
 	override parse() {
-		return `<h5>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</h5>`;
+		return `<h5>${this.children.map((child) => child.parse()).join("")}</h5>`;
 	}
 }
 
 class H6 extends Branch {
 	override parse() {
-		return `<h6>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</h6>`;
+		return `<h6>${this.children.map((child) => child.parse()).join("")}</h6>`;
 	}
 }
 
@@ -83,25 +83,25 @@ class HR extends Branch {
 //
 class BQ extends Branch {
 	override parse() {
-		return `<blockquote>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</blockquote>`;
+		return `<blockquote>${this.children.map((child) => child.parse()).join("")}</blockquote>`;
 	}
 }
 
 class OL extends Branch {
 	override parse() {
-		return `<ol>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</ol>`;
+		return `<ol>${this.children.map((child) => child.parse()).join("")}</ol>`;
 	}
 }
 
 class UL extends Branch {
 	override parse() {
-		return `<ul>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</ul>`;
+		return `<ul>${this.children.map((child) => child.parse()).join("")}</ul>`;
 	}
 }
 
 class LI extends Branch {
 	override parse() {
-		return `<li>${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</li>`;
+		return `<li>${this.children.map((child) => child.parse()).join("")}</li>`;
 	}
 }
 //
@@ -134,7 +134,7 @@ export default class Parser {
 	public static run(tokens: ReturnType<typeof Scanner.run>) {
 		const origin = new (class ROOT extends Branch {
 			override parse() {
-				return `<article class="md text-md font-normal text-gray-500 tablet:text-lg">${this.children.map((child) => child.parse()).reduce((prev, cur) => prev + cur, "")}</article>`;
+				return `<article class="md text-md font-normal text-gray-500 tablet:text-lg">${this.children.map((child) => child.parse()).join("")}</article>`;
 			}
 		})(null as never);
 
