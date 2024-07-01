@@ -45,25 +45,6 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 			}
 		}
 
-		function stack(token: Token) {
-			let insert = false;
-
-			test: for (let i = 0; i < token.grammar.length; i++) {
-				if (token.grammar[token.grammar.length - i - 1] !== text[start - i - 1]) {
-					insert = true;
-					break test;
-				}
-			}
-
-			if (insert) {
-				input.current!!.value = text.slice(0, start) + token.grammar + text.slice(start);
-				input.current!!.setSelectionRange(start + token.grammar.length, end + token.grammar.length);
-			} else {
-				input.current!!.value = text.slice(0, start - token.grammar.length) + text.slice(start);
-				input.current!!.setSelectionRange(start - token.grammar.length, end - token.grammar.length);
-			}
-		}
-
 		switch (type) {
 			case "bold": {
 				inline(Token.BOLD);
@@ -77,16 +58,7 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 				inline(Token.UNDERLINE);
 				break;
 			}
-			case "ol": {
-				stack(Token.OL);
-				break;
-			}
-			case "ul": {
-				stack(Token.UL);
-				break;
-			}
 		}
-
 		input.current.focus();
 		setData(input.current.value);
 	}, []);
@@ -117,35 +89,35 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 								</div>
 								<div className="mx-[10px] flex items-center gap-[3.5px]">
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("bold")}>
-										<BoldIcon width="25" height="25" />
+										<BoldIcon width={25} height={25} />
 									</button>
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("italic")}>
-										<ItalicIcon width="25" height="25" />
+										<ItalicIcon width={25} height={25} />
 									</button>
 									<button
 										className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300"
 										onClick={() => style("underline")}
 									>
-										<UnderlineIcon width="25" height="25" />
+										<UnderlineIcon width={25} height={25} />
 									</button>
 									{/* <button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<ColoringIcon width="25" height="25" />
+										<ColoringIcon width={25} height={25} />
 									</button>
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<AlignLeftIcon width="25" height="25" />
+										<AlignLeftIcon width={25} height={25} />
 									</button>
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<AlignCenterIcon width="25" height="25" />
+										<AlignCenterIcon width={25} height={25} />
 									</button>
 									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<AlignRightIcon width="25" height="25" />
+										<AlignRightIcon width={25} height={25} />
 									</button> */}
-									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("ul")}>
-										<BulletIcon width="25" height="25" />
+									{/* <button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
+										<BulletIcon width={25} height={25} />
 									</button>
-									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("ol")}>
-										<NumberingIcon width="25" height="25" />
-									</button>
+									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
+										<NumberingIcon width={25} height={25} />
+									</button> */}
 								</div>
 							</div>
 						</Switch.Case>
@@ -174,10 +146,9 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 							></textarea>
 						</Switch.Case>
 						<Switch.Case of="viewer">
-							<div
-								className="h-full min-h-[100px] w-full rounded-[10px] border border-gray-300 px-[10px] py-[10px] text-lg font-normal text-gray-500"
-								dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(data)).parse() }}
-							/>
+							<div className="h-full min-h-[100px] w-full rounded-[10px] border border-gray-300 px-[10px] py-[10px] text-lg font-normal text-gray-500">
+								{Parser.run(Scanner.run(data)).parse()}
+							</div>
 						</Switch.Case>
 					</div>
 				</div>
