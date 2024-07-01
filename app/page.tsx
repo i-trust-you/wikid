@@ -1,51 +1,35 @@
 "use client";
 
-import Form from "@/_components/general/Form";
+import useCrossState from "@/_hooks/useCrossState";
+import useLocalStorage from "@/_hooks/useLocalStorage";
 
 export default function Page() {
+	// test uselocalstorage (localstorage)
+	const [a, setA] = useLocalStorage("test", 0);
+	const [b, setB] = useLocalStorage("test", 0);
+	const [c, setC] = useLocalStorage("test", 0);
+	// test usecrossstate (memory)
+	const [d, setD] = useCrossState("idk", 0);
+	const [e, setE] = useCrossState("idk", 0);
+	const [f, setF] = useCrossState("idk", 0);
+
 	return (
-		<div className="flex h-screen w-screen items-center justify-center">
-			<Form onSubmit={(data) => console.log(data)}>
-				<div className="flex flex-col gap-[24px]">
-					<div className="flex flex-col gap-[10px]">
-						<Form.Label for="email">이메일</Form.Label>
-						<Form.Input.Text id="email" required={{ value: true, message: "이메일을 입력해주세요" }} />
-						<Form.Error for="email" />
-					</div>
-					<div className="flex flex-col gap-[10px]">
-						<Form.Label for="password">비밀번호</Form.Label>
-						<Form.Input.Text id="password" pattern={{ value: /^[\d\D]{3}$/, message: "ㅇ" }} required={{ value: true, message: "비밀번호를 입력해주세요" }} />
-						<Form.Error for="password" />
-					</div>
-					<div className="flex flex-col gap-[10px]">
-						<Form.Label for="confirmPassword">비밀번호 확인</Form.Label>
-						<Form.Input.Text
-							id="confirmPassword"
-							sync={{ value: "password", message: "비밀번호가 일치하지 않습니다" }}
-							required={{ value: true, message: "비밀번호를 다시 한번 입력해주세요" }}
-						/>
-						<Form.Error for="confirmPassword" />
-					</div>
-					<div className="flex flex-col gap-[10px]">
-						<Form.Input.Select id="test1" required={{ value: true, message: "ㅇㅇ을 입력해주세요" }}>
-							{new Array(5).fill(null).map((_, index) => index.toString())}
-						</Form.Input.Select>
-						<Form.Error for="test1" />
-					</div>
-					<div className="flex flex-col gap-[10px]">
-						<Form.Input.Select id="test2" sync={{ value: "test1", message: "ㅇㅇ 가 일치하지 않습니다" }} required={{ value: true, message: "ㅇㅇ을 입력해주세요" }}>
-							{new Array(5).fill(null).map((_, index) => index.toString())}
-						</Form.Input.Select>
-						<Form.Error for="test2" />
-					</div>
-					<div>
-						<Form.Input.Image id="test3" required={{ value: true, message: "ㅇㅇ을 입력해주세요" }}/>
-					</div>
-					<Form.Submit>
-						어쩌라고
-					</Form.Submit>
-				</div>
-			</Form>
-		</div>
+		<main className="flex flex-col items-center">
+			<button onClick={() => setA((_) => _ + 1)}>ㅇㅇ</button>
+			<button onClick={() => setB((_) => _ + 1)}>ㅇㅇ</button>
+			<button onClick={() => setC((_) => _ + 1)}>ㅇㅇ</button>
+			<hr />
+			<div>{a}</div>
+			<div>{b}</div>
+			<div>{c}</div>
+			<hr />
+			<button onClick={() => setD((_) => _ + 1)}>ㅇㅇ</button>
+			<button onClick={() => setE((_) => _ + 1)}>ㅇㅇ</button>
+			<button onClick={() => setF((_) => _ + 1)}>ㅇㅇ</button>
+			<hr />
+			<div>{d}</div>
+			<div>{e}</div>
+			<div>{f}</div>
+		</main>
 	);
 }

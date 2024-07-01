@@ -112,10 +112,20 @@ interface Report<T> {
 	message: string;
 }
 
-function Text(props: Readonly<{ id: string; sync?: Report<string>; pattern?: Report<RegExp>; required?: Report<boolean> }>) {
+function Text(
+	props: Readonly<{
+		id: string;
+		sync?: Report<string>;
+		pattern?: Report<RegExp>;
+		required?: Report<boolean>;
+		minlength?: Report<number>;
+		maxlength?: Report<number>;
+		placeholder?: string;
+	}>,
+) {
 	const ctx = useCTX();
 
-	const [blur, setBlur] = useState(false);
+	const [blur, setBlur] = useState(0);
 	const [value, setValue] = useState("");
 	const [error, setError] = useState(NO);
 	const [sync, setSync] = useState("");
@@ -128,18 +138,28 @@ function Text(props: Readonly<{ id: string; sync?: Report<string>; pattern?: Rep
 
 	useEffect(() => {
 		ctx.setValue(props.id, value);
+	}, [value]);
+
+	useEffect(() => {
+		if (!blur) return;
 
 		if (props.sync?.value && sync !== value) {
 			return setError(props.sync.message);
 		}
 		if (props.required?.value && value.length === 0) {
-			return setError(blur ? props.required.message : NO);
+			return setError(props.required.message);
 		}
 		if (props.pattern?.value && !props.pattern.value.test(value)) {
 			return setError(props.pattern.message);
 		}
+		if (props.minlength?.value && value.length < props.minlength.value) {
+			return setError(props.minlength.message);
+		}
+		if (props.maxlength?.value && props.maxlength.value < value.length) {
+			return setError(props.maxlength.message);
+		}
 		setError(OK);
-	}, [props, blur, error, sync, value]);
+	}, [blur, props, blur, error, sync, value]);
 
 	useEffect(() => {
 		if (props.sync?.value) setSync(ctx.values[props.sync.value] as string);
@@ -147,15 +167,34 @@ function Text(props: Readonly<{ id: string; sync?: Report<string>; pattern?: Rep
 
 	useEffect(() => {
 		ctx.setError(props.id, error);
+
+		switch (error) {
+			case OK: {
+				self.current?.style.setProperty("border-color", "#4CBFA4");
+				break;
+			}
+			case NO: {
+				break;
+			}
+			default: {
+				self.current?.style.setProperty("border-color", "#D14343");
+				break;
+			}
+		}
 	}, [error]);
+
+	const self = useRef<HTMLInputElement>(null);
 
 	return (
 		<input
+			ref={self}
 			id={props.id}
-			onBlur={() => setBlur(true)}
-			placeholder={props.required?.message}
+			onBlur={() => setBlur((_) => _ + 1)}
+			placeholder={props.placeholder ?? props.required?.message}
+			// @ts-ignore
+			onPaste={(event) => setValue(event.target.value)}
 			onChange={(event) => setValue(event.target.value)}
-			className="rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal text-gray-500 outline-none placeholder:text-gray-400"
+			className="w-[335px] rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal text-gray-500 outline-none placeholder:text-gray-400 tablet:w-[400px]"
 		/>
 	);
 }
@@ -246,8 +285,8 @@ function Select(props: Readonly<{ id: string; sync?: Report<string>; required?: 
 		<Dropdown options={props.children.map((value) => ({ value: value, content: value }))} onSelect={(value, content) => setValue(value)}>
 			<div className="relative">
 				<Dropdown.Trigger>
-					<div className="w-full rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal text-gray-500 outline-none placeholder:text-gray-400">
-						{0 < value.length ? <Dropdown.Current /> : props.required?.message ?? "..."}
+					<div className="w-full rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal" style={{ borderColor: 0 < value.length && "#4CBFA4" }}>
+						{0 < value.length ? <div className="text-gray-500"><Dropdown.Current /></div> : <div className="text-gray-400">{props.required?.message ?? "..."}</div>}
 					</div>
 				</Dropdown.Trigger>
 				<div className="absolute z-20 mt-[5px] w-full overflow-hidden rounded-[10px]">
@@ -271,7 +310,7 @@ Form.Submit = function Submit(props: Readonly<React.PropsWithChildren>) {
 		<button
 			type="submit"
 			disabled={ctx.disabled}
-			className="rounded-[10px] bg-primary-200 px-[20px] py-[8px] text-center text-md font-semibold text-white disabled:bg-gray-500"
+			className="h-full w-full rounded-[10px] bg-primary-200 px-[20px] py-[8px] text-center text-md font-semibold text-white disabled:bg-gray-500"
 		>
 			{props.children}
 		</button>
