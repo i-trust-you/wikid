@@ -122,7 +122,7 @@ export default abstract class API {
 		}
 
 		public override GET({ teamId = "6-11", ...query }: { teamId: string; name: string; page: number; pageSize: number }) {
-			return API.GET<OffsetBasedPaginationResponse<ProfileListType>>(MIME.JSON, `${BASE_URL}/${teamId}/profiles`);
+			return API.GET<OffsetBasedPaginationResponse<ProfileListType>>(MIME.JSON, `${BASE_URL}/${teamId}/profiles?${API.query(query)}`);
 		}
 	})();
 
