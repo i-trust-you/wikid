@@ -6,23 +6,11 @@ import SearchBar from "@/wikilist/_components/SearchBar";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-type Profile = {
-	totalCount: number;
-	list: {
-		updatedAt: string;
-		job: string;
-		nationality: string;
-		city: string;
-		image: string | null;
-		code: string;
-		name: string;
-		id: number;
-	}[];
-};
+type Profile = Awaited<ReturnType<(typeof API)["{teamId}/profiles"]["GET"]>>["list"][number];
 
 export default function Page() {
 	const [name, setName] = useState<string>("");
-	const [profiles, setProfiles] = useState<Profile["list"] | undefined>();
+	const [profiles, setProfiles] = useState<Profile[]>([]);
 	const [totalProfiles, setTotalProfiles] = useState<number>(0);
 
 	const handleSearchBar = (value: string) => {
