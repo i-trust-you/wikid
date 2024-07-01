@@ -3,35 +3,57 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import ExpandedMenu from "@/_components/common/Header/ExpandedMenu";
-
-import Alarm from "../../../../public/icons/Alarm";
-import Logo from "../../../../public/icons/Logo";
-import MenuIcon from "../../../../public/icons/MenuIcon";
-import Profile from "../../../../public/icons/Profile";
+import Alarm from "../../../public/icons/Alarm";
+import Logo from "../../../public/icons/Logo";
+import MenuIcon from "../../../public/icons/MenuIcon";
+import Profile from "../../../public/icons/Profile";
 
 interface HeaderProps {
 	loggedIn: boolean;
 	alarm: number;
 }
+interface Item {
+	name: string;
+	href: string;
+}
+
+interface ItemListProps {
+	items: Item[];
+	styles?: { boxShadow: string };
+	classNames?: string;
+}
+
+const ExpandedMenu: React.FC<ItemListProps> = ({ items, styles, classNames }) => {
+	return (
+		<ul style={styles} className={`z-100 flex w-fit flex-col items-center rounded-[10px] bg-white text-md text-gray-500 ${classNames}`}>
+			{items.map((item, index) => (
+				<li className="cursor-pointer p-[10px_35px]" key={index}>
+					<Link href={item.href}>{item.name}</Link>
+				</li>
+			))}
+		</ul>
+	);
+};
 
 const Header: React.FC<HeaderProps> = ({ loggedIn, alarm }) => {
 	const [isMenuExpanded, setIsMenuExpanded] = useState(false);
 	const [alarmCount, setAlarmCount] = useState(alarm);
 
-	/** 스타일 */
-	// inline-style에 추가하는 shadow 요소
 	const customShadowStyle = {
 		boxShadow: "0 4px 20px 0 rgba(0, 0, 0, 0.05)",
 	};
 
-	/** 반응형 메뉴 */
-	// 삼발이 클릭 시 확장메뉴 제어
+	const expandedMenuList: Item[] = [
+		{ name: "위키목록", href: "/" },
+		{ name: "자유게시판", href: "/" },
+		{ name: "알림", href: "/" },
+		{ name: "마이페이지", href: "/" },
+	];
+
 	const handleExpandedMenu = () => {
 		setIsMenuExpanded((prevState) => !prevState);
 	};
 
-	// window resize 감지 -> tablet 혹은 desktop 상태일 시 확장메뉴 숨김
 	useEffect(() => {
 		const handleResize = () => {
 			if (window.innerWidth >= 768) {
@@ -45,26 +67,6 @@ const Header: React.FC<HeaderProps> = ({ loggedIn, alarm }) => {
 		};
 	}, []);
 
-	// 메뉴 요소
-	type menuList = {
-		name: string;
-		href: string;
-	}[];
-
-	const expandedMenuList: menuList = [
-		{ name: "위키목록", href: "/" },
-		{ name: "자유게시판", href: "/" },
-		{ name: "알림", href: "/" },
-		{ name: "마이페이지", href: "/" },
-	];
-
-	const profileMenuList: menuList = [
-		{ name: "계정 설정", href: "/" },
-		{ name: "내 위키", href: "/" },
-		{ name: "로그아웃", href: "/" },
-	];
-
-	/** 알림 관련 */
 	useEffect(() => {
 		setAlarmCount(alarm);
 	}, [alarm]); //알림 카운트 변경 시 리렌더링

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import Header from "@/_components/common/Header/Header";
+import Header from "@/_components/common/Header";
 
 export default function Page() {
 	const [isLogin, setIsLogin] = useState(false);
