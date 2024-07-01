@@ -15,7 +15,7 @@ const Article = async ({ articleId }: { articleId: number }) => {
 	});
 
 	return (
-		<div className="w-[335px] rounded-[10px] py-5 shadow-basic tablet:w-[624px] tablet:py-10 desktop:w-[1060px]">
+		<div className="shadow-basic w-[335px] rounded-[10px] py-5 tablet:w-[624px] tablet:py-10 desktop:w-[1060px]">
 			<div className="m-auto flex w-[295px] flex-col tablet:w-[564px] tablet:gap-3 desktop:w-[1000px]">
 				<div className="flex flex-col justify-between gap-[14px]">
 					<div className="flex justify-between">

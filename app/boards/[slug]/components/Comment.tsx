@@ -3,12 +3,20 @@ import Image from "next/image";
 import DeleteIcon from "../../../../public/icons/DeleteIcon";
 import EditIcon from "../../../../public/icons/EditIcon";
 import ProfileImage from "../../../../public/icons/profile.svg";
-import { getCommentData } from "../page";
+import { deleteComment, editComment, getCommentData } from "../page";
 import EmptyState from "./EmptyState";
 
 // TODO:무한 스크롤
 const Comment = async ({ articleId }: { articleId: number }) => {
 	const commentData = await getCommentData(articleId);
+
+	const onEdit = async () => {
+		const doEdit = await editComment();
+	};
+
+	const onDelete = async () => {
+		const doDelete = await deleteComment();
+	};
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -42,8 +50,12 @@ const Comment = async ({ articleId }: { articleId: number }) => {
 										<h3 className="text-lg font-semibold text-gray-500">{comment.writer.name}</h3>
 										<div className="flex gap-[15px] tablet:gap-5">
 											{/* TODO: 사이트 크기에 따라 버튼 크기 변경 24 24 20 */}
-											<EditIcon width="20" height="20" />
-											<DeleteIcon width="20" height="20" />
+											<button>
+												<EditIcon width="20" height="20" />
+											</button>
+											<button>
+												<DeleteIcon width="20" height="20" />
+											</button>
 										</div>
 									</div>
 									<span className="text-md font-normal text-gray-500">{comment.content}</span>
