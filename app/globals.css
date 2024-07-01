@@ -45,15 +45,3 @@
 		@apply border-l-[5px] border-gray-500 pl-[20px];
 	}
 }
-
-@font-face {
-	font-family: "NEXON Lv1 Gothic OTF";
-	src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/NEXON Lv1 Gothic OTF.woff") format("woff");
-	font-weight: normal;
-	font-style: normal;
-}
-
-.font-nexon {
-	@apply font-sans; /* Tailwind 기본 sans-serif 폰트 스타일 */
-	font-family: "NEXON Lv1 Gothic OTF", sans-serif;
-}
