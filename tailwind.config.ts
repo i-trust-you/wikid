@@ -42,5 +42,10 @@ export default {
 			purple: "#8E66FF",
 			yellow: "#FDD181",
 		},
+		extend: {
+			fontFamily: {
+				nexon: ['"NEXON Lv1 Gothic OTF"', "sans-serif"],
+			},
+		},
 	},
 };
