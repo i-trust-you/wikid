@@ -4,6 +4,7 @@ interface Option {
 	value: string;
 	content: string;
 }
+
 interface DropdownContextProps {
 	options: Option[];
 	isOpen: boolean;
@@ -23,6 +24,7 @@ const useDropdownContext = () => {
 	}
 	return context;
 };
+
 interface DropdownProps {
 	options: Option[];
 	onSelect: (value: string, content: string) => void;
@@ -38,6 +40,7 @@ export default function Dropdown({ options, onSelect, children }: DropdownProps 
 	const hideOptions = useCallback(() => {
 		setIsOpen(false);
 	}, []);
+
 	const handleSelect = useCallback((option: Option) => {
 		setSelectedOption(option);
 		onSelect(option.value, option.content);
@@ -99,6 +102,7 @@ function EventHandler({ children }: React.PropsWithChildren) {
 			document.removeEventListener("mousedown", onOutsideClick);
 		};
 	}, [isOpen]);
+
 	// 방향키로 option focus
 	const { options, handleSelect } = useDropdownContext();
 	const [focusedOptionIndex, setFocusedOptionIndex] = useState(-1);
@@ -117,15 +121,18 @@ function EventHandler({ children }: React.PropsWithChildren) {
 			);
 		}
 	};
+
 	useEffect(() => {
 		if (focusedOptionIndex >= 0 && optionsRef.current[focusedOptionIndex]) {
 			optionsRef.current[focusedOptionIndex]?.focus();
 		}
+
 		document.addEventListener("keydown", handleKeyDown);
 		return () => {
 			document.removeEventListener("keydown", handleKeyDown);
 		};
 	}, [focusedOptionIndex]);
+
 	return (
 		<>{Children.map(children, (child, index) => cloneElement(child as React.ReactElement, { ref: (el: HTMLElement) => (optionsRef.current[index] = el) }))}</>
 	);
