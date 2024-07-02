@@ -1,6 +1,7 @@
-import Image from "next/image";
 import { useEffect, useRef } from "react";
 import ReactDOM from "react-dom/client";
+
+import CheckIcon from "../../public/icons/CheckIcon";
 
 export default class Toast {
 	protected static container?: ReactDOM.Root;
@@ -38,7 +39,7 @@ function Overlay(props: Readonly<React.PropsWithChildren>) {
 
 	useEffect(() => {
 		clearTimeout(timeout);
-		setTimeout(() => self.current?.style.setProperty("transform", "translateY(100px)"))
+		setTimeout(() => self.current?.style.setProperty("transform", "translateY(100px)"));
 		timeout = setTimeout(() => self.current?.style.setProperty("transform", "translateY(-100px)"), 1000);
 	}, [props]);
 
@@ -52,7 +53,7 @@ function Overlay(props: Readonly<React.PropsWithChildren>) {
 Overlay.Info = function Info(props: Readonly<{ message: string }>) {
 	return (
 		<div className="flex h-[50px] gap-[15px] rounded-[10px] border border-purple bg-gray-100 px-[20px] py-[13px] text-md font-semibold text-purple">
-			<Image src="icons/check.svg" alt="icon" width={20} height={20} />
+			<CheckIcon width="20" height="20" color="#8e66ff" />
 			{props.message}
 		</div>
 	);
@@ -61,7 +62,7 @@ Overlay.Info = function Info(props: Readonly<{ message: string }>) {
 Overlay.Error = function Error(props: Readonly<{ message: string }>) {
 	return (
 		<div className="flex h-[50px] gap-[15px] rounded-[10px] border border-red-200 bg-red-100 px-[20px] py-[13px] text-md font-semibold text-red-200">
-			<Image src="icons/check.svg" alt="icon" width={20} height={20} />
+			<CheckIcon width="20" height="20" color="#d14343" />
 			{props.message}
 		</div>
 	);
@@ -70,7 +71,7 @@ Overlay.Error = function Error(props: Readonly<{ message: string }>) {
 Overlay.Warning = function Warning(props: Readonly<{ message: string }>) {
 	return (
 		<div className="flex h-[50px] gap-[15px] rounded-[10px] border border-yellow bg-gray-100 px-[20px] py-[13px] text-md font-semibold text-yellow">
-			<Image src="icons/check.svg" alt="icon" width={20} height={20} />
+			<CheckIcon width="20" height="20" color="#fdd181" />
 			{props.message}
 		</div>
 	);
@@ -79,7 +80,7 @@ Overlay.Warning = function Warning(props: Readonly<{ message: string }>) {
 Overlay.Success = function Success(props: Readonly<{ message: string }>) {
 	return (
 		<div className="flex h-[50px] gap-[15px] rounded-[10px] border border-primary-200 bg-primary-100 px-[20px] py-[13px] text-md font-semibold text-primary-200">
-			<Image src="icons/check.svg" alt="icon" width={20} height={20} />
+			<CheckIcon width="20" height="20" color="#4cbfa4" />
 			{props.message}
 		</div>
 	);
