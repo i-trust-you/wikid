@@ -46,6 +46,7 @@ export default function BoardTable({ boards }: BoardTableProps) {
 							onClick={() => {
 								handleClick(board.id);
 							}}
+							key={board.id}
 						>
 							<td>{board.id}</td>
 							<td className="pl-6 text-left group-hover:font-semibold group-hover:underline">{board.title}</td>
