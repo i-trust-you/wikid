@@ -141,7 +141,7 @@ export default abstract class API {
 			return API.GET<PingResponse>(MIME.JSON, `${BASE_URL}/{teamId}/profiles/${code}/ping`);
 		}
 
-		public override POST({ teamId = "6-11", code, ...query }: { teamId: string; code: number }, body: PingRequestBody) {
+		public override POST({ teamId = "6-11", code, ...query }: { teamId: string; code: string }, body: PingRequestBody) {
 			return API.POST<PingResponse>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}/ping`, body);
 		}
 	})();
