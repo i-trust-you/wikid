@@ -1,9 +1,10 @@
 import { Children, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-export default function Swiper(props: Readonly<React.PropsWithChildren & { gap: number; columns: number; sensitivity: number }>) {
+export default function Swiper(props: Readonly<React.PropsWithChildren & { gap: number; columns: number; threshold: number }>) {
 	const [width, setWidth] = useState(0);
 
 	const self = useRef<HTMLDivElement>(null);
+	const idk = useRef<HTMLDivElement>(null);
 
 	useLayoutEffect(() => {
 		setWidth(self.current?.getBoundingClientRect().width ?? 0);
@@ -16,8 +17,6 @@ export default function Swiper(props: Readonly<React.PropsWithChildren & { gap: 
 		document.addEventListener("resize", handle);
 		return () => document.removeEventListener("resize", handle);
 	}, []);
-
-	const [offset, setOffset] = useState(0);
 
 	const [totalWidth, setTotalWidth] = useState(0);
 
@@ -32,69 +31,80 @@ export default function Swiper(props: Readonly<React.PropsWithChildren & { gap: 
 	//
 	// handlers
 	//
-	function handle_down(value: number) {
-		setDownX(value + offset);
+	function onDown(value: number) {
+		setDownX(value);
 	}
-	const handle_move = useCallback(
+	const onMove = useCallback(
 		(value: number) => {
+			let delta = downX - value;
+
+			if (0 < delta) {
+				delta = Math.min(delta, (width / props.columns) * props.threshold);
+				if (index === Children.count(props.children) - props.columns && 0 <= delta) delta = Math.min(delta, 0);
+			} else {
+				delta = Math.max(delta, (width / props.columns) * -props.threshold);
+				if (index === 0 && delta <= 0) delta = Math.max(0, delta);
+			}
+
+			idk.current?.style.setProperty("transform", `translateX(${-((width / props.columns) * index + delta)}px)`);
+		},
+		[downX, index, props.children, props.columns, props.threshold, width],
+	);
+
+	const onUp = useCallback(
+		(value: number) => {
+			setDownX(NaN);
+
+			idk.current?.style.setProperty("transform", `translateX(${-((width / props.columns) * index)}px)`);
+
 			const delta = downX - value;
+
+			console.log("ㅇㅇ", delta);
 
 			if ((index === 0 && delta <= 0) || (index === Children.count(props.children) - props.columns && 0 <= delta)) return;
 
 			const ratio = delta / (width / props.columns);
 
-			if (Math.abs(ratio) <= props.sensitivity) {
-				setOffset(delta);
+			if (Math.abs(ratio) >= props.threshold) {
+				setIndex(index + (0 < ratio ? 1 : -1));
 			}
 		},
-		[downX, index, props.children, props.columns, props.sensitivity, width],
-	);
-	const handle_up = useCallback(
-		(value: number) => {
-			setDownX(NaN);
-
-			if ((index === 0 && offset <= 0) || (index === Children.count(props.children) - props.columns && 0 <= offset)) return;
-
-			const ratio = offset / (width / props.columns);
-			if (Math.abs(ratio) <= props.sensitivity) setIndex(index + (0 < ratio ? 1 : -1));
-
-			setOffset(0);
-		},
-		[index, offset, props.children, props.columns, props.sensitivity, width],
+		[index, downX, props.children, props.columns, props.threshold, width],
 	);
 
 	useEffect(() => {
 		if (!isNaN(downX)) {
 			const handle = (event: MouseEvent) => {
-				handle_move(event.clientX);
+				onMove(event.clientX);
 			};
 			window.addEventListener("mousemove", handle);
 			return () => window.removeEventListener("mousemove", handle);
 		}
-	}, [downX, handle_move]);
+	}, [downX, onMove]);
 
 	useEffect(() => {
 		if (!isNaN(downX)) {
 			const handle = (event: MouseEvent) => {
-				handle_up(event.clientX);
+				onUp(event.clientX);
 			};
 			window.addEventListener("mouseup", handle);
 			return () => window.removeEventListener("mouseup", handle);
 		}
-	}, [downX, handle_up]);
+	}, [downX, onUp]);
 
 	return (
 		<div
 			ref={self}
 			className="h-full w-full overflow-hidden"
-			onMouseDown={(event) => handle_down(event.clientX)}
-			onTouchStart={(event) => handle_down(event.touches[0].clientX)}
-			onTouchMove={(event) => handle_move(event.changedTouches[0].clientX)}
-			onTouchEnd={(event) => handle_up(event.changedTouches[0].clientX)}
+			onMouseDown={(event) => onDown(event.clientX)}
+			onTouchStart={(event) => onDown(event.touches[0].clientX)}
+			onTouchMove={(event) => onMove(event.changedTouches[0].clientX)}
+			onTouchEnd={(event) => onUp(event.changedTouches[0].clientX)}
 		>
 			<div
+				ref={idk}
 				className="flex h-full transition-transform [&>*]:grow"
-				style={{ gap: props.gap, width: totalWidth, transform: `translateX(-${(width / props.columns) * index + offset}px)` }}
+				style={{ gap: props.gap, width: totalWidth, transform: `translateX(${-((width / props.columns) * index)}px)` }}
 			>
 				{props.children}
 			</div>
