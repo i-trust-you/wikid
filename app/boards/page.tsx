@@ -21,7 +21,8 @@ export default function Page() {
 	const [bestBoards, setBestBoards] = useState<Board[]>([]);
 	const [allBoards, setAllBoards] = useState<Board[]>([]);
 	const [order, setOrder] = useState<Order>("recent");
-	const [page, setPage] = useState(1);
+	const [page, setPage] = useState<number>(1);
+	const [totalBoards, setTotalBoards] = useState<number>(0);
 
 	useEffect(() => {
 		const getBestBoards = async () => {
@@ -36,11 +37,13 @@ export default function Page() {
 	const getAllBoards = useCallback(async (page: number, orderBy: Order, keyword?: string) => {
 		await API["{teamId}/articles"].GET({ teamId: "6-16", page, pageSize: 10, orderBy, keyword }).then((response) => {
 			setAllBoards(response.list);
+			setTotalBoards(response.totalCount);
 		});
 	}, []);
 
 	const handleFormClick = (value: string) => {
-		getAllBoards(page, order, value);
+		setPage(1);
+		getAllBoards(1, order, value);
 	};
 
 	useEffect(() => {
@@ -61,6 +64,14 @@ export default function Page() {
 	const handleDropdownClick = (value: string) => {
 		setOrder(value as Order);
 	};
+
+	const handlePagination = (page: number) => {
+		setPage(page + 1);
+	};
+
+	useEffect(() => {
+		getAllBoards(page, order);
+	}, [page]);
 
 	return (
 		<main className="px-5 py-10 tablet:px-[60px] tablet:py-[60px]">
@@ -96,7 +107,7 @@ export default function Page() {
 				</div>
 				<div className="mt-5">{isLargeScreen ? <BoardTable boards={allBoards} /> : <BoardList boards={allBoards} />}</div>
 				<div className="mt-8 flex items-center justify-center tablet:mt-[60px]">
-					<Pagination page={page} clamp={5} length={5} />
+					<Pagination page={page - 1} clamp={5} length={Math.ceil(totalBoards / 10)} onChange={handlePagination} />
 				</div>
 			</section>
 		</main>
