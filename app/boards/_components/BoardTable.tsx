@@ -49,7 +49,7 @@ export default function BoardTable({ boards }: BoardTableProps) {
 							key={board.id}
 						>
 							<td>{board.id}</td>
-							<td className="text-left group-hover:font-semibold group-hover:underline">{board.title}</td>
+							<td className="text-left group-hover:font-semibold group-hover:text-primary-300 group-hover:underline">{board.title}</td>
 							<td>{board.writer.name}</td>
 							<td>{board.likeCount}</td>
 							<td>{formatDateToString(new Date(board.createdAt))}</td>
