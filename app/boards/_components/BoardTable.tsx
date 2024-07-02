@@ -30,13 +30,13 @@ export default function BoardTable({ boards }: BoardTableProps) {
 	return (
 		<>
 			<table className="w-full table-auto border-collapse border-t border-gray-200">
-				<thead className="border-b text-lg font-normal text-gray-400">
+				<thead className="w-full border-b text-lg font-normal text-gray-400">
 					<tr className="h-[50px]">
-						<th>번호</th>
-						<th>제목</th>
-						<th>작성자</th>
-						<th>좋아요</th>
-						<th>날짜</th>
+						<th className="w-2/12">번호</th>
+						<th className="w-4/12">제목</th>
+						<th className="w-2/12">작성자</th>
+						<th className="w-2/12">좋아요</th>
+						<th className="w-2/12">날짜</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -49,7 +49,7 @@ export default function BoardTable({ boards }: BoardTableProps) {
 							key={board.id}
 						>
 							<td>{board.id}</td>
-							<td className="pl-6 text-left group-hover:font-semibold group-hover:underline">{board.title}</td>
+							<td className="text-left group-hover:font-semibold group-hover:underline">{board.title}</td>
 							<td>{board.writer.name}</td>
 							<td>{board.likeCount}</td>
 							<td>{formatDateToString(new Date(board.createdAt))}</td>
