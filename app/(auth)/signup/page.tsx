@@ -5,12 +5,21 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useCallback, useEffect } from "react";
 
+
+
 import useLocalStorage from "@/_hooks/useLocalStorage";
+
+
 
 import Form from "@/_components/general/Form";
 
+
 export default function Page() {
 	const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
+
+	if (accessToken) {
+		redirect("/login");
+	}
 
 	const handle = useCallback((data: FormData) => {
 		// @ts-ignore
@@ -20,18 +29,17 @@ export default function Page() {
 			payload[key as keyof typeof payload] = value as (typeof payload)[keyof typeof payload];
 		}
 		// TODO: display error
-		API["{teamId}/auth/signUp"].POST({}, payload).then((response) => {
-			alert("가입이 완료되었습니다");
-			setAccessToken(response.accessToken);
-			// redirect("/login");
-		});
+		API["{teamId}/auth/signUp"]
+			.POST({}, payload)
+			.then((response) => {
+				alert("회원가입이 완료되었습니다");
+				setAccessToken(response.accessToken);
+				// redirect("/login");
+			})
+			.catch((error) => {
+				alert("회원가입 실패");
+			});
 	}, []);
-
-	useEffect(() => {
-		if (accessToken) {
-			redirect("/login");
-		}
-	}, [accessToken]);
 
 	return (
 		<main className="flex flex-col items-center">
@@ -82,7 +90,7 @@ export default function Page() {
 					</div>
 				</Form>
 			</div>
-			<div className="mt-[40px] text-md font-normal text-gray-400">
+			<div className="mt-[40px] text-md font-normal text-gray-400 mb-[111px] tablet:mb-[263px] desktop:mb-[224px]">
 				이미 회원이신가요?{" "}
 				<Link href="/login" className="text-primary-200">
 					로그인

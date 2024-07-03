@@ -11,11 +11,13 @@ import Form from "@/_components/general/Form";
 export default function Page() {
 	const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
 
+	if (!accessToken) {
+		redirect("/");
+	}
+
 	useEffect(() => {
-		if (accessToken) {
-			API.credential(accessToken);
-		}
-	}, [accessToken]);
+		API.credential(accessToken);
+	}, []);
 
 	const changePassword = useCallback((data: FormData) => {
 		// @ts-ignore
@@ -25,9 +27,14 @@ export default function Page() {
 			payload[key as keyof typeof payload] = value as (typeof payload)[keyof typeof payload];
 		}
 		// TODO: display error
-		API["{teamId}/users/me/password"].PATCH({}, payload).then((response) => {
-			alert("비밀번호가 변경되었습니다");
-		});
+		API["{teamId}/users/me/password"]
+			.PATCH({}, payload)
+			.then((response) => {
+				alert("비밀번호가 변경되었습니다");
+			})
+			.catch((error) => {
+				alert("비밀번호 변경 실패");
+			});
 	}, []);
 
 	const createProfile = useCallback((data: FormData) => {
@@ -38,9 +45,14 @@ export default function Page() {
 			payload[key as keyof typeof payload] = value as (typeof payload)[keyof typeof payload];
 		}
 		// TODO: display error
-		API["{teamId}/profiles"].POST({}, payload).then((response) => {
-			alert("위키가 생성되었습니다");
-		});
+		API["{teamId}/profiles"]
+			.POST({}, payload)
+			.then((response) => {
+				alert("위키가 생성되었습니다");
+			})
+			.catch((error) => {
+				alert("위키 생성 실패");
+			});
 	}, []);
 
 	return (
