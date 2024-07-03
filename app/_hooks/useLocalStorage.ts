@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export default function useLocalStorage<T>(key: string, fallback: T) {
-	const [storage, set_storage] = useState<T>(key in localStorage ? deserialize(localStorage[key]) : fallback);
+	const [storage, set_storage] = useState<T>("localStorage" in window && key in localStorage ? deserialize(localStorage[key]) : fallback);
 
 	useEffect(() => {
 		function handle(event: StorageEvent) {

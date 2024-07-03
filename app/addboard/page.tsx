@@ -33,16 +33,7 @@ export default function Page() {
 	if (!accessToken) {
 		redirect("/");
 	}
-	const [user, setUser] = useState<Awaited<ReturnType<(typeof API)["{teamId}/users/me"]["GET"]>>>();
-
-	useEffect(() => {
-		// auth
-		API.credential(accessToken);
-
-		API["{teamId}/users/me"].GET({}).then((response) => {
-			console.log(response);
-		});
-	}, []);
+	API.credential(accessToken);
 
 	const [title, setTitle] = useState("");
 	const [content, setContent] = useState("");
@@ -50,7 +41,7 @@ export default function Page() {
 	const onSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		API["{teamId}/articles"].POST({}, { title, content, image: "" }).then((response) =>
+		API["{teamId}/articles"].POST({}, { title, content, image: "https://" }).then((response) =>
 		{
 			console.log(response);
 		});
