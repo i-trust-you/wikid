@@ -1,6 +1,6 @@
+/* eslint-disable import/no-anonymous-default-export */
 /** @type {import("tailwindcss").Config} */
 export default {
-	content: ["./pages/**/*.{js,ts,jsx,tsx,mdx}", "./components/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}"],
 	theme: {
 		screens: {
 			tablet: "768px",
@@ -19,9 +19,6 @@ export default {
 			xs: ["12px", "18px"],
 		},
 		colors: {
-			transparent: "transparent",
-			black: "#000000",
-			white: "#FFFFFF",
 			primary: {
 				100: "#EEF9F6",
 				200: "#4CBFA4",
@@ -39,8 +36,12 @@ export default {
 				100: "#FBEDED",
 				200: "#D14343",
 			},
+			black: "#000000",
+			white: "#FFFFFF",
 			purple: "#8E66FF",
 			yellow: "#FDD181",
+			transparent: "transparent",
 		},
 	},
+	content: ["./pages/**/*.{js,ts,jsx,tsx,mdx}", "./components/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}"],
 };
