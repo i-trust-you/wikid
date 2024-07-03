@@ -1,7 +1,7 @@
-import Button from "@/_components/common/Button";
+import Article from "@/boards/[id]/_components/Article";
+import CommentList from "@/boards/[id]/_components/CommentList";
 
-import Article from "./components/Article";
-import CommentList from "./components/CommentList";
+import Button from "@/_components/common/Button";
 
 export default function Page(props: { params: { slug: number } }) {
 	const articleId = props.params.slug;
