@@ -26,7 +26,7 @@ export default function Page() {
 
 	useEffect(() => {
 		const getBestBoards = async () => {
-			await API["{teamId}/articles"].GET({ teamId: "6-16", page: 1, pageSize: 4, orderBy: "like" }).then((response) => {
+			await API["{teamId}/articles"].GET({ teamId: "6-11", page: 1, pageSize: 4, orderBy: "like" }).then((response) => {
 				setBestBoards(response.list);
 			});
 		};
@@ -35,7 +35,7 @@ export default function Page() {
 	}, []);
 
 	const getAllBoards = useCallback(async (page: number, orderBy: Order, keyword?: string) => {
-		await API["{teamId}/articles"].GET({ teamId: "6-16", page, pageSize: 10, orderBy, keyword }).then((response) => {
+		await API["{teamId}/articles"].GET({ teamId: "6-11", page, pageSize: 10, orderBy, keyword }).then((response) => {
 			setAllBoards(response.list);
 			setTotalBoards(response.totalCount);
 		});
