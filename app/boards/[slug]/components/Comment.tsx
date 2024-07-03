@@ -1,9 +1,11 @@
-import { CommentType } from "@/_api";
+import API from "@/_api";
 import Image from "next/image";
 
 import DeleteIcon from "../../../../public/icons/DeleteIcon";
 import EditIcon from "../../../../public/icons/EditIcon";
 import ProfileImage from "../../../../public/icons/profile.svg";
+
+type CommentType = Awaited<ReturnType<(typeof API)["{teamId}/articles/{articleId}/comments"]["GET"]>>["list"][0];
 
 export default function Comment({ comment }: Readonly<{ comment: CommentType }>) {
 	return (

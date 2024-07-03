@@ -1,6 +1,6 @@
 "use client";
 
-import API, { ArticleDetailType } from "@/_api";
+import API from "@/_api";
 // import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { MouseEventHandler, useEffect, useState } from "react";
@@ -8,6 +8,8 @@ import { MouseEventHandler, useEffect, useState } from "react";
 import Button from "@/_components/common/Button";
 
 import HeartIcon from "../../../../public/icons/HeartIcon";
+
+type ArticleDetailType = Awaited<ReturnType<(typeof API)["{teamId}/articles/{articleId}"]["GET"]>>;
 
 export default function Article({ articleId }: { articleId: number }) {
 	const router = useRouter();
