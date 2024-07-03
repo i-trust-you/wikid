@@ -26,6 +26,7 @@ export default {
 				100: "#EEF9F6",
 				200: "#4CBFA4",
 				300: "#32A68A",
+				400: "#287D70",
 			},
 			gray: {
 				100: "#F7F7FA",
@@ -38,6 +39,8 @@ export default {
 			red: {
 				100: "#FBEDED",
 				200: "#D14343",
+				300: "#B23B3B",
+				400: "#9A3333",
 			},
 			purple: "#8E66FF",
 			yellow: "#FDD181",
