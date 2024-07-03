@@ -1,7 +1,8 @@
-import Image from "next/image";
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import Dropdown from "@/_components/general/Dropdown";
+
+import CameraIcon from "../../../public/icons/CameraIcon";
 
 const NO = crypto.randomUUID();
 const OK = "ok";
@@ -239,7 +240,7 @@ function ImageInput(props: Readonly<{ id: string; required?: Report<boolean> }>)
 					className="flex aspect-square w-full items-center justify-center rounded-full bg-gray-200 bg-cover bg-center text-white"
 					style={{ backgroundImage: `url("${preview}")` }}
 				>
-					<Image src="/icons/camera.svg" alt="icon" width={35} height={35} />
+					<CameraIcon width="35" height="35" />
 				</div>
 				<input id={props.id} type="file" accept=".png,.jpg,.jpeg,.webp" multiple={false} className="hidden" onChange={(event) => upload(event)} />
 			</label>
