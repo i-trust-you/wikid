@@ -1,9 +1,11 @@
 "use client";
 
-import API, { CommentType } from "@/_api";
+import API from "@/_api";
 import { useEffect, useState } from "react";
 
 import Comment from "./Comment";
+
+type CommentType = Awaited<ReturnType<(typeof API)["{teamId}/articles/{articleId}/comments"]["GET"]>>["list"][0];
 
 export default function CommentList({ articleId }: { articleId: number }) {
 	const [commentData, setCommentData] = useState<CommentType[]>([] as CommentType[]);
