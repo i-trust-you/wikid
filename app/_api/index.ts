@@ -121,8 +121,8 @@ export default abstract class API {
 			return API.POST<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles`, body);
 		}
 
-		public override GET({ teamId = "6-11", ...query }: { teamId: string; name: string; page: number; pageSize: number }) {
-			return API.GET<OffsetBasedPaginationResponse<ProfileListType>>(MIME.JSON, `${BASE_URL}/${teamId}/profiles?${API.query(query)}`);
+		public override GET({ teamId = "6-11", ...query }: { teamId?: string; name: string; page: number; pageSize: number }) {
+			return API.GET<OffsetBasedPaginationResponse<ProfileListType>>(MIME.JSON, `${BASE_URL}/${teamId}/profiles`);
 		}
 	})();
 
