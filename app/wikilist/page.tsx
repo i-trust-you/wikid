@@ -4,34 +4,46 @@ import API from "@/_api";
 import ProfileCard from "@/wikilist/_components/ProfileCard";
 import SearchBar from "@/wikilist/_components/SearchBar";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+import Pagination from "@/_components/general/Pagination";
 
 type Profile = Awaited<ReturnType<(typeof API)["{teamId}/profiles"]["GET"]>>["list"][number];
 
 export default function Page() {
 	const [name, setName] = useState<string>("");
 	const [profiles, setProfiles] = useState<Profile[]>([]);
+	const [page, setPage] = useState<number>(1);
 	const [totalProfiles, setTotalProfiles] = useState<number>(0);
 
 	const handleSearchBar = (value: string) => {
 		setName(value);
 	};
 
-	useEffect(() => {
-		const getProfiles = async (keyword: string) => {
-			await API["{teamId}/profiles"].GET({ teamId: "6-11", page: 1, pageSize: 3, name: keyword }).then((response) => {
-				setTotalProfiles(response.totalCount);
-				setProfiles(response.list);
-			});
-		};
+	const getProfiles = useCallback(async (page: number, keyword: string) => {
+		await API["{teamId}/profiles"].GET({ teamId: "6-11", page, pageSize: 3, name: keyword }).then((response) => {
+			setTotalProfiles(response.totalCount);
+			setProfiles(response.list);
+		});
+	}, []);
 
+	useEffect(() => {
 		if (name !== "") {
-			getProfiles(name);
+			setPage(1);
+			getProfiles(1, name);
 		} else {
 			setProfiles([]);
 			setTotalProfiles(0);
 		}
 	}, [name]);
+
+	const handlePagination = (page: number) => {
+		setPage(page + 1);
+	};
+
+	useEffect(() => {
+		getProfiles(page, name);
+	}, [page]);
 
 	return (
 		<main className="flex h-full min-h-screen justify-center px-[21px] py-[80px] tablet:px-6">
@@ -51,8 +63,9 @@ export default function Page() {
 						</p>
 						<div className="mt-10 flex flex-col gap-6 tablet:mt-[57px]">
 							{profiles?.map((profile) => <ProfileCard key={profile.id} profile={profile} />)}
-							{/* TODO: pagination 컴포넌트로 변경 */}
-							<div className="mt-[54px] flex justify-center tablet:mt-20 desktop:mt-[120px]">pagination</div>
+							<div className="mt-[54px] flex justify-center tablet:mt-20 desktop:mt-[120px]">
+								<Pagination page={page - 1} clamp={5} length={Math.ceil(totalProfiles / 3)} onChange={handlePagination} />
+							</div>
 						</div>
 					</>
 				)}

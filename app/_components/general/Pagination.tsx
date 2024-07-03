@@ -1,13 +1,14 @@
 import capsule from "@/_utilities/capsule";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import ArrowDownIcon from "../../../public/icons/ArrowDownIcon";
+import ArrowLeftIcon from "../../../public/icons/ArrowLeftIcon";
 import ArrowRightIcon from "../../../public/icons/ArrowRightIcon";
 
 interface Props {
 	page: number;
 	clamp: number;
 	length: number;
+	onChange: (page: number) => void;
 }
 
 interface State {
@@ -15,7 +16,7 @@ interface State {
 }
 
 // @ts-ignore
-const CTX = createContext<{ props: Props; state: State }>();
+const CTX = createContext<{ props: Omit<Props, "onChange">; state: State }>();
 
 function useCTX() {
 	const ctx = useContext(CTX);
@@ -29,6 +30,10 @@ function useCTX() {
 export default function Pagination(props: Readonly<React.PropsWithChildren & Props>) {
 	const [page, setPage] = useState(props.page);
 
+	useEffect(() => {
+		props.onChange(page);
+	}, [page]);
+
 	const children = useMemo(() => {
 		// early return
 		if (props.children) return props.children;
@@ -36,7 +41,7 @@ export default function Pagination(props: Readonly<React.PropsWithChildren & Pro
 		return (
 			<div className="flex gap-[15px] [&_button:disabled]:border-primary-200 [&_button:disabled]:bg-primary-100 [&_button:disabled]:text-primary-200 [&_button:not(:disabled)]:bg-white [&_button:not(:disabled)]:text-gray-400 hover:[&_button:not(:disabled)]:text-primary-200 [&_button]:flex [&_button]:aspect-square [&_button]:w-[40px] [&_button]:items-center [&_button]:justify-center [&_button]:rounded-[10px] [&_button]:border [&_button]:border-transparent [&_button]:text-xs [&_button]:font-normal [&_button]:shadow-[0_4px_20px_-0px_rgba(0,0,0,0.1)] tablet:[&_button]:w-[45px] tablet:[&_button]:text-2lg">
 				<Pagination.Jump to="prev">
-					<ArrowDownIcon width="24" height="24" />
+					<ArrowLeftIcon width="24" height="24" />
 				</Pagination.Jump>
 				<Pagination.Generator>
 					{(page) => (
