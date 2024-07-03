@@ -1,4 +1,4 @@
-/* eslint-disable import/no-anonymous-default-export /
+/* eslint-disable import/no-anonymous-default-export */
 /** @type {import("next").NextConfig} */
 export default {
 	images: {
