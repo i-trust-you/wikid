@@ -2,13 +2,26 @@
 
 import { cloneElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-
 export default function Popover(
 	props: Readonly<
 		React.PropsWithChildren & {
 			gap: number;
 			trigger: "click" | "hover";
-			position: "top" | "left" | "right" | "bottom";
+			position:
+				| "top"
+				| "left"
+				| "top-right-top-left"
+				| "top-right-bottom-left"
+				| "bottom-right-top-left"
+				| "bottom-right-bottom-left"
+				| "right"
+				| "top-left-top-right"
+				| "top-left-bottom-right"
+				| "bottom-left-top-right"
+				| "bottom-left-bottom-right"
+				| "bottom"
+				| "top-left-bottom-left"
+				| "top-right-bottom-right";
 			overlay: JSX.Element;
 		}
 	>,
@@ -42,12 +55,18 @@ export default function Popover(
 
 	const getTop = useCallback(() => {
 		switch (props.position) {
-			case "top": {
+			case "top":
+			case "bottom-right-top-left":
+			case "bottom-left-top-right": {
 				return -overHeight - props.gap;
 			}
 			case "left":
 			case "right": {
 				return (popHeight - overHeight) / 2;
+			}
+			case "top-right-top-left":
+			case "top-left-top-right": {
+				return 0;
 			}
 		}
 	}, [props.gap, props.position, overHeight, popHeight]);
@@ -58,24 +77,45 @@ export default function Popover(
 			case "bottom": {
 				return (popWidth - overWidth) / 2;
 			}
-			case "left": {
+			case "left":
+			case "top-right-top-left":
+			case "top-right-bottom-left":
+			case "bottom-right-top-left":
+			case "bottom-right-bottom-left": {
 				return -overWidth - props.gap;
+			}
+			case "top-left-bottom-left": {
+				return 0;
 			}
 		}
 	}, [props.gap, props.position, popWidth, overWidth]);
 
 	const getRight = useCallback(() => {
 		switch (props.position) {
-			case "right": {
+			case "right":
+			case "top-left-top-right":
+			case "top-left-bottom-right":
+			case "bottom-left-top-right":
+			case "bottom-left-bottom-right": {
 				return -overWidth - props.gap;
+			}
+			case "top-right-bottom-right": {
+				return 0;
 			}
 		}
 	}, [props.gap, props.position, overWidth]);
 
 	const getBottom = useCallback(() => {
 		switch (props.position) {
-			case "bottom": {
+			case "bottom":
+			case "top-left-bottom-right":
+			case "top-left-bottom-left":
+			case "top-right-bottom-right": {
 				return -overHeight - props.gap;
+			}
+			case "bottom-right-bottom-left":
+			case "bottom-left-bottom-right": {
+				return 0;
 			}
 		}
 	}, [props.gap, props.position, overHeight]);
@@ -84,8 +124,7 @@ export default function Popover(
 		if (toggle) {
 			switch (props.trigger) {
 				case "click": {
-					const handle = () =>
-					{
+					const handle = () => {
 						setToggle(false);
 					};
 					document.addEventListener("click", handle);

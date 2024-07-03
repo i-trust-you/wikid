@@ -5,11 +5,13 @@ import "./globals.css";
 export default function Layout({ children }: Readonly<React.PropsWithChildren>) {
 	return (
 		<html lang="ko">
-			<Header />
-			<body>{children}</body>
-			<div id="toast" />
-			<div id="alert" />
-			<div id="modal" />
+			<body>
+				<Header />
+				{children}
+				<div id="toast" />
+				<div id="alert" />
+				<div id="modal" />
+			</body>
 		</html>
 	);
 }
