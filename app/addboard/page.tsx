@@ -2,17 +2,12 @@
 
 import API from "@/_api";
 import { redirect } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-
-
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 
 import useLocalStorage from "@/_hooks/useLocalStorage";
 
-
-
 import Button from "@/_components/common/Button";
-
-
 
 import AlignCenterIcon from "../../public/icons/AlignCenterIcon";
 import AlignLeftIcon from "../../public/icons/AlignLeftIcon";
@@ -26,8 +21,8 @@ import LinkIcon from "../../public/icons/LinkIcon";
 import NumberingIcon from "../../public/icons/NumberingIcon";
 import UnderlineIcon from "../../public/icons/UnderlineIcon";
 
-
 export default function Page() {
+	const router = useRouter();
 	const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
 
 	if (!accessToken) {
@@ -38,21 +33,29 @@ export default function Page() {
 	const [title, setTitle] = useState("");
 	const [content, setContent] = useState("");
 
-	const onSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
+	const onSubmit = useCallback(
+		async (event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault();
 
-		API["{teamId}/articles"].POST({}, { title, content, image: "https://" }).then((response) =>
-		{
-			console.log(response);
-		});
-	}, [title, content]);
+			API["{teamId}/articles"].POST({}, { title, content, image: "https://example.com" }).then((response) => {
+				router.push(`/boards/${response.id}`);
+			});
+		},
+		[title, content],
+	);
 
 	return (
 		<main className="flex w-screen flex-col items-center">
-			<form onSubmit={onSubmit} className="mt-[32px] flex min-h-[680px] w-full flex-col px-[20px] tablet:mx-[60px] tablet:mt-[40px] tablet:w-[calc(100%-120px)] tablet:rounded-[10px] tablet:pb-[30px] tablet:pt-[40px] tablet:shadow-[0px_4px_20px_0px_#00000014] desktop:min-h-[850px] desktop:w-[1060px]">
+			<form
+				onSubmit={onSubmit}
+				className="mt-[32px] flex min-h-[680px] w-full flex-col px-[20px] tablet:mx-[60px] tablet:mt-[40px] tablet:w-[calc(100%-120px)] tablet:rounded-[10px] tablet:pb-[30px] tablet:pt-[40px] tablet:shadow-[0px_4px_20px_0px_#00000014] desktop:min-h-[850px] desktop:w-[1060px]"
+			>
 				<div className="flex justify-between text-lg font-semibold text-gray-500 tablet:text-2xl">
 					게시물 등록하기
-					<button disabled={!(0 < title.length && 0 < content.length)} className="h-[45px] w-[72px] rounded-[10px] text-white bg-primary-200 text-md font-semibold disabled:bg-gray-300 disabled:text-white tablet:w-[140px]">
+					<button
+						disabled={!(0 < title.length && 0 < content.length)}
+						className="h-[45px] w-[72px] rounded-[10px] bg-primary-200 text-md font-semibold text-white disabled:bg-gray-300 disabled:text-white tablet:w-[140px]"
+					>
 						등록하기
 					</button>
 				</div>
