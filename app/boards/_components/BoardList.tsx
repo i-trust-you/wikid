@@ -24,17 +24,10 @@ export default function BoardList({ boards }: BoardListProps) {
 	return (
 		<div className="flex flex-col">
 			{boards.map((board) => (
-				<>
-					<Board
-						key={board.id}
-						id={board.id}
-						title={board.title}
-						writerName={board.writer.name}
-						createdAt={new Date(board.createdAt)}
-						likeCount={board.likeCount}
-					/>
+				<div key={board.id}>
+					<Board id={board.id} title={board.title} writerName={board.writer.name} createdAt={new Date(board.createdAt)} likeCount={board.likeCount} />
 					<hr className="text-gray-200" />
-				</>
+				</div>
 			))}
 		</div>
 	);
