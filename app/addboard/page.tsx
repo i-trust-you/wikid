@@ -1,19 +1,27 @@
 "use client";
 
 import API from "@/_api";
-import { redirect } from "next/navigation";
+import Modal from "@/_utilities/Modal";
+import Toast from "@/_utilities/Toast";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+
 
 import useLocalStorage from "@/_hooks/useLocalStorage";
 
+
+
 import Button from "@/_components/common/Button";
+
+
 
 import AlignCenterIcon from "../../public/icons/AlignCenterIcon";
 import AlignLeftIcon from "../../public/icons/AlignLeftIcon";
 import AlignRightIcon from "../../public/icons/AlignRightIcon";
 import BoldIcon from "../../public/icons/BoldIcon";
 import BulletIcon from "../../public/icons/BulletIcon";
+import CameraIcon from "../../public/icons/CameraIcon";
 import ColoringIcon from "../../public/icons/ColoringIcon";
 import ImageIcon from "../../public/icons/ImageIcon";
 import ItalicIcon from "../../public/icons/ItalicIcon";
@@ -21,15 +29,20 @@ import LinkIcon from "../../public/icons/LinkIcon";
 import NumberingIcon from "../../public/icons/NumberingIcon";
 import UnderlineIcon from "../../public/icons/UnderlineIcon";
 
+
 export default function Page() {
 	const router = useRouter();
 	const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
 
-	if (!accessToken) {
-		redirect("/");
-	}
-	API.credential(accessToken);
+	useEffect(() => {
+		if (accessToken) {
+			API.credential(accessToken);
+		} else {
+			router.push("/");
+		}
+	}, [accessToken]);
 
+	const [img, setImg] = useState("");
 	const [title, setTitle] = useState("");
 	const [content, setContent] = useState("");
 
@@ -43,6 +56,8 @@ export default function Page() {
 		},
 		[title, content],
 	);
+
+	const modal = useMemo(() => new Modal(<Page.Modal />, (modal) => modal.shake()), []);
 
 	return (
 		<main className="flex w-screen flex-col items-center">
@@ -95,7 +110,9 @@ export default function Page() {
 						<BulletIcon width="24" height="24" />
 						<NumberingIcon width="24" height="24" />
 						<ColoringIcon width="24" height="24" />
-						<ImageIcon width="24" height="24" />
+						<div onClick={() => modal.open()}>
+							<ImageIcon width="24" height="24" />
+						</div>
 					</div>
 					<div className="flex h-[24px] w-[24px] items-center justify-center rounded-full bg-gray-200">
 						<LinkIcon width="16" height="16" />
@@ -108,3 +125,71 @@ export default function Page() {
 		</main>
 	);
 }
+
+Page.Modal = function UploadModal(props: Readonly<{ onUpload: (response: Awaited<ReturnType<(typeof API)["{teamId}/images/upload"]["POST"]>>) => void }>) {
+	const [file, setFile] = useState<File>();
+	const [preview, setPreview] = useState<FileReader["result"]>();
+
+	const onUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0];
+
+		if (file) {
+			if (!/^[a-zA-Z0-9._\-\s]+\.(png|jpe?g)$/.test(file.name)) {
+				return Toast.error("이미지의 확장자를 확인해주세요");
+			}
+			if (file.size > 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5) {
+				return Toast.error("최대 5MB의 이미지만 업로그 가능합니다");
+			}
+			const reader = new FileReader();
+
+			reader.addEventListener("load", (event) => {
+				setPreview(reader.result);
+			});
+			reader.readAsDataURL(file);
+
+			setFile(file);
+		} else {
+			setFile(undefined);
+			setPreview(undefined);
+		}
+	}, []);
+
+	const onSubmit = useCallback(
+		(event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault();
+
+			if (file) {
+				Modal.close();
+
+				API["{teamId}/images/upload"].POST({}, file).then((response) => {
+					console.log(response);
+					props.onUpload(response);
+				});
+			}
+		},
+		[file, preview],
+	);
+
+	return (
+		<form onSubmit={onSubmit}>
+			<div className="flex justify-center text-2lg font-semibold text-gray-500">이미지</div>
+			<label
+				htmlFor="upload"
+				className="mt-[22px] flex h-max min-h-[160px] w-[240px] items-center justify-center rounded-[10px] bg-gray-100 bg-cover bg-center tablet:w-[354px]"
+				style={{ backgroundImage: `url("${preview}")` }}
+			>
+				<CameraIcon width="36" height="36" />
+				<input id="upload" type="file" accept="image/*" multiple={false} className="hidden" onChange={onUpload} />
+			</label>
+			<div className="mt-[20px] flex flex-row-reverse">
+				<button
+					type="submit"
+					className="flex h-[40px] items-center rounded-[10px] bg-primary-200 px-[20px] text-md font-semibold text-white disabled:bg-gray-300"
+					disabled={!preview}
+				>
+					삽입하기
+				</button>
+			</div>
+		</form>
+	);
+};

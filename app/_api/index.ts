@@ -39,10 +39,14 @@ export default abstract class API {
 	}
 
 	protected static PUT<T>(type: MIME, url: string, body: BodyInit | Object) {
-		const payload = typeof body === "object" ? JSON.stringify(body) : body;
+		const payload = type === MIME.JSON && typeof body === "object" ? JSON.stringify(body) : body;
 
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, { method: "PUT", headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON }, body: payload });
+			const response = await fetch(url, {
+				method: "PUT",
+				headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON },
+				body: payload as BodyInit,
+			});
 
 			const data = await response.json();
 
@@ -51,10 +55,14 @@ export default abstract class API {
 	}
 
 	protected static POST<T>(type: MIME, url: string, body: BodyInit | Object) {
-		const payload = typeof body === "object" ? JSON.stringify(body) : body;
+		const payload = type === MIME.JSON && typeof body === "object" ? JSON.stringify(body) : body;
 
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, { method: "POST", headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON }, body: payload });
+			const response = await fetch(url, {
+				method: "POST",
+				headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON },
+				body: payload as BodyInit,
+			});
 
 			const data = await response.json();
 
@@ -63,10 +71,14 @@ export default abstract class API {
 	}
 
 	protected static PATCH<T>(type: MIME, url: string, body: BodyInit | Object) {
-		const payload = typeof body === "object" ? JSON.stringify(body) : body;
+		const payload = type === MIME.JSON && typeof body === "object" ? JSON.stringify(body) : body;
 
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, { method: "PATCH", headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON }, body: payload });
+			const response = await fetch(url, {
+				method: "PATCH",
+				headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON },
+				body: payload as BodyInit,
+			});
 
 			const data = await response.json();
 
@@ -159,8 +171,12 @@ export default abstract class API {
 	})();
 
 	public static readonly ["{teamId}/images/upload"] = new (class extends API {
-		public override POST({ teamId = "6-11", ...query }: { teamId?: string }, body: string) {
-			return API.POST<{ url: string }>(MIME.FORM_DATA, `${BASE_URL}/${teamId}/images/upload`, body);
+		public override POST({ teamId = "6-11", ...query }: { teamId?: string }, body: File) {
+			const data = new FormData();
+
+			data.append("image", body);
+
+			return API.POST<{ url: string }>(MIME.FORM_DATA, `${BASE_URL}/${teamId}/images/upload`, data);
 		}
 	})();
 
