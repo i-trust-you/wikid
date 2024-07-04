@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 
 
-import useLocalStorage from "@/_hooks/useLocalStorage";
+import useCookie from "@/_hooks/useCookie";
 
 
 
@@ -32,15 +32,13 @@ import UnderlineIcon from "../../public/icons/UnderlineIcon";
 
 export default function Page() {
 	const router = useRouter();
-	const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
 
-	useEffect(() => {
-		if (accessToken) {
-			API.credential(accessToken);
-		} else {
-			router.push("/");
-		}
-	}, [accessToken]);
+	const [accessToken, setAccessToken] = useCookie<string>("accessToken");
+	const [refreshoken, setRefreshToken] = useCookie<string>("refreshToken");
+
+	if (!accessToken && !refreshoken) {
+		router.push("/");
+	}
 
 	const [img, setImg] = useState("");
 	const [title, setTitle] = useState("");

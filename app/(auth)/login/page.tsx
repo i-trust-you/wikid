@@ -1,19 +1,23 @@
 "use client";
 
 import API from "@/_api";
+import Toast from "@/_utilities/Toast";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 
-import useLocalStorage from "@/_hooks/useLocalStorage";
+import useCookie from "@/_hooks/useCookie";
 
 import Form from "@/_components/general/Form";
 
 export default function Page() {
-	const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
+	const router = useRouter();
 
-	if (accessToken) {
-		redirect("/");
+	const [accessToken, setAccessToken] = useCookie<string>("accessToken");
+	const [refreshoken, setRefreshToken] = useCookie<string>("refreshToken");
+
+	if (accessToken && refreshoken) {
+		router.push("/");
 	}
 
 	const handle = useCallback((data: FormData) => {
@@ -27,14 +31,13 @@ export default function Page() {
 		API["{teamId}/auth/signIn"]
 			.POST({}, payload)
 			.then((response) => {
-				alert("로그인이 완료되었습니다");
+				Toast.success("로그인이 완료되었습니다");
 				setAccessToken(response.accessToken);
-				// apply token
-				API.credential(response.accessToken);
-				// redirect("/");
+				setRefreshToken(response.refreshToken);
+				router.push("/");
 			})
 			.catch((error) => {
-				alert("로그인 실패");
+				Toast.error("로그인 실패");
 			});
 	}, []);
 
@@ -69,7 +72,7 @@ export default function Page() {
 					</div>
 				</Form>
 			</div>
-			<div className="mt-[40px] text-md font-normal text-gray-400 mb-[203px] tablet:mb-[387px] desktop:mb-[334px]">
+			<div className="mb-[203px] mt-[40px] text-md font-normal text-gray-400 tablet:mb-[387px] desktop:mb-[334px]">
 				처음이신가요?{" "}
 				<Link href="/signup" className="text-primary-200">
 					회원가입

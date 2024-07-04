@@ -1,23 +1,24 @@
 "use client";
 
 import API from "@/_api";
-import { redirect } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import Toast from "@/_utilities/Toast";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 
-import useLocalStorage from "@/_hooks/useLocalStorage";
+import useCookie from "@/_hooks/useCookie";
 
 import Form from "@/_components/general/Form";
 
 export default function Page() {
-	const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
+	const router = useRouter();
 
-	if (!accessToken) {
-		redirect("/");
+	const [accessToken, setAccessToken] = useCookie<string>("accessToken");
+	const [refreshoken, setRefreshToken] = useCookie<string>("refreshToken");
+
+	if (accessToken && refreshoken) {
+		router.push("/");
 	}
-
-	useEffect(() => {
-		API.credential(accessToken);
-	}, []);
 
 	const changePassword = useCallback((data: FormData) => {
 		// @ts-ignore
@@ -30,10 +31,10 @@ export default function Page() {
 		API["{teamId}/users/me/password"]
 			.PATCH({}, payload)
 			.then((response) => {
-				alert("비밀번호가 변경되었습니다");
+				Toast.success("비밀번호가 변경되었습니다");
 			})
 			.catch((error) => {
-				alert("비밀번호 변경 실패");
+				Toast.error("비밀번호 변경 실패");
 			});
 	}, []);
 
@@ -48,10 +49,10 @@ export default function Page() {
 		API["{teamId}/profiles"]
 			.POST({}, payload)
 			.then((response) => {
-				alert("위키가 생성되었습니다");
+				Toast.success("위키가 생성되었습니다");
 			})
 			.catch((error) => {
-				alert("위키 생성 실패");
+				Toast.error("위키 생성 실패");
 			});
 	}, []);
 

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
+
 const [CACHE, TARGET, CHANNEL] = [new Map<string, unknown>(), new EventTarget(), new BroadcastChannel("useCrossState")];
 
 const enum Protocol
@@ -15,10 +16,17 @@ class Message<T>
 		// TODO: none
 	}
 }
-
-export default function useCrossState<T>(key: string, fallback: T, options: { refresh_on_focus?: boolean; refresh_on_interval?: number; } = {})
+//
+// overloads
+//
+export default function useCrossState<T>(key: string): [T | null, (value: T | ((_: T) => T)) => void];
+export default function useCrossState<T>(key: string, fallback: T): [T, (value: T | ((_: T) => T)) => void];
+//
+// implementation
+//
+export default function useCrossState<T>(key: string, fallback?: T)
 {
-	const [data, set_data] = useState<T>(CACHE.has(key) ? CACHE.get(key) as T : fallback);
+	const [data, set_data] = useState<T>(CACHE.has(key) ? CACHE.get(key) as T : fallback ?? null as T);
 
 	const setter = useCallback((value: T | ((_: T) => T)) =>
 	{

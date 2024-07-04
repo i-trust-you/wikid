@@ -1,3 +1,6 @@
+import Codec from "@/_utilities/codec";
+import Cookie from "@/_utilities/cookie";
+
 const BASE_URL = "https://wikied-api.vercel.app";
 
 const enum MIME {
@@ -5,16 +8,30 @@ const enum MIME {
 	FORM_DATA = "multipart/form-data",
 }
 
-/** @see https://wikied-api.vercel.app/docs/#/ */
-export default abstract class API {
-	private static JWT: string;
+class Token {
+	private static _access?: string;
+	private static _refresh?: string;
 
 	private constructor() {
 		// final
 	}
 
-	public static credential(token: string) {
-		API.JWT = `Bearer ${token}`;
+	public static get ACCESS() {
+		return (Token._access ??= Codec.decode(Cookie.get("accessToken")));
+	}
+
+	public static get REFRESH() {
+		return (Token._refresh ??= Codec.decode(Cookie.get("refreshToken")));
+	}
+}
+
+/** @see https://wikied-api.vercel.app/docs/#/ */
+export default abstract class API {
+	//
+	// TODO: use service worker instead
+	//
+	private constructor() {
+		// final
 	}
 
 	protected static query(data: object) {
@@ -28,9 +45,35 @@ export default abstract class API {
 		return params.toString();
 	}
 
-	protected static GET<T>(type: MIME, url: string) {
+	protected static headers(type: MIME) {
+		const buffer: HeadersInit = { "Content-Type": type, accept: MIME.JSON };
+
+		if (Token.ACCESS) {
+			buffer["Authorization"] = `Bearer ${Token.ACCESS}`;
+		}
+		switch (type) {
+			case MIME.FORM_DATA: {
+				delete buffer["Content-Type"];
+			}
+		}
+		return buffer;
+	}
+
+	protected static payload(body: BodyInit | Object) {
+		return (body instanceof FormData ? body : typeof body === "object" ? JSON.stringify(body) : body) as BodyInit;
+	}
+
+	protected static GET<T>(type: MIME, url: string, retries = 0) {
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, { method: "GET", headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON } });
+			const response = await fetch(url, { method: "GET", headers: API.headers(type) });
+
+			if (retries < 1 && response.status === 401 && Token.REFRESH) {
+				const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
+
+				Cookie.set("accessToken", Codec.encode(data.accessToken));
+
+				return API.GET(type, url, retries + 1);
+			}
 
 			const data = await response.json();
 
@@ -38,15 +81,17 @@ export default abstract class API {
 		});
 	}
 
-	protected static PUT<T>(type: MIME, url: string, body: BodyInit | Object) {
-		const payload = type === MIME.JSON && typeof body === "object" ? JSON.stringify(body) : body;
-
+	protected static PUT<T>(type: MIME, url: string, body: BodyInit | Object, retries = 0) {
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, {
-				method: "PUT",
-				headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON },
-				body: payload as BodyInit,
-			});
+			const response = await fetch(url, { method: "PUT", headers: API.headers(type), body: API.payload(body) });
+
+			if (retries < 1 && response.status === 401 && Token.REFRESH) {
+				const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
+
+				Cookie.set("accessToken", Codec.encode(data.accessToken));
+
+				return API.PUT(type, url, body, retries + 1);
+			}
 
 			const data = await response.json();
 
@@ -54,15 +99,17 @@ export default abstract class API {
 		});
 	}
 
-	protected static POST<T>(type: MIME, url: string, body: BodyInit | Object) {
-		const payload = type === MIME.JSON && typeof body === "object" ? JSON.stringify(body) : body;
-
+	protected static POST<T>(type: MIME, url: string, body: BodyInit | Object, retries = 0) {
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, {
-				method: "POST",
-				headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON },
-				body: payload as BodyInit,
-			});
+			const response = await fetch(url, { method: "POST", headers: API.headers(type), body: API.payload(body) });
+
+			if (retries < 1 && response.status === 401 && Token.REFRESH) {
+				const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
+
+				Cookie.set("accessToken", Codec.encode(data.accessToken));
+
+				return API.POST(type, url, body, retries + 1);
+			}
 
 			const data = await response.json();
 
@@ -70,15 +117,17 @@ export default abstract class API {
 		});
 	}
 
-	protected static PATCH<T>(type: MIME, url: string, body: BodyInit | Object) {
-		const payload = type === MIME.JSON && typeof body === "object" ? JSON.stringify(body) : body;
-
+	protected static PATCH<T>(type: MIME, url: string, body: BodyInit | Object, retries = 0) {
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, {
-				method: "PATCH",
-				headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON },
-				body: payload as BodyInit,
-			});
+			const response = await fetch(url, { method: "PATCH", headers: API.headers(type), body: API.payload(body) });
+
+			if (retries < 1 && response.status === 401 && Token.REFRESH) {
+				const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
+
+				Cookie.set("accessToken", Codec.encode(data.accessToken));
+
+				return API.PATCH(type, url, body, retries + 1);
+			}
 
 			const data = await response.json();
 
@@ -86,9 +135,17 @@ export default abstract class API {
 		});
 	}
 
-	protected static DELETE<T>(type: MIME, url: string) {
+	protected static DELETE<T>(type: MIME, url: string, retries = 0) {
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, { method: "DELETE", headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON } });
+			const response = await fetch(url, { method: "DELETE", headers: API.headers(type) });
+
+			if (retries < 1 && response.status === 401 && Token.REFRESH) {
+				const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
+
+				Cookie.set("accessToken", Codec.encode(data.accessToken));
+
+				return API.DELETE(type, url, retries + 1);
+			}
 
 			const data = await response.json();
 
