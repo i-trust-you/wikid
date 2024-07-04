@@ -1,3 +1,5 @@
+import Header from "@/_components/common/Header";
+
 import "./globals.css";
 
 export default function Layout({ children }: Readonly<React.PropsWithChildren>) {

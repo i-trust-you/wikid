@@ -288,7 +288,7 @@ interface User {
 		id: number;
 		code: string;
 	};
-	teamId: string;
+	teamId?: string;
 	updatedAt: string;
 }
 
@@ -334,7 +334,7 @@ interface ProfileDetailType {
 	nickname: string;
 	securityQuestion: string;
 	sns: string;
-	teamId: string;
+	teamId?: string;
 	updatedAt: string;
 }
 
@@ -398,7 +398,7 @@ interface SignUpResponse {
 		id: number;
 		name: string;
 		email: string;
-		teamId: string;
+		teamId?: string;
 		profile: {
 			id: number;
 			code: string;
@@ -420,7 +420,7 @@ interface SignInResponse {
 		id: number;
 		name: string;
 		email: string;
-		teamId: string;
+		teamId?: string;
 		profile: {
 			id: number;
 			code: string;
