@@ -74,18 +74,6 @@ export default function Page() {
 		getAllBoards(page, order);
 	}, [page]);
 
-	// return (
-	// 	<main className="flex h-screen w-screen items-center justify-center">
-	// 		<div className="h-[250px] w-[500px]">
-	// 			<Swiper gap={16} columns={2} threshold={1}>
-	// 				{bestBoards.map((board) => (
-	// 					<BoardCard key={board.id} board={board} />
-	// 				))}
-	// 			</Swiper>
-	// 		</div>
-	// 	</main>
-	// );
-
 	return (
 		<main className="px-5 py-10 tablet:px-[60px] tablet:py-[60px]">
 			<section className="mx-auto max-w-[1200px]">
