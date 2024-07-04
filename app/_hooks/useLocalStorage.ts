@@ -1,19 +1,15 @@
 import { useEffect, useState } from "react";
 
 export default function useLocalStorage<T>(key: string, fallback: T) {
-	//
-	// due to a hydration mismatch
-	// the initial value must be updated
-	// after the very first render occurs
-	//
-	const [storage, set_storage] = useState<T>(fallback);
+	const [storage, set_storage] = useState<T>(() => {
+		try {
+			return key in localStorage ? deserialize(localStorage[key]) : fallback;
+		} catch (error) {
+			return fallback;
+		}
+	});
 
 	useEffect(() => {
-		//
-		// initial update
-		//
-		set_storage(key in localStorage ? deserialize(localStorage[key]) : fallback);
-
 		function handle(event: StorageEvent) {
 			if (key === event.key && event.oldValue !== event.newValue && event.storageArea === localStorage) {
 				set_storage(key in localStorage ? deserialize(localStorage[key]) : fallback);
