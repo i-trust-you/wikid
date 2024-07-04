@@ -1,6 +1,7 @@
 "use client";
 
 import API from "@/_api";
+import Modal from "@/_utilities/Modal";
 import { useEffect, useState } from "react";
 
 import useLocalStorage from "@/_hooks/useLocalStorage";
@@ -12,9 +13,10 @@ import LockIcon from "../../../../public/icons/LockIcon";
 type Props = {
 	code: string;
 	question: string;
+	onSuccess: () => void;
 };
 
-export default function QuizModal({ code, question }: Props) {
+export default function QuizModal({ code, question, onSuccess }: Props) {
 	const [isError, setIsError] = useState<Boolean>(false);
 	const [value, setValue] = useState<string>("");
 
@@ -32,8 +34,9 @@ export default function QuizModal({ code, question }: Props) {
 		await API["{teamId}/profiles/{code}/ping"]
 			.POST({ teamId: "6-11", code }, { securityAnswer: value })
 			.then((response) => {
-				// TODO: 모달 끄고 이동???
 				setIsError(false);
+				onSuccess();
+				Modal.close();
 			})
 			.catch(() => {
 				setIsError(true);

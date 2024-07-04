@@ -19,12 +19,12 @@ export default function Page() {
 	const code = Array.isArray(params.code) ? params.code[0] : params.code;
 
 	const [wiki, setWiki] = useState<WikiType | undefined>();
+	const [isEditing, setIsEditing] = useState<boolean>(false);
 
 	useEffect(() => {
 		const getWiki = async () => {
 			await API["{teamId}/profiles/{code}"].GET({ code: code }).then((response) => {
 				setWiki(response);
-				console.log(response);
 			});
 		};
 
@@ -33,12 +33,24 @@ export default function Page() {
 		}
 	}, [code]);
 
+	const handleQuizModalSuccess = () => {
+		setIsEditing(true);
+	};
+
 	const quizModal = useMemo(() => {
-		const newModal = new Modal(<QuizModal code={code} question={wiki?.securityQuestion ?? ""} />, (modal) => {
+		const newModal = new Modal(<QuizModal code={code} question={wiki?.securityQuestion ?? ""} onSuccess={handleQuizModalSuccess} />, (modal) => {
 			modal.close();
 		});
 		return newModal;
 	}, [wiki]);
+
+	if (isEditing) {
+		return (
+			<main className="desktop:pr-[400px]">
+				<div className="relative m-auto max-w-[860px] px-5 py-10 tablet:px-[60px] tablet:py-[60px]">edit</div>
+			</main>
+		);
+	}
 
 	return (
 		<main className="desktop:pr-[400px]">
@@ -61,9 +73,28 @@ export default function Page() {
 				<div className="mt-3 flex tablet:mt-[15px] desktop:absolute desktop:-right-[320px] desktop:top-0 desktop:mt-10">
 					{wiki && <Profile profile={wiki} />}
 				</div>
-				{wiki && (
-					<div className="mt-10 w-full text-gray-500 tablet:mt-[60px]" dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(wiki.content)).parse() }} />
-				)}
+				<div className="mt-10 w-full tablet:mt-[60px]">
+					{wiki?.content ? (
+						<div className="text-gray-500" dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(wiki.content)).parse() }} />
+					) : (
+						<div className="flex flex-col items-center justify-center rounded-[10px] bg-gray-100 p-10">
+							<p className="text-md font-normal text-gray-400 tablet:text-lg">
+								아직 작성된 내용이 없네요.
+								<br />
+								위키에 참여해 보세요!
+							</p>
+							<div className="mt-4 tablet:mt-5">
+								<Button
+									onClick={() => {
+										quizModal.open();
+									}}
+								>
+									시작하기
+								</Button>
+							</div>
+						</div>
+					)}
+				</div>
 			</div>
 		</main>
 	);
