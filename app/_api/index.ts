@@ -127,8 +127,8 @@ export default abstract class API {
 	})();
 
 	public static readonly ["{teamId}/profiles/{code}"] = new (class extends API {
-		public override GET({ code, ...query }: { code: number }) {
-			return API.GET<ProfileDetailType>(MIME.JSON, `${BASE_URL}/{teamId}/profiles/${code}`);
+		public override GET({ teamId = "6-11", code, ...query }: { teamId?: string; code: string }) {
+			return API.GET<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}`);
 		}
 
 		public override PATCH({ teamId = "6-11", code, ...query }: { teamId?: string; code: number }, body: UpdateProfileBody) {
