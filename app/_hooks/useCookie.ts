@@ -8,12 +8,18 @@ import useCrossState from "@/_hooks/useCrossState";
 // overloads
 //
 export default function useCookie<T>(key: string): [T | null, (value: T | ((_: T) => T)) => void];
-export default function useCookie<T>(key: string, fallback: T): [T, (value: T | ((_: T) => T)) => void];
+export default function useCookie<T>(key: string, fallback?: T | (() => T)): [T, (value: T | ((_: T) => T)) => void];
 //
 // implementation
 //
-export default function useCookie<T>(key: string, fallback?: T) {
-	const [value, setter] = useCrossState(key, Codec.decode(Cookie.get(key)) ?? fallback);
+export default function useCookie<T>(key: string, fallback?: T | (() => T)) {
+	const [value, setter] = useCrossState(key, () => {
+		try {
+			return Codec.decode(Cookie.get(key)) ?? (fallback instanceof Function ? fallback() : fallback);
+		} catch (error) {
+			return fallback instanceof Function ? fallback() : fallback;
+		}
+	});
 
 	useEffect(() => Cookie.set(key, Codec.encode(value)), [key, value]);
 

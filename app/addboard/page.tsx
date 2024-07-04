@@ -6,15 +6,9 @@ import Toast from "@/_utilities/Toast";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-
-
 import useCookie from "@/_hooks/useCookie";
 
-
-
 import Button from "@/_components/common/Button";
-
-
 
 import AlignCenterIcon from "../../public/icons/AlignCenterIcon";
 import AlignLeftIcon from "../../public/icons/AlignLeftIcon";
@@ -28,7 +22,6 @@ import ItalicIcon from "../../public/icons/ItalicIcon";
 import LinkIcon from "../../public/icons/LinkIcon";
 import NumberingIcon from "../../public/icons/NumberingIcon";
 import UnderlineIcon from "../../public/icons/UnderlineIcon";
-
 
 export default function Page() {
 	const router = useRouter();
@@ -55,7 +48,7 @@ export default function Page() {
 		[image, title, content],
 	);
 
-	const modal = useMemo(() => new Modal(<Page.Modal onUpload={(response) => setImage(response.url)}/>, (modal) => modal.shake()), []);
+	const modal = useMemo(() => new Modal(<Page.Modal onUpload={(response) => setImage(response.url)} />, (modal) => modal.shake()), []);
 
 	return (
 		<main className="flex w-screen flex-col items-center">

@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 
-
 const [CACHE, TARGET, CHANNEL] = [new Map<string, unknown>(), new EventTarget(), new BroadcastChannel("useCrossState")];
 
-const enum Protocol
-{
+const enum Protocol {
 	SYNC,
 	UPDATE,
 }
 
-class Message<T>
-{
-	constructor(public readonly type: Protocol, public readonly key: string, public readonly value: T)
-	{
+class Message<T> {
+	constructor(
+		public readonly type: Protocol,
+		public readonly key: string,
+		public readonly value: T,
+	) {
 		// TODO: none
 	}
 }
@@ -20,92 +20,81 @@ class Message<T>
 // overloads
 //
 export default function useCrossState<T>(key: string): [T | null, (value: T | ((_: T) => T)) => void];
-export default function useCrossState<T>(key: string, fallback: T): [T, (value: T | ((_: T) => T)) => void];
+export default function useCrossState<T>(key: string, fallback?: T | (() => T)): [T, (value: T | ((_: T) => T)) => void];
 //
 // implementation
 //
-export default function useCrossState<T>(key: string, fallback?: T)
-{
-	const [data, set_data] = useState<T>(CACHE.has(key) ? CACHE.get(key) as T : fallback ?? null as T);
+export default function useCrossState<T>(key: string, fallback?: T | (() => T)) {
+	const [data, set_data] = useState<T>(CACHE.has(key) ? (CACHE.get(key) as T) : fallback instanceof Function ? fallback() : fallback ?? (null as T));
 
-	const setter = useCallback((value: T | ((_: T) => T)) =>
-	{
-		const signal = value instanceof Function ? value(data) : value;
+	const setter = useCallback(
+		(value: T | ((_: T) => T)) => {
+			const signal = value instanceof Function ? value(data) : value;
 
-		if (signal !== data)
-		{
-			set_data(signal);
+			if (signal !== data) {
+				set_data(signal);
 
-			const msg = new Message(Protocol.UPDATE, key, signal);
+				const msg = new Message(Protocol.UPDATE, key, signal);
+				//
+				// STEP 3. waterfall cache -> target -> channel
+				//
+				CACHE.set(key, signal);
+				TARGET.dispatchEvent(new CustomEvent("msg", { detail: msg }));
+				CHANNEL.postMessage(msg);
+			}
+		},
+		[key, data],
+	);
+
+	const protocol = useCallback(
+		(msg: Message<T>) => {
 			//
-			// STEP 3. waterfall cache -> target -> channel
+			// STEP 2. match key & value
 			//
-			CACHE.set(key, signal); TARGET.dispatchEvent(new CustomEvent("msg", { detail: msg })); CHANNEL.postMessage(msg);
-		}
-	},
-	[key, data]);
-
-	const protocol = useCallback((msg: Message<T>) =>
-	{
-		//
-		// STEP 2. match key & value
-		//
-		if (msg.key === key && msg.value !== data)
-		{
-			switch (msg.type)
-			{
-				case Protocol.SYNC:
-				{
-					//
-					// STEP 3. send back data
-					//
-					CHANNEL.postMessage(new Message(Protocol.UPDATE, key, data));
-					break;
-				}
-				case Protocol.UPDATE:
-				{
-					//
-					// STEP 3. reflect msg
-					//
-					set_data(msg.value);
-					break;
+			if (msg.key === key && msg.value !== data) {
+				switch (msg.type) {
+					case Protocol.SYNC: {
+						//
+						// STEP 3. send back data
+						//
+						CHANNEL.postMessage(new Message(Protocol.UPDATE, key, data));
+						break;
+					}
+					case Protocol.UPDATE: {
+						//
+						// STEP 3. reflect msg
+						//
+						set_data(msg.value);
+						break;
+					}
 				}
 			}
-		}
-	},
-	[key, data]);
+		},
+		[key, data],
+	);
 
-	useEffect(() =>
-	{
-		function handle(event: CustomEvent)
-		{
+	useEffect(() => {
+		function handle(event: CustomEvent) {
 			protocol(event.detail as Message<T>);
 		}
 		// @ts-ignore
 		TARGET.addEventListener("msg", handle);
 		// @ts-ignore
 		return () => TARGET.removeEventListener("msg", handle);
-	},
-	[protocol]);
+	}, [protocol]);
 
-	useEffect(() =>
-	{
-		function handle(event: MessageEvent)
-		{
+	useEffect(() => {
+		function handle(event: MessageEvent) {
 			protocol(event.data as Message<T>);
 		}
 		CHANNEL.addEventListener("message", handle);
 		return () => CHANNEL.removeEventListener("message", handle);
-	},
-	[protocol]);
+	}, [protocol]);
 
 	/** @see https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API */
-	useEffect(() =>
-	{
-		function handle(event: Event)
-		{
-			if (!document.hidden)
-			{
+	useEffect(() => {
+		function handle(event: Event) {
+			if (!document.hidden) {
 				//
 				// STEP 1. synchronize
 				//
@@ -114,17 +103,14 @@ export default function useCrossState<T>(key: string, fallback?: T)
 		}
 		document.addEventListener("visibilitychange", handle);
 		return () => document.removeEventListener("visibilitychange", handle);
-	},
-	[key, data]);
+	}, [key, data]);
 
-	useEffect(() =>
-	{
+	useEffect(() => {
 		//
 		// STEP 1. synchronize
 		//
 		CHANNEL.postMessage(new Message<T>(Protocol.SYNC, key, data));
-	},
-	[]);
+	}, []);
 
 	return [data, setter] as [T, typeof setter];
 }
