@@ -16,7 +16,7 @@ export default function BoardDropdown({ options, onSelect }: BoardDropdownProps)
 	return (
 		<div className="relative w-full">
 			<Dropdown options={options} onSelect={onSelect}>
-				<div className="[&_button]:flex [&_button]:h-[45px] [&_button]:w-full [&_button]:items-center [&_button]:justify-between [&_button]:rounded-[10px] [&_button]:bg-gray-100 [&_button]:px-[20px] [&_button]:py-[10px] [&_button]:transition [&_button]:hover:bg-gray-200 [&_button]:active:bg-gray-300">
+				<div className="[&_div]:flex [&_div]:h-[45px] [&_div]:w-full [&_div]:cursor-pointer [&_div]:items-center [&_div]:justify-between [&_div]:rounded-[10px] [&_div]:bg-gray-100 [&_div]:px-[20px] [&_div]:py-[10px] [&_div]:transition [&_div]:hover:bg-gray-200 [&_div]:active:bg-gray-300">
 					<Dropdown.Trigger>
 						<p className="truncate text-md font-normal text-gray-500">
 							<Dropdown.Current />
