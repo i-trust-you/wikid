@@ -1,5 +1,6 @@
 "use client";
 
+import API from "@/_api";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -7,17 +8,7 @@ import useMediaQuery from "@/_hooks/useMediaQuery";
 
 import ArrowDownIcon from "../../../../public/icons/ArrowDownIcon";
 
-type ProfileData = {
-	image: string | null;
-	city: string;
-	mbti: string;
-	job: string;
-	sns: string;
-	birthday: string;
-	nickname: string;
-	bloodType: string;
-	nationality: string;
-};
+type ProfileData = Awaited<ReturnType<(typeof API)["{teamId}/profiles/{code}"]["GET"]>>;
 
 type Props = {
 	profile: ProfileData;
