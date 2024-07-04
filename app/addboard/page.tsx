@@ -40,7 +40,7 @@ export default function Page() {
 		router.push("/");
 	}
 
-	const [img, setImg] = useState("");
+	const [image, setImg] = useState("");
 	const [title, setTitle] = useState("");
 	const [content, setContent] = useState("");
 
@@ -48,14 +48,14 @@ export default function Page() {
 		async (event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			API["{teamId}/articles"].POST({}, { title, content, image: "https://example.com" }).then((response) => {
+			API["{teamId}/articles"].POST({}, { image, title, content }).then((response) => {
 				router.push(`/boards/${response.id}`);
 			});
 		},
 		[title, content],
 	);
 
-	const modal = useMemo(() => new Modal(<Page.Modal />, (modal) => modal.shake()), []);
+	const modal = useMemo(() => new Modal(<Page.Modal onUpload={(response) => setImg(response.url)}/>, (modal) => modal.shake()), []);
 
 	return (
 		<main className="flex w-screen flex-col items-center">
@@ -157,12 +157,10 @@ Page.Modal = function UploadModal(props: Readonly<{ onUpload: (response: Awaited
 			event.preventDefault();
 
 			if (file) {
+				// gtfo
 				Modal.close();
 
-				API["{teamId}/images/upload"].POST({}, file).then((response) => {
-					console.log(response);
-					props.onUpload(response);
-				});
+				API["{teamId}/images/upload"].POST({}, file).then((response) => props.onUpload(response));
 			}
 		},
 		[file, preview],
