@@ -32,37 +32,37 @@ export default function Profile({ profile }: Props) {
 					<tbody className="flex flex-col gap-2 text-left text-xs font-normal tablet:text-md desktop:gap-4">
 						<tr>
 							<th className="w-[60px] font-normal text-gray-400">거주 도시</th>
-							<td className="pl-[10px] text-gray-500">{profile.city}</td>
+							<td className="pl-[10px] text-gray-500">{profile.city === "" ? "-" : profile.city}</td>
 						</tr>
 						<tr>
 							<th className="w-[60px] font-normal text-gray-400">MBTI</th>
-							<td className="pl-[10px] text-gray-500">{profile.mbti}</td>
+							<td className="pl-[10px] text-gray-500">{profile.mbti === "" ? "-" : profile.mbti}</td>
 						</tr>
 						<tr>
 							<th className="w-[60px] font-normal text-gray-400">직업</th>
-							<td className="pl-[10px] text-gray-500">{profile.job}</td>
+							<td className="pl-[10px] text-gray-500">{profile.job === "" ? "-" : profile.job}</td>
 						</tr>
 						{(isLargeScreen || isOpen) && (
 							<>
 								<tr>
 									<th className="w-[60px] font-normal text-gray-400">SNS 계정</th>
-									<td className="pl-[10px] text-gray-500">{profile.sns}</td>
+									<td className="pl-[10px] text-gray-500">{profile.sns === "" ? "-" : profile.sns}</td>
 								</tr>
 								<tr>
 									<th className="w-[60px] font-normal text-gray-400">생일</th>
-									<td className="pl-[10px] text-gray-500">{profile.birthday}</td>
+									<td className="pl-[10px] text-gray-500">{profile.birthday === "" ? "-" : profile.birthday}</td>
 								</tr>
 								<tr>
 									<th className="w-[60px] font-normal text-gray-400">별명</th>
-									<td className="pl-[10px] text-gray-500">{profile.nickname}</td>
+									<td className="pl-[10px] text-gray-500">{profile.nickname === "" ? "-" : profile.nickname}</td>
 								</tr>
 								<tr>
 									<th className="w-[60px] font-normal text-gray-400">혈액형</th>
-									<td className="pl-[10px] text-gray-500">{profile.bloodType}</td>
+									<td className="pl-[10px] text-gray-500">{profile.bloodType === "" ? "-" : profile.bloodType}</td>
 								</tr>
 								<tr>
 									<th className="w-[60px] font-normal text-gray-400">국적</th>
-									<td className="pl-[10px] text-gray-500">{profile.nationality}</td>
+									<td className="pl-[10px] text-gray-500">{profile.nationality === "" ? "-" : profile.nationality}</td>
 								</tr>
 							</>
 						)}
