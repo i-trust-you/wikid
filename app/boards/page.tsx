@@ -12,6 +12,7 @@ import useMediaQuery from "@/_hooks/useMediaQuery";
 
 import Button from "@/_components/common/Button";
 import Pagination from "@/_components/general/Pagination";
+import Swiper from "@/_components/general/Swiper";
 
 type Board = Awaited<ReturnType<(typeof API)["{teamId}/articles"]["GET"]>>["list"][number];
 type Order = "recent" | "like";
@@ -73,6 +74,18 @@ export default function Page() {
 		getAllBoards(page, order);
 	}, [page]);
 
+	// return (
+	// 	<main className="flex h-screen w-screen items-center justify-center">
+	// 		<div className="h-[250px] w-[500px]">
+	// 			<Swiper gap={16} columns={2} threshold={1}>
+	// 				{bestBoards.map((board) => (
+	// 					<BoardCard key={board.id} board={board} />
+	// 				))}
+	// 			</Swiper>
+	// 		</div>
+	// 	</main>
+	// );
+
 	return (
 		<main className="px-5 py-10 tablet:px-[60px] tablet:py-[60px]">
 			<section className="mx-auto max-w-[1200px]">
@@ -82,18 +95,22 @@ export default function Page() {
 						<Button href="/addboard">게시물 등록하기</Button>
 					</div>
 				</div>
-				<div className="mt-10 flex items-start gap-4 tablet:mt-[60px] tablet:grid tablet:grid-cols-2 tablet:gap-5 desktop:flex">
-					{bestBoards.map((board) => (
-						<BoardCard
-							key={board.id}
-							id={board.id}
-							title={board.title}
-							image={board.image}
-							writerName={board.writer.name}
-							createdAt={new Date(board.createdAt)}
-							likeCount={board.likeCount}
-						/>
-					))}
+				<div className="mt-10">
+					{isLargeScreen ? (
+						<div className="flex items-start gap-4 tablet:mt-[60px] tablet:grid tablet:grid-cols-2 tablet:gap-5 desktop:flex">
+							{bestBoards.map((board) => (
+								<BoardCard key={board.id} board={board} />
+							))}
+						</div>
+					) : (
+						<div className="overflow-y-visible">
+							<Swiper gap={16} columns={2} threshold={1}>
+								{bestBoards.map((board) => (
+									<BoardCard key={board.id} board={board} />
+								))}
+							</Swiper>
+						</div>
+					)}
 				</div>
 			</section>
 			<section className="mx-auto mt-10 flex max-w-[1200px] flex-col tablet:mt-[60px]">
