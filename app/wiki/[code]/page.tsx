@@ -1,11 +1,22 @@
 "use client";
 
+import Modal from "@/_utilities/Modal";
 import Profile from "@/wiki/[code]/_components/Profile";
+import QuizModal from "@/wiki/[code]/_components/QuizModal";
+import { useMemo } from "react";
 
 import BackLink from "@/_components/common/BackLink";
 import Button from "@/_components/common/Button";
 
 export default function Page() {
+	const quizModal = useMemo(
+		() =>
+			new Modal(<QuizModal code="456" question="안녕" />, (modal) => {
+				modal.close();
+			}),
+		[],
+	);
+
 	const test = {
 		image: null,
 		city: "전주",
@@ -24,7 +35,13 @@ export default function Page() {
 				<div className="flex justify-between">
 					<h1 className="text-3xl font-semibold text-gray-500 tablet:text-5xl">이승헌</h1>
 					<div className="w-[120px] tablet:w-[160px]">
-						<Button> 위키 참여하기</Button>
+						<Button
+							onClick={() => {
+								quizModal.open();
+							}}
+						>
+							위키 참여하기
+						</Button>
 					</div>
 				</div>
 				<div className="mt-6 tablet:mt-8">
