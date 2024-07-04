@@ -40,7 +40,7 @@ export default function Page() {
 		router.push("/");
 	}
 
-	const [image, setImg] = useState("");
+	const [image, setImage] = useState("");
 	const [title, setTitle] = useState("");
 	const [content, setContent] = useState("");
 
@@ -52,10 +52,10 @@ export default function Page() {
 				router.push(`/boards/${response.id}`);
 			});
 		},
-		[title, content],
+		[image, title, content],
 	);
 
-	const modal = useMemo(() => new Modal(<Page.Modal onUpload={(response) => setImg(response.url)}/>, (modal) => modal.shake()), []);
+	const modal = useMemo(() => new Modal(<Page.Modal onUpload={(response) => setImage(response.url)}/>, (modal) => modal.shake()), []);
 
 	return (
 		<main className="flex w-screen flex-col items-center">
