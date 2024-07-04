@@ -131,7 +131,7 @@ export default abstract class API {
 			return API.GET<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}`);
 		}
 
-		public override PATCH({ teamId = "6-11", code, ...query }: { teamId?: string; code: number }, body: UpdateProfileBody) {
+		public override PATCH({ teamId = "6-11", code, ...query }: { teamId?: string; code: string }, body: UpdateProfileBody) {
 			return API.PATCH<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}`, body);
 		}
 	})();
