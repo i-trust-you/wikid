@@ -1,13 +1,19 @@
 "use client";
 
 import Pagination from "@/_components/general/Pagination";
+import { useState } from "react";
 
 export default function Page() {
+	const [page, setPage] = useState(0);
+
 	return (
 		<main className="flex h-screen w-screen flex-col items-center justify-center gap-[25px]">
-			<Pagination page={0} clamp={10} length={25} />
+			<button onClick={() => setPage((_) => _ + 1)}>
+				클릭! {page}
+			</button>
+			<Pagination page={page} clamp={10} length={25} onChange={(_) => setPage(_)}/>
 			<hr />
-			<Pagination page={0} clamp={10} length={100}>
+			<Pagination page={page} clamp={10} length={100} onChange={(_) => setPage(_)}>
 				<div className="flex gap-[10px]">
 					<Pagination.Generator>
 						{(page) => (

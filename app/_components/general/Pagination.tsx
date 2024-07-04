@@ -25,8 +25,20 @@ function useCTX() {
 }
 
 // TODO: pass id, class, style
-export default function Pagination(props: Readonly<React.PropsWithChildren & Props>) {
+export default function Pagination(props: Readonly<React.PropsWithChildren & Props & { onChange: (_: number) => void; }>) {
 	const [page, setPage] = useState(props.page);
+
+	useEffect(() =>
+	{
+		props.onChange(page);
+	},
+	[page]);
+
+	useEffect(() =>
+	{
+		setPage(Math.min(Math.max(0, props.page), props.length - 1));
+	},
+	[props.page, props.length]);
 
 	const children = useMemo(() => {
 		// early return
