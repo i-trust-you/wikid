@@ -3,6 +3,7 @@
 import API from "@/_api";
 import Modal from "@/_utilities/Modal";
 import Profile from "@/wiki/[code]/_components/Profile";
+import ProfileForm from "@/wiki/[code]/_components/ProfileForm";
 import QuizModal from "@/wiki/[code]/_components/QuizModal";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -47,7 +48,18 @@ export default function Page() {
 	if (isEditing) {
 		return (
 			<main className="desktop:pr-[400px]">
-				<div className="relative m-auto max-w-[860px] px-5 py-10 tablet:px-[60px] tablet:py-[60px]">edit</div>
+				<div className="relative m-auto max-w-[860px] px-5 py-10 tablet:px-[60px] tablet:py-[60px]">
+					<div className="mt-3 flex tablet:mt-[15px] desktop:absolute desktop:-right-[320px] desktop:top-0 desktop:mt-10">
+						{wiki && (
+							<ProfileForm
+								profile={wiki}
+								onCancle={() => {
+									setIsEditing(false);
+								}}
+							/>
+						)}
+					</div>
+				</div>
 			</main>
 		);
 	}
