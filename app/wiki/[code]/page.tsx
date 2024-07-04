@@ -1,39 +1,50 @@
 "use client";
 
+import API from "@/_api";
 import Modal from "@/_utilities/Modal";
 import Profile from "@/wiki/[code]/_components/Profile";
 import QuizModal from "@/wiki/[code]/_components/QuizModal";
-import { useMemo } from "react";
+import { useParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 import BackLink from "@/_components/common/BackLink";
 import Button from "@/_components/common/Button";
+import Parser from "@/_components/common/Markdown/parser";
+import Scanner from "@/_components/common/Markdown/scanner";
+
+type WikiType = Awaited<ReturnType<(typeof API)["{teamId}/profiles/{code}"]["GET"]>>;
 
 export default function Page() {
-	const quizModal = useMemo(
-		() =>
-			new Modal(<QuizModal code="456" question="안녕" />, (modal) => {
-				modal.close();
-			}),
-		[],
-	);
+	const params = useParams();
+	const code = Array.isArray(params.code) ? params.code[0] : params.code;
 
-	const test = {
-		image: null,
-		city: "전주",
-		mbti: "ESFJ",
-		job: "home protector",
-		sns: "heony704",
-		birthday: "1997-07-04",
-		nickname: "허니",
-		bloodType: "A",
-		nationality: "한국",
-	};
+	const [wiki, setWiki] = useState<WikiType | undefined>();
+
+	useEffect(() => {
+		const getWiki = async () => {
+			await API["{teamId}/profiles/{code}"].GET({ code: code }).then((response) => {
+				setWiki(response);
+				console.log(response);
+			});
+		};
+
+		if (code) {
+			getWiki();
+		}
+	}, [code]);
+
+	const quizModal = useMemo(() => {
+		const newModal = new Modal(<QuizModal code={code} question={wiki?.securityQuestion ?? ""} />, (modal) => {
+			modal.close();
+		});
+		return newModal;
+	}, [wiki]);
 
 	return (
 		<main className="desktop:pr-[400px]">
 			<div className="relative m-auto max-w-[860px] px-5 py-10 tablet:px-[60px] tablet:py-[60px]">
 				<div className="flex justify-between">
-					<h1 className="text-3xl font-semibold text-gray-500 tablet:text-5xl">이승헌</h1>
+					<h1 className="text-3xl font-semibold text-gray-500 tablet:text-5xl">{wiki?.name}</h1>
 					<div className="w-[120px] tablet:w-[160px]">
 						<Button
 							onClick={() => {
@@ -48,9 +59,11 @@ export default function Page() {
 					<BackLink>https://dkjfaklfd</BackLink>
 				</div>
 				<div className="mt-3 flex tablet:mt-[15px] desktop:absolute desktop:-right-[320px] desktop:top-0 desktop:mt-10">
-					<Profile profile={test} />
+					{wiki && <Profile profile={wiki} />}
 				</div>
-				<div className="mt-10 tablet:mt-[60px]">개요</div>
+				{wiki && (
+					<div className="mt-10 w-full text-gray-500 tablet:mt-[60px]" dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(wiki.content)).parse() }} />
+				)}
 			</div>
 		</main>
 	);
