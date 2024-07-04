@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import useObserver from "@/_hooks/useObserver";
 
 import Comment from "./Comment";
+import CommentForm from "./CommentForm";
 
 type CommentType = Awaited<ReturnType<(typeof API)["{teamId}/articles/{articleId}/comments"]["GET"]>>["list"][0];
 
@@ -40,8 +41,7 @@ export default function CommentList({ articleId }: { articleId: number }) {
 				<span className="text-gray-500">댓글</span>
 				<span className="text-primary-200">{commentData ? commentData.length : 0}</span>
 			</div>
-			{/* // TODO: Form 컴포넌트 <div>Form</div> */}
-			{/* // TODO: Intersection Observer를 활용한 무한스크롤의 구현 */}
+			<CommentForm articleId={articleId} />
 			<div className="m-auto flex w-[335px] flex-col gap-[14px] tablet:w-[624px] tablet:gap-4 desktop:w-[1060px] desktop:gap-6">
 				{commentData && commentData.length > 0 ? (
 					<>
