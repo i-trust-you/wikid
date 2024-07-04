@@ -105,136 +105,169 @@ export default abstract class API {
 	}
 
 	public static readonly ["{teamId}/users/me"] = new (class extends API {
-		public override GET({ teamId = "6-11", ...query }: { teamId: string }) {
+		public override GET({ teamId = "6-11" }: TeamId) {
 			return API.GET<User>(MIME.JSON, `${BASE_URL}/${teamId}/users/me`);
 		}
 	})();
 
 	public static readonly ["{teamId}/users/me/password"] = new (class extends API {
-		public override PATCH({ teamId = "6-11", ...query }: { teamId: string }, body: UpdatePasswordBody) {
-			return API.PATCH<User>(MIME.JSON, `${BASE_URL}/${teamId}/users/me/password`, body);
+		public override PATCH({ teamId = "6-11" }: TeamId, body: UpdatePasswordBody) {
+			return API.PATCH<User>(MIME.JSON, `${BASE_URL}/${teamId}/users/me/password?}`, body);
 		}
 	})();
 
 	public static readonly ["{teamId}/profiles"] = new (class extends API {
-		public override POST({ teamId = "6-11", ...query }: { teamId: string }, body: CreateProfileBody) {
+		public override POST({ teamId = "6-11" }: TeamId, body: CreateProfileBody) {
 			return API.POST<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles`, body);
 		}
 
-		public override GET({ teamId = "6-11", ...query }: { teamId: string; name: string; page: number; pageSize: number }) {
-			return API.GET<OffsetBasedPaginationResponse<ProfileListType>>(MIME.JSON, `${BASE_URL}/${teamId}/profiles`);
+		public override GET({ teamId = "6-11", ...query }: TeamId & { name?: string } & { page?: number; pageSize?: number }) {
+			return API.GET<OffsetBasedPaginationResponse<ProfileListType>>(MIME.JSON, `${BASE_URL}/${teamId}/profiles?${API.query(query)}`);
 		}
 	})();
 
 	public static readonly ["{teamId}/profiles/{code}"] = new (class extends API {
-		public override GET({ code, ...query }: { code: number }) {
-			return API.GET<ProfileDetailType>(MIME.JSON, `${BASE_URL}/{teamId}/profiles/${code}`);
+		public override GET({ teamId = "6-11", code }: TeamId & ProfileCode) {
+			return API.GET<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}`);
 		}
 
-		public override PATCH({ teamId = "6-11", code, ...query }: { teamId: string; code: number }, body: UpdateProfileBody) {
+		public override PATCH({ teamId = "6-11", code }: TeamId & ProfileCode, body: UpdateProfileBody) {
 			return API.PATCH<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}`, body);
 		}
 	})();
 
 	public static readonly ["{teamId}/profiles/{code}/ping"] = new (class extends API {
-		public override GET({ code, ...query }: { code: number }) {
-			return API.GET<PingResponse>(MIME.JSON, `${BASE_URL}/{teamId}/profiles/${code}/ping`);
+		public override GET({ teamId = "6-11", code }: TeamId & ProfileCode) {
+			return API.GET<PingResponse>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}/ping`);
 		}
 
-		public override POST({ teamId = "6-11", code, ...query }: { teamId: string; code: number }, body: PingRequestBody) {
+		public override POST({ teamId = "6-11", code }: TeamId & ProfileCode, body: PingRequestBody) {
 			return API.POST<PingResponse>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}/ping`, body);
 		}
 	})();
 
 	public static readonly ["{teamId}/notifications"] = new (class extends API {
-		public override GET({ teamId = "6-11", ...query }: { teamId: string; page: number; pageSize: number }) {
+		public override GET({ teamId = "6-11", ...query }: TeamId & GetNotificationsQuery) {
 			return API.GET<OffsetBasedPaginationResponse<NotificationType>>(MIME.JSON, `${BASE_URL}/${teamId}/notifications?${API.query(query)}`);
 		}
 	})();
 
 	public static readonly ["{teamId}/notifications/{id}"] = new (class extends API {
-		public override DELETE({ teamId = "6-11", id, ...query }: { teamId: string; id: number }) {
+		public override DELETE({ teamId = "6-11", id }: TeamId & { id: number }) {
 			return API.DELETE<NotificationType>(MIME.JSON, `${BASE_URL}/${teamId}/notifications/${id}`);
 		}
 	})();
 
 	public static readonly ["{teamId}/images/upload"] = new (class extends API {
-		public override POST({ teamId = "6-11", ...query }: { teamId: string }, body: string) {
+		public override POST({ teamId = "6-11" }: TeamId, body: string) {
 			return API.POST<{ url: string }>(MIME.FORM_DATA, `${BASE_URL}/${teamId}/images/upload`, body);
 		}
 	})();
 
 	public static readonly ["{teamId}/articles/{articleId}/comments"] = new (class extends API {
-		public override POST({ articleId, ...query }: { articleId: number }, body: CreateCommentBody) {
-			return API.POST<CommentType>(MIME.JSON, `${BASE_URL}/{teamId}/articles/${articleId}/comments`, body);
+		public override POST({ teamId = "6-11", articleId }: TeamId & ArticleId, body: CreateCommentBody) {
+			return API.POST<CommentType>(MIME.JSON, `${BASE_URL}/${teamId}/articles/${articleId}/comments`, body);
 		}
 
-		public override GET({ articleId, ...query }: { articleId: number; limit: number; cursor?: number }) {
-			return API.GET<CursorBasedPaginationResponse<CommentType>>(MIME.JSON, `${BASE_URL}/{teamId}/articles/${articleId}/comments?${API.query(query)}`);
+		public override GET({ teamId = "6-11", articleId, ...query }: TeamId & ArticleId & GetCommentsQuery) {
+			return API.GET<CursorBasedPaginationResponse<CommentType>>(MIME.JSON, `${BASE_URL}/${teamId}/articles/${articleId}/comments?${API.query(query)}`);
 		}
 	})();
 
 	public static readonly ["{teamId}/comments/{commentId}"] = new (class extends API {
-		public override PATCH({ commentId, ...query }: { commentId: number }, body: UpdateCommentBody) {
-			return API.PATCH<CommentType>(MIME.JSON, `${BASE_URL}/{teamId}/comments/${commentId}`, body);
+		public override PATCH({ teamId = "6-11", commentId }: TeamId & CommentId, body: UpdateCommentBody) {
+			return API.PATCH<CommentType>(MIME.JSON, `${BASE_URL}/${teamId}/comments/${commentId}`, body);
 		}
 
-		public override DELETE({ commentId, ...query }: { commentId: number }) {
-			return API.DELETE<{ id: number }>(MIME.JSON, `${BASE_URL}/{teamId}/comments/${commentId}`);
+		public override DELETE({ teamId = "6-11", commentId }: TeamId & CommentId) {
+			return API.DELETE<{ id: number }>(MIME.JSON, `${BASE_URL}/${teamId}/comments/${commentId}`);
 		}
 	})();
 
 	public static readonly ["{teamId}/auth/signUp"] = new (class extends API {
-		public override POST({ teamId = "6-11", ...query }: { teamId: string }, body: SignUpRequestBody) {
+		public override POST({ teamId = "6-11" }: TeamId, body: SignUpRequestBody) {
 			return API.POST<SignUpResponse>(MIME.JSON, `${BASE_URL}/${teamId}/auth/signUp`, body);
 		}
 	})();
 
 	public static readonly ["{teamId}/auth/signIn"] = new (class extends API {
-		public override POST({ ...query }: {}, body: SignInRequestBody) {
-			return API.POST<SignInResponse>(MIME.JSON, `${BASE_URL}/{teamId}/auth/signIn`, body);
+		public override POST({ teamId = "6-11" }: TeamId, body: SignInRequestBody) {
+			return API.POST<SignInResponse>(MIME.JSON, `${BASE_URL}/${teamId}/auth/signIn`, body);
 		}
 	})();
 
 	public static readonly ["{teamId}/auth/refresh-token"] = new (class extends API {
-		public override POST({ ...query }: {}, body: { refreshToken: string }) {
-			return API.POST<{ accessToken: string }>(MIME.JSON, `${BASE_URL}/{teamId}/auth/refresh-token`, body);
+		public override POST({ teamId = "6-11" }: TeamId, body: { refreshToken: string }) {
+			return API.POST<{ accessToken: string }>(MIME.JSON, `${BASE_URL}/${teamId}/auth/refresh-token`, body);
 		}
 	})();
 
 	public static readonly ["{teamId}/articles"] = new (class extends API {
-		public override POST({ teamId = "6-11", ...query }: { teamId: string }, body: CreateArticleBody) {
+		public override POST({ teamId = "6-11" }: TeamId, body: CreateArticleBody) {
 			return API.POST<ArticleListType>(MIME.JSON, `${BASE_URL}/${teamId}/articles`, body);
 		}
 
-		public override GET({ teamId = "6-11", ...query }: { teamId: string; page?: number; pageSize?: number; orderBy?: "like" | "recent"; keyword?: string }) {
-			return API.GET<OffsetBasedPaginationResponse<ArticleListType>>(MIME.JSON, `${BASE_URL}/${teamId}/articles?${API.query}`);
+		public override GET({ teamId = "6-11", ...query }: TeamId & GetArticlesQuery) {
+			return API.GET<OffsetBasedPaginationResponse<ArticleListType>>(MIME.JSON, `${BASE_URL}/${teamId}/articles?${API.query(query)}`);
 		}
 	})();
 
 	public static readonly ["{teamId}/articles/{articleId}"] = new (class extends API {
-		public override GET({ teamId = "6-11", articleId, ...query }: { teamId: string; articleId: number }) {
+		public override GET({ teamId = "6-11", articleId }: TeamId & ArticleId) {
 			return API.GET<ArticleDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/articles/${articleId}`);
 		}
 
-		public override PATCH({ teamId = "6-11", articleId, ...query }: { teamId: string; articleId: number }, body: UpdateArticleBody) {
+		public override PATCH({ teamId = "6-11", articleId }: TeamId & ArticleId, body: UpdateArticleBody) {
 			return API.PATCH<ArticleDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/articles/${articleId}`, body);
 		}
 
-		public override DELETE({ teamId = "6-11", articleId, ...query }: { teamId: string; articleId: number }) {
+		public override DELETE({ teamId = "6-11", articleId }: TeamId & ArticleId) {
 			return API.DELETE<{ id: number }>(MIME.JSON, `${BASE_URL}/${teamId}/articles/${articleId}`);
 		}
 	})();
 
 	public static readonly ["{teamId}/articles/{articleId}/like"] = new (class extends API {
-		public override POST({ articleId, ...query }: { articleId: number }) {
-			return API.POST<ArticleDetailType>(MIME.JSON, `${BASE_URL}/{teamId}/articles/${articleId}/like`, "");
+		public override POST({ teamId = "6-11", articleId }: TeamId & ArticleId) {
+			return API.POST<ArticleDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/articles/${articleId}/like`, "");
 		}
 
-		public override DELETE({ articleId, ...query }: { articleId: number }) {
-			return API.DELETE<ArticleDetailType>(MIME.JSON, `${BASE_URL}/{teamId}/articles/${articleId}/like`);
+		public override DELETE({ teamId = "6-11", articleId }: TeamId & ArticleId) {
+			return API.DELETE<ArticleDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/articles/${articleId}/like`);
 		}
 	})();
+}
+
+interface TeamId {
+	teamId: string;
+}
+
+interface ArticleId {
+	articleId: number;
+}
+
+interface CommentId {
+	commentId: number;
+}
+
+interface ProfileCode {
+	code: number;
+}
+
+interface GetArticlesQuery {
+	page?: number;
+	pageSize?: number;
+	orderBy?: "like" | "recent";
+	keyword?: string;
+}
+
+interface GetCommentsQuery {
+	limit: number;
+	cursor?: number;
+}
+
+interface GetNotificationsQuery {
+	page?: number;
+	pageSize: number;
 }
 
 interface OffsetBasedPaginationResponse<T> {
@@ -255,7 +288,7 @@ interface User {
 		id: number;
 		code: string;
 	};
-	teamId: string;
+	teamId?: string;
 	updatedAt: string;
 }
 
@@ -301,7 +334,7 @@ interface ProfileDetailType {
 	nickname: string;
 	securityQuestion: string;
 	sns: string;
-	teamId: string;
+	teamId?: string;
 	updatedAt: string;
 }
 
@@ -365,7 +398,7 @@ interface SignUpResponse {
 		id: number;
 		name: string;
 		email: string;
-		teamId: string;
+		teamId?: string;
 		profile: {
 			id: number;
 			code: string;
@@ -387,7 +420,7 @@ interface SignInResponse {
 		id: number;
 		name: string;
 		email: string;
-		teamId: string;
+		teamId?: string;
 		profile: {
 			id: number;
 			code: string;
