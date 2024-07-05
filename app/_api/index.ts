@@ -207,7 +207,7 @@ export default abstract class API {
 			return API.POST<ArticleListType>(MIME.JSON, `${BASE_URL}/${teamId}/articles`, body);
 		}
 
-		public override GET({ teamId = "6-11", ...query }: TeamId & GetArticlesQuery) {
+		public override GET({ teamId = "6-11", ...query }: { teamId: string; page?: number; pageSize?: number; orderBy?: "like" | "recent"; keyword?: string }) {
 			return API.GET<OffsetBasedPaginationResponse<ArticleListType>>(MIME.JSON, `${BASE_URL}/${teamId}/articles?${API.query(query)}`);
 		}
 	})();
@@ -238,7 +238,7 @@ export default abstract class API {
 }
 
 interface TeamId {
-	teamId: string;
+	teamId?: string;
 }
 
 interface ArticleId {
