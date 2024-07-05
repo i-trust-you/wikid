@@ -238,7 +238,7 @@ export default abstract class API {
 }
 
 interface TeamId {
-	teamId: string;
+	teamId?: string;
 }
 
 interface ArticleId {
