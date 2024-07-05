@@ -1,4 +1,3 @@
-import Image from "next/image";
 import ReactDOM from "react-dom/client";
 
 import CloseIcon from "../../public/icons/CloseIcon";

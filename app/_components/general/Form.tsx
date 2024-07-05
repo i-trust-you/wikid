@@ -62,6 +62,7 @@ export default function Form(props: Readonly<React.PropsWithChildren & { onSubmi
 					}
 					props.onSubmit(data);
 				}}
+				className="w-full"
 			>
 				{props.children}
 			</form>
@@ -195,7 +196,7 @@ function Text(
 			// @ts-ignore
 			onPaste={(event) => setValue(event.target.value)}
 			onChange={(event) => setValue(event.target.value)}
-			className="w-[335px] rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal text-gray-500 outline-none placeholder:text-gray-400 tablet:w-[400px]"
+			className="w-full rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal text-gray-500 outline-none placeholder:text-gray-400"
 		/>
 	);
 }
@@ -237,10 +238,16 @@ function ImageInput(props: Readonly<{ id: string; required?: Report<boolean> }>)
 		<div>
 			<label htmlFor={props.id}>
 				<div
-					className="flex aspect-square w-full items-center justify-center rounded-full bg-gray-200 bg-cover bg-center text-white"
+					className="flex aspect-square w-full cursor-pointer items-center justify-center rounded-full bg-gray-200 bg-cover bg-center text-white"
 					style={{ backgroundImage: `url("${preview}")` }}
 				>
-					<CameraIcon width="35" height="35" />
+					{preview ? (
+						<div className="flex aspect-square w-full items-center justify-center rounded-full bg-black opacity-50">
+							<CameraIcon width="35" height="35" />
+						</div>
+					) : (
+						<CameraIcon width="35" height="35" />
+					)}
 				</div>
 				<input id={props.id} type="file" accept=".png,.jpg,.jpeg,.webp" multiple={false} className="hidden" onChange={(event) => upload(event)} />
 			</label>
@@ -287,8 +294,17 @@ function Select(props: Readonly<{ id: string; sync?: Report<string>; required?: 
 			<div className="relative">
 				<Dropdown.Trigger>
 					{/* @ts-ignore */}
-					<div className="w-full rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal" style={{ borderColor: 0 < value.length && "#4CBFA4" }}>
-						{0 < value.length ? <div className="text-gray-500"><Dropdown.Current /></div> : <div className="text-gray-400">{props.required?.message ?? "..."}</div>}
+					<div
+						className="w-full rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal"
+						style={{ borderColor: 0 < value.length ? "#4CBFA4" : "" }}
+					>
+						{0 < value.length ? (
+							<div className="text-gray-500">
+								<Dropdown.Current />
+							</div>
+						) : (
+							<div className="text-gray-400">{props.required?.message ?? "..."}</div>
+						)}
 					</div>
 				</Dropdown.Trigger>
 				<div className="absolute z-20 mt-[5px] w-full overflow-hidden rounded-[10px]">

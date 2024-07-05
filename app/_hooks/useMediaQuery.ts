@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function useMediaQuery(media: string)
-{
+export default function useMediaQuery(media: string) {
 	//
 	// due to a hydration mismatch
 	// the initial value must be updated
@@ -9,23 +8,20 @@ export default function useMediaQuery(media: string)
 	//
 	const [matches, set_matches] = useState(false);
 
-	useEffect(() =>
-	{
+	useEffect(() => {
 		const MediaQuery = window.matchMedia(media);
 		//
 		// initial update
 		//
 		set_matches(MediaQuery.matches);
 
-		function handle(event: MediaQueryListEvent)
-		{
+		function handle(event: MediaQueryListEvent) {
 			set_matches(MediaQuery.matches);
 		}
 
 		MediaQuery.addEventListener("change", handle);
 		return () => MediaQuery.removeEventListener("change", handle);
-	},
-	[media]);
+	}, [media]);
 
 	return matches;
 }
