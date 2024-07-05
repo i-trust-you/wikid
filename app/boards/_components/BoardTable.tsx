@@ -1,20 +1,10 @@
 "use client";
 
+import API from "@/_api";
 import { formatDateToString } from "@/boards/_utilities/formatDateToString";
 import { useRouter } from "next/navigation";
 
-type BoardType = {
-	id: number;
-	title: string;
-	image: string | null;
-	writer: {
-		name: string;
-		id: number;
-	};
-	likeCount: number;
-	createdAt: string;
-	updatedAt: string;
-};
+type BoardType = Awaited<ReturnType<(typeof API)["{teamId}/articles"]["GET"]>>["list"][number];
 
 type BoardTableProps = {
 	boards: BoardType[];
