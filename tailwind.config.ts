@@ -50,7 +50,7 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				nexon: ['"NEXON Lv1 Gothic OTF"', "sans-serif"],
+				nexon: "NexonLv1Gothic",
 			},
 		},
 	},

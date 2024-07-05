@@ -1,114 +1,126 @@
 "use client";
 
+import API from "@/_api";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+
+import Footer from "@/_components/common/Footer";
 
 export default function Page() {
-	//애니메이션 이미지
-	const Images = [
-		{ src: "/images/speaker.png", alt: "스피커 이미지" },
-		{ src: "/images/logo.png", alt: "로고 이미지" },
-		{ src: "/images/phone.png", alt: "휴대폰 이미지" },
-		{ src: "/images/bubbles.png", alt: "말풍선 이미지" },
-	];
+	const [code, setCode] = useState<string>("");
+
+	useEffect(() => {
+		const getCode = async () => {
+			await API["{teamId}/users/me"].GET({}).then((response) => {
+				setCode(response.profile.code);
+			});
+		};
+
+		getCode();
+	}, []);
 
 	return (
 		<>
-			<header className="z-10 mb-[-134px] flex flex-col bg-[#F1F4FD] pt-[160px] text-center tablet:mb-[-323px] tablet:pt-[180px] desktop:mb-[-252px] desktop:pt-[200px]">
-				<span className="font-nexon flex-row items-center text-[40px] leading-[15px] tablet:text-[60px]">남들이 만드는</span>
-				<span className="font-nexon mt-[15px] text-[60px] font-bold tablet:text-[90px]">나만의 위키</span>
-				<Link href="/wikilist" className="m-[0_auto] block w-max rounded-[15px] bg-gray-500 p-[15px_30px] text-[20px] font-bold text-white tablet:text-[24px]">
-					위키 만들기
-				</Link>
-				<div className="relative mx-auto mt-[44px] h-[398px] w-[336px] tablet:h-[590px] tablet:w-[498px]">
-					<Image src="/images/profile.png" layout="fill" objectFit="contain" alt="프로필 이미지" />
-				</div>
-			</header>
-			<main className="flex w-full flex-col items-center overflow-hidden bg-[#F1F4FD]">
-				<section className="h-[714px] w-[800px] rounded-t-[900px_150px] bg-gray-500 pt-[364px] tablet:h-[1059px] tablet:w-[1200px] tablet:pt-[531px] desktop:h-[1412px] desktop:w-[2000px]">
-					<div className="mx-auto flex w-[335px] gap-[10px] tablet:w-[647px] tablet:gap-[20px] desktop:w-[924px] desktop:gap-[40px]">
-						<div className="flex flex-1 flex-col items-start">
-							<span className="font-nexon text-[10px] font-bold text-primary-200 tablet:text-[20px] desktop:text-[30px]">WRITE</span>
-							<p className="font-nexon mt-[10px] flex items-start text-[16px] leading-[18.4px] text-white tablet:text-[32px] tablet:leading-[36.8px] desktop:mt-[20px] desktop:text-[50px] desktop:leading-[57px]">
-								친구의 위키,
-								<br /> 직접 작성해 봐요
-							</p>
-							<div className="relative mt-[30px] w-full flex-grow rounded-[10px] bg-primary-200 tablet:mt-[40px] tablet:rounded-[15px] desktop:rounded-[20px]">
-								<Image src="/images/keyboard.png" layout="fill" objectFit="contain" alt="키보드 이미지" />
+			<main className="bg-[#F1F4FD]">
+				<section className="relative flex flex-col items-center pt-[100px] tablet:pt-[120px]">
+					<div className="flex flex-col items-center justify-center gap-[15px]">
+						<h2 className="font-nexon text-4xl font-light leading-[1.15] text-gray-500 tablet:text-[60px]">남들이 만드는</h2>
+						<h2 className="font-nexon text-[60px] font-bold leading-[1.15] text-gray-500 tablet:text-[90px]">나만의 위키</h2>
+					</div>
+					<Link
+						href={`/wiki/${code}`}
+						className="mt-10 rounded-[15px] bg-gray-500 px-[30px] py-[15px] text-xl font-bold leading-6 text-white transition hover:bg-gray-600 tablet:text-2xl"
+					>
+						위키 만들기
+					</Link>
+					<Image className="z-10 mt-[44px]" src="/images/profile.png" width={498} height={590} alt="프로필 이미지" />
+					<div className="absolute bottom-0 h-[180px] w-[120vw] rounded-t-[70%] bg-gray-500 pb-20" />
+				</section>
+				<section className="flex justify-center bg-gray-500 px-5 py-[100px] tablet:py-[160px] desktop:py-[200px]">
+					<div className="flex w-full max-w-[924px] gap-[10px] tablet:gap-5 desktop:gap-10">
+						<div className="flex flex-col justify-between">
+							<div>
+								<p className="font-nexon text-[10px] font-bold leading-[1.15] text-primary-200 tablet:text-xl desktop:text-[30px]">WRITE</p>
+								<h3 className="mt-[10px] font-nexon text-lg font-normal leading-[1.15] text-white tablet:mt-5 tablet:text-3xl desktop:text-[50px] desktop:leading-[1.15]">
+									친구의 위키,
+									<br />
+									직접 작성해 봐요
+								</h3>
 							</div>
-						</div>
-						<div className="h-[250px] w-[192px] shrink-0 tablet:h-[479px] tablet:w-[365px] desktop:h-[681px] desktop:w-[520px]">
 							<Image
-								src="/images/promotion.png"
-								width={681}
-								height={510}
-								alt="프로모션 이미지"
-								className="h-[250px] w-[192px] shrink-0 tablet:h-[479px] tablet:w-[365px] desktop:h-[681px] desktop:w-[520px]"
+								className="mt-[30px] object-cover tablet:mt-10 desktop:mt-[60px]"
+								src="/images/keyboard.png"
+								width={364}
+								height={450}
+								alt="키보드 이미지"
 							/>
 						</div>
+						<div className="flex items-end">
+							<Image className="object-cover" src="/images/promotion.png" width={520} height={681} alt="프로모션 이미지" />
+						</div>
 					</div>
 				</section>
-				<section className="relative h-[374px] w-full overflow-hidden bg-white tablet:h-[676px] desktop:h-[1051px]">
-					<div className="mx-auto mt-[100px] flex w-[335px] flex-col items-end tablet:mt-[160px] tablet:w-[647px] desktop:mt-[200px] desktop:w-[924px]">
-						<span className="font-nexon text-[10px] font-bold text-primary-200 tablet:text-[20px] desktop:text-[30px]">SHARE</span>
-						<p className="font-nexon mt-[10px] flex text-right text-[16px] leading-[18.4px] text-gray-500 tablet:text-[32px] tablet:leading-[36.8px] desktop:mt-[20px] desktop:text-[50px] desktop:leading-[57px]">
-							내 위키 만들고 <br /> 친구에게 공유해요
-						</p>
+				<section className="flex flex-col items-end justify-center px-5 py-[100px] tablet:py-[160px] desktop:py-[200px]">
+					<div className="m-auto flex w-full max-w-[924px] flex-col items-end text-right">
+						<p className="font-nexon text-[10px] font-bold leading-[1.15] text-primary-200 tablet:text-xl desktop:text-[30px]">SHARE</p>
+						<h3 className="mt-[10px] font-nexon text-lg font-normal leading-[1.15] text-gray-500 tablet:mt-5 tablet:text-3xl desktop:text-[50px] desktop:leading-[1.15]">
+							내 위키 만들고
+							<br />
+							친구에게 공유해요
+						</h3>
 					</div>
-					<div
-						className="absolute top-[198px] flex gap-[10px] whitespace-nowrap tablet:top-[369px] tablet:gap-[20px] desktop:top-[491px] desktop:gap-[70px]"
-						style={{ animation: "scrollLeft 100s linear infinite" }}
-					>
-						{Images.concat(Images).map((image, index) => (
-							<span
-								key={index}
-								className="relative inline-block h-[76px] w-[76px] rounded-[10px] tablet:h-[147px] tablet:w-[147px] tablet:rounded-[15px] desktop:h-[360px] desktop:w-[360px] desktop:rounded-[25px]"
-							>
-								<Image src={image.src} alt={image.alt} layout="fill" objectFit="contain" />
-							</span>
-						))}
+					<div className="m-auto mt-10 flex w-full max-w-[1650px] justify-center gap-[10px] tablet:mt-[80px] tablet:gap-5 desktop:mt-[120px] desktop:gap-[70px]">
+						<div>
+							<Image src="/images/speaker.png" width={360} height={360} alt="스피커 이미지" />
+						</div>
+						<div>
+							<Image src="/images/logo.png" width={360} height={360} alt="로고 이미지" />
+						</div>
+						<div>
+							<Image src="/images/phone.png" width={360} height={360} alt="휴대폰 이미지" />
+						</div>
+						<div>
+							<Image src="/images/bubbles.png" width={360} height={360} alt="말풍선 이미지" />
+						</div>
 					</div>
-					<style jsx>
-						{`
-							@keyframes scrollLeft {
-								0% {
-									transform: translateX(0);
-								}
-								100% {
-									transform: translateX(-50%);
-								}
-							}
-						`}
-					</style>
 				</section>
-				<section className="w-full pb-[100px] tablet:pb-[160px] desktop:pb-[200px]">
-					<div className="mx-auto mt-[100px] w-[335px] tablet:mt-[160px] tablet:w-[647px] desktop:mt-[200px] desktop:w-[924px]">
-						<span className="font-nexon text-[10px] font-bold text-primary-200 tablet:text-[20px] desktop:text-[30px]">VIEW</span>
-						<p className="font-nexon mt-[10px] flex items-start text-[16px] leading-[18.4px] text-gray-500 tablet:text-[32px] tablet:leading-[36.8px] desktop:mt-[20px] desktop:text-[50px] desktop:leading-[57px]">
-							친구들이 달아준 <br /> 내용을 확인해 봐요
-						</p>
-						<div className="mt-[40px] flex flex-col gap-[10px] tablet:mt-[80px] tablet:gap-[22px] desktop:mt-[120px] desktop:gap-[40px]">
-							<Image src="/images/review.png" alt="자기소개 이미지" layout="fill" objectFit="contain" />
-							<div className="flex justify-between gap-[10px] tablet:gap-[22px] desktop:gap-[40px]">
-								<Image
-									className="w-[102px] rounded-[10px] bg-purple tablet:w-[198px] tablet:rounded-[20px] desktop:w-[280px]"
-									src="/images/bell.png"
-									alt="종 이미지"
-									layout="fill"
-									objectFit="contain"
-								/>
-								<Image src="/images/alarm.png" className="w-[223px] tablet:w-[428px] desktop:w-[604px]" alt="알림 이미지" layout="fill" objectFit="contain" />
+				<section className="flex justify-center bg-[#ECF0FA] px-5 py-[100px] tablet:py-[160px] desktop:py-[200px]">
+					<div className="flex w-full max-w-[924px] flex-col gap-10 tablet:gap-[80px] desktop:gap-[120px]">
+						<div>
+							<p className="font-nexon text-[10px] font-bold leading-[1.15] text-primary-200 tablet:text-xl desktop:text-[30px]">VIEW</p>
+							<h3 className="mt-[10px] font-nexon text-lg font-normal leading-[1.15] text-gray-500 tablet:mt-5 tablet:text-3xl desktop:text-[50px] desktop:leading-[1.15]">
+								친구들이 달아준
+								<br />
+								내용을 확인해 봐요
+							</h3>
+						</div>
+						<div className="flex w-full flex-col gap-[10px] tablet:gap-5 desktop:gap-10">
+							<div>
+								<Image src="/images/review.png" width={924} height={280} alt="리뷰 이미지" />
+							</div>
+							<div className="flex justify-between gap-[10px] tablet:gap-5 desktop:gap-10">
+								<div>
+									<Image src="/images/bell.png" width={280} height={280} alt="벨 이미지" />
+								</div>
+								<div>
+									<Image src="/images/alarm.png" width={604} height={280} alt="알람 이미지" />
+								</div>
 							</div>
 						</div>
 					</div>
 				</section>
+				<section className="flex flex-col items-center bg-gray-500 py-[100px] tablet:py-[160px] desktop:py-[200px]">
+					<h2 className="font-nexon text-[30px] font-bold leading-[1.15] text-white tablet:text-[60px]">나만의 위키 만들어 보기</h2>
+					<Link
+						href={`/wiki/${code}`}
+						className="mt-10 rounded-[15px] bg-white px-[30px] py-[15px] text-xl font-bold leading-4 text-gray-500 transition hover:bg-gray-200 active:bg-gray-300 tablet:text-2xl"
+					>
+						지금 시작하기
+					</Link>
+				</section>
 			</main>
-			<footer className="bg-gray-500 py-[100px] text-center tablet:py-[160px] desktop:py-[200px]">
-				<p className="font-nexon mb-[30px] text-[30px] text-white tablet:mb-[40px] tablet:text-[60px]">나만의 위키 만들어 보기</p>
-				<Link href="/login" className="rounded-[15px] bg-white p-[15px_30px] text-2xl font-bold text-gray-500">
-					지금 시작하기
-				</Link>
-			</footer>
+			<Footer />
 		</>
 	);
 }
