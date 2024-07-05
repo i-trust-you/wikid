@@ -25,10 +25,10 @@ export default function Header() {
 				<Link href="/">
 					<Image src="/icons/logo.svg" alt="logo" width={105} height={30} />
 				</Link>
-				<Link href="/wikilist" className="hidden tablet:block">
+				<Link href="/wikilist" className="hidden hover:font-bold hover:text-primary-200 tablet:block">
 					위키 목록
 				</Link>
-				<Link href="/boards" className="hidden tablet:block">
+				<Link href="/boards" className="hidden hover:font-bold hover:text-primary-200 tablet:block">
 					자유게시판
 				</Link>
 			</div>
