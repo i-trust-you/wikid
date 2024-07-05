@@ -127,11 +127,11 @@ export default abstract class API {
 	})();
 
 	public static readonly ["{teamId}/profiles/{code}"] = new (class extends API {
-		public override GET({ teamId = "6-11", code }: TeamId & ProfileCode) {
+		public override GET({ teamId = "6-11", code, ...query }: { teamId?: string; code: string }) {
 			return API.GET<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}`);
 		}
 
-		public override PATCH({ teamId = "6-11", code }: TeamId & ProfileCode, body: UpdateProfileBody) {
+		public override PATCH({ teamId = "6-11", code, ...query }: { teamId?: string; code: string }, body: UpdateProfileBody) {
 			return API.PATCH<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}`, body);
 		}
 	})();
@@ -141,7 +141,7 @@ export default abstract class API {
 			return API.GET<PingResponse>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}/ping`);
 		}
 
-		public override POST({ teamId = "6-11", code }: TeamId & ProfileCode, body: PingRequestBody) {
+		public override POST({ teamId = "6-11", code, ...query }: { teamId: string; code: string }, body: PingRequestBody) {
 			return API.POST<PingResponse>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}/ping`, body);
 		}
 	})();
