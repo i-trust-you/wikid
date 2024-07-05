@@ -2,15 +2,22 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useCallback } from "react";
 
-import useLocalStorage from "@/_hooks/useLocalStorage";
+import useCookie from "@/_hooks/useCookie";
 
 import Popover from "@/_components/general/Popover";
 
 import MenuIcon from "../../../public/icons/MenuIcon";
 
 export default function Header() {
-	const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
+	const [accessToken, setAccessToken] = useCookie<string>("accessToken");
+	const [refreshoken, setRefreshToken] = useCookie<string>("refreshToken");
+
+	const logout = useCallback(() => {
+		setAccessToken(null);
+		setRefreshToken(null);
+	}, []);
 
 	return (
 		<header className="flex h-[60px] justify-between bg-white px-[20px] text-md font-normal shadow-[0px_4px_20px_0px_#0000000D] desktop:px-[80px]">
@@ -56,7 +63,7 @@ export default function Header() {
 							<Link href="/mypage">
 								<div className="flex h-[44px] w-full items-center justify-center hover:bg-gray-100">마이페이지</div>
 							</Link>
-							<div className="flex h-[44px] w-full items-center justify-center hover:bg-gray-100" onClick={() => setAccessToken(null)}>
+							<div className="flex h-[44px] w-full items-center justify-center hover:bg-gray-100" onClick={logout}>
 								로그아웃
 							</div>
 						</div>
