@@ -2,7 +2,6 @@ import capsule from "@/_utilities/capsule";
 import Image from "next/image";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-
 interface Props {
 	page: number;
 	clamp: number;
@@ -25,20 +24,16 @@ function useCTX() {
 }
 
 // TODO: pass id, class, style
-export default function Pagination(props: Readonly<React.PropsWithChildren & Props & { onChange: (_: number) => void; }>) {
+export default function Pagination(props: Readonly<React.PropsWithChildren & Props & { onChange: (_: number) => void }>) {
 	const [page, setPage] = useState(props.page);
 
-	useEffect(() =>
-	{
+	useEffect(() => {
 		props.onChange(page);
-	},
-	[page]);
+	}, [page]);
 
-	useEffect(() =>
-	{
+	useEffect(() => {
 		setPage(Math.min(Math.max(0, props.page), props.length - 1));
-	},
-	[props.page, props.length]);
+	}, [props.page, props.length]);
 
 	const children = useMemo(() => {
 		// early return
@@ -127,11 +122,7 @@ Pagination.Jump = function $(props: Readonly<React.PropsWithChildren & { to: "fi
 Pagination.Generator = function $(props: Readonly<{ children: (page: number) => JSX.Element }>) {
 	const ctx = useCTX();
 
-	const offset = Math.floor(ctx.state.page() / (ctx.props.clamp)) * ctx.props.clamp;
+	const offset = Math.floor(ctx.state.page() / ctx.props.clamp) * ctx.props.clamp;
 
-	return (
-		<>
-			{new Array(Math.min(ctx.props.clamp, ctx.props.length - offset)).fill(null).map((_, index) => props.children(index + offset))}
-		</>
-	);
+	return <>{new Array(Math.min(ctx.props.clamp, ctx.props.length - offset)).fill(null).map((_, index) => props.children(index + offset))}</>;
 };
