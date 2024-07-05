@@ -17,6 +17,17 @@ import Swiper from "@/_components/general/Swiper";
 type Board = Awaited<ReturnType<(typeof API)["{teamId}/articles"]["GET"]>>["list"][number];
 type Order = "recent" | "like";
 
+const options = [
+	{
+		value: "recent",
+		content: "최신순",
+	},
+	{
+		value: "like",
+		content: "좋아요순",
+	},
+];
+
 export default function Page() {
 	const isLargeScreen = useMediaQuery("(min-width: 768px)");
 	const [bestBoards, setBestBoards] = useState<Board[]>([]);
@@ -53,17 +64,6 @@ export default function Page() {
 	useEffect(() => {
 		getAllBoards(page, order);
 	}, [order]);
-
-	const options = [
-		{
-			value: "recent",
-			content: "최신순",
-		},
-		{
-			value: "like",
-			content: "좋아요순",
-		},
-	];
 
 	const handleDropdownClick = useCallback((value: string) => {
 		setOrder(value as Order);
