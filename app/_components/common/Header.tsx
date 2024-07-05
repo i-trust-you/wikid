@@ -3,14 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import useLocalStorage from "@/_hooks/useLocalStorage";
+import useCookie from "@/_hooks/useCookie";
 
 import Popover from "@/_components/general/Popover";
 
 import MenuIcon from "../../../public/icons/MenuIcon";
 
 export default function Header() {
-	const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
+	const [accessToken, setAccessToken] = useCookie<string>("accessToken");
+	const [refreshoken, setRefreshToken] = useCookie<string>("refreshToken");
 
 	return (
 		<header className="flex h-[60px] justify-between bg-white px-[20px] text-md font-normal shadow-[0px_4px_20px_0px_#0000000D] desktop:px-[80px]">

@@ -6,20 +6,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
-
-
 import useCookie from "@/_hooks/useCookie";
 
-
-
 import Form from "@/_components/general/Form";
-
 
 export default function Page() {
 	const router = useRouter();
 
-	const [accessToken, setAccessToken] = useCookie<string | null>("accessToken", null);
-	const [refreshoken, setRefreshToken] = useCookie<string | null>("refreshToken", null);
+	const [accessToken, setAccessToken] = useCookie<string>("accessToken");
+	const [refreshoken, setRefreshToken] = useCookie<string>("refreshToken");
 
 	if (accessToken && refreshoken) {
 		router.push("/");
