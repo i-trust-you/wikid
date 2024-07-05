@@ -296,7 +296,7 @@ function Select(props: Readonly<{ id: string; sync?: Report<string>; required?: 
 					{/* @ts-ignore */}
 					<div
 						className="w-full rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal"
-						style={{ borderColor: 0 < value.length && "#4CBFA4" }}
+						style={{ borderColor: 0 < value.length ? "#4CBFA4" : "" }}
 					>
 						{0 < value.length ? (
 							<div className="text-gray-500">
