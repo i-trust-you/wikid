@@ -16,7 +16,7 @@ export default function Page() {
 	const [accessToken, setAccessToken] = useCookie<string>("accessToken");
 	const [refreshoken, setRefreshToken] = useCookie<string>("refreshToken");
 
-	if (accessToken && refreshoken) {
+	if (!accessToken && !refreshoken) {
 		router.push("/");
 	}
 

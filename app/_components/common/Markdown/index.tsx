@@ -1,8 +1,5 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
-
-import Parser from "@/_components/common/Markdown/parser";
-import Scanner, { Token } from "@/_components/common/Markdown/scanner";
-import Switch from "@/_components/general/Switch";
+import API from "@/_api";
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 
 import AlignCenterIcon from "../../../../public/icons/AlignCenterIcon";
 import AlignLeftIcon from "../../../../public/icons/AlignLeftIcon";
@@ -14,189 +11,218 @@ import ItalicIcon from "../../../../public/icons/ItalicIcon";
 import NumberingIcon from "../../../../public/icons/NumberingIcon";
 import UnderlineIcon from "../../../../public/icons/UnderlineIcon";
 
-export default function Markdown(props: Readonly<{ children?: string }>) {
-	const [data, setData] = useState(props.children ?? "");
+const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
-	const input = useRef<HTMLTextAreaElement>(null);
+export default function Markdown() {
+	const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
+	const [isVisible, setIsVisible] = useState(false);
 
-	const style = useCallback((type: "bold" | "italic" | "underline" | "ol" | "ul") => {
-		if (!input.current) throw new Error();
+	const [data, setData] = useState("");
 
-		const [text, start, end] = [input.current.value, input.current.selectionStart, input.current.selectionEnd];
+	const helper = useRef<HTMLDivElement>(null);
+	const editor = useRef<HTMLDivElement>(null);
 
-		function inline(token: Token) {
-			// TODO: stack함수와 마찬가지로 입력 구간 전체를 파싱하기
-			let insert = false;
-			test: for (let i = 0; i < token.grammar.length; i++) {
-				if (token.grammar[i] !== text[start - i - 1]) {
-					insert = true;
-					break test;
-				}
-				if (token.grammar[i] !== text[end + i]) {
-					insert = true;
-					break test;
-				}
-			}
-			if (insert) {
-				input.current!!.value = text.slice(0, start) + token.grammar + text.slice(start, end) + token.grammar + text.slice(end);
-				input.current!!.setSelectionRange(start + token.grammar.length, end + token.grammar.length);
-			} else {
-				input.current!!.value = text.slice(0, start - token.grammar.length) + text.slice(start, end) + text.slice(end + token.grammar.length);
-				input.current!!.setSelectionRange(start - token.grammar.length, end - token.grammar.length);
-			}
-		}
+	const onSelectionChanged = () => {
+		setTimeout(() => {
+			const editorRef = editor.current;
+			if (!editorRef) return;
 
-		function stack(token: Token) {
-			let Tokens: (string | Token)[] = Scanner.run(text.slice(start, end));
-			let tokenCount = 0;
+			const selection = window.getSelection();
+			if (!selection || selection.rangeCount === 0) return;
 
-			const isIndent = (value: Token | string) => {
-				if (typeof value !== "string") {
-					return value.grammar === Token.INDENT_1T.grammar || value.grammar === Token.INDENT_2S.grammar || value.grammar === Token.INDENT_4S.grammar;
-				}
-				return false;
+			const selectionRect = selection.getRangeAt(0).getBoundingClientRect();
+			const editorRect = editorRef.getBoundingClientRect();
+
+			// The toolbar shouldn't be positioned directly on top of the selected text,
+			// but rather with a small offset so the caret doesn't overlap with the text.
+			const extraTopOffset = -5;
+
+			const newPosition = {
+				top: selectionRect.top - editorRect.top - (helper.current?.getBoundingClientRect().height ?? 0) + extraTopOffset,
+				left: selectionRect.left - editorRect.left + selectionRect.width / 2,
 			};
-			for (let i = 0; i < Tokens.length; i++) {
-				if (isIndent(Tokens[i])) continue;
-				if (Tokens[i] === token) {
-					tokenCount--;
-					Tokens.splice(i, 1);
-					i--;
-				} else {
-					tokenCount++;
-					Tokens.splice(i, 0, token);
-					i++;
-				}
-				while (i < Tokens.length && Tokens[i] !== Token.BREAK) {
-					i++;
-				}
-			}
-			for (let i = 0; i < Tokens.length; i++) {
-				let value = Tokens[i];
-				if (typeof value !== "string") Tokens[i] = value.grammar;
-			}
-			input.current!!.value = text.slice(0, start) + Tokens.join("") + text.slice(end);
-			input.current!!.setSelectionRange(start, end + tokenCount * token.grammar.length);
+
+			setPosition(newPosition);
+			setIsVisible(!selection.isCollapsed && selection.getRangeAt(0).toString().length > 0);
+		});
+	};
+
+	const getStyle = (): CSSProperties => {
+		if (!position) return { visibility: "hidden", transform: "translate(-50%) scale(0)" };
+
+		const style: CSSProperties = { ...position };
+
+		if (isVisible) {
+			style.visibility = "visible";
+			style.transform = "translate(-50%) scale(1)";
+			style.transition = "transform 0.15s cubic-bezier(.3,1.2,.2,1)";
+		} else {
+			style.transform = "translate(-50%) scale(0)";
+			style.visibility = "hidden";
 		}
 
-		switch (type) {
-			case "bold": {
-				inline(Token.BOLD);
-				break;
-			}
-			case "italic": {
-				inline(Token.ITALIC);
-				break;
-			}
-			case "underline": {
-				inline(Token.UNDERLINE);
-				break;
-			}
-			case "ol": {
-				stack(Token.OL);
-				break;
-			}
-			case "ul": {
-				stack(Token.UL);
-				break;
-			}
-		}
+		return style;
+	};
 
-		input.current.focus();
-		setData(input.current.value);
+	useEffect(() => {
+		document.addEventListener("selectionchange", onSelectionChanged);
+		return () => {
+			document.removeEventListener("selectionchange", onSelectionChanged);
+		};
 	}, []);
 
-	const adjust = useCallback(() => {
-		if (!input.current) throw new Error();
+	const [readonly, setReadOnly] = useState(false);
 
-		input.current.style.setProperty("height", "auto");
-		input.current.style.setProperty("height", input.current.scrollHeight + 1.5 + "px");
+	const onDrop = useCallback(
+		(event: React.DragEvent) => {
+			// important
+			event.preventDefault();
+			event.stopPropagation();
+
+			if (editor.current) {
+				// cache
+				const html = editor.current;
+				// seal
+				setReadOnly(true);
+
+				const files = [] as File[];
+
+				loop: for (const item of event.dataTransfer.items) {
+					scan: switch (item.kind) {
+						case "file": {
+							const file = item.getAsFile() as File;
+
+							if (FILE_SIZE < file.size) {
+								break scan;
+							}
+							if (!FILE_NAME.test(file.name)) {
+								break scan;
+							}
+							files.push(file);
+							break scan;
+						}
+					}
+				}
+				const buffer = files.map((_) => `![Uploading ${_.name}...]()`);
+				// render
+				html.innerHTML = [data.replace(/\n/g, "<br>"), ...buffer].join("<br>");
+
+				let done = 0;
+
+				for (let i = 0; i < files.length; i++) {
+					API["{teamId}/images/upload"].POST({}, files[i]).then((response) => {
+						// alter
+						buffer[i] = `![${files[i].name}](${response.url})`;
+						// render
+						html.innerHTML = [data.replace(/\n/g, "<br>"), ...buffer].join("<br>");
+						// resolve
+						if (++done === files.length) {
+							// unseal
+							setReadOnly(false);
+							// reflect
+							setData([data, ...buffer].join("\n"));
+						}
+					});
+				}
+			}
+		},
+		[data],
+	);
+
+	const onDragEnter = useCallback((event: React.DragEvent) => {
+		// important
+		event.preventDefault();
+		event.stopPropagation();
+
+		editor.current?.style.setProperty("border-color", "#8F95B2");
 	}, []);
 
-	useLayoutEffect(() => {
-		adjust();
+	const onDragLeave = useCallback((event: React.DragEvent) => {
+		// important
+		event.preventDefault();
+		event.stopPropagation();
+
+		editor.current?.style.setProperty("border-color", "transparent");
 	}, []);
 
 	return (
-		<div className="h-max w-full overflow-hidden rounded-[10px] border border-gray-300 bg-white">
-			<Switch case="editor">
-				<div className="flex h-full w-full flex-col">
-					<div className="border-b border-gray-300 bg-gray-200">
-						<Switch.Case of="editor">
-							<div className="m-[-1px] flex items-center justify-between">
-								<div className="flex items-center text-lg font-normal text-gray-500">
-									<button className="rounded-t-[10px] border border-gray-300 border-b-white bg-white px-[16px] py-[8px]">Write</button>
-									<Switch.Jump to="viewer">
-										<button className="border border-transparent px-[16px] py-[8px]">Preview</button>
-									</Switch.Jump>
-								</div>
-								<div className="mx-[10px] flex items-center gap-[3.5px]">
-									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("bold")}>
-										<BoldIcon width="25" height="25" />
-									</button>
-									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("italic")}>
-										<ItalicIcon width="25" height="25" />
-									</button>
-									<button
-										className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300"
-										onClick={() => style("underline")}
-									>
-										<UnderlineIcon width="25" height="25" />
-									</button>
-									{/* <button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<ColoringIcon width="25" height="25" />
-									</button>
-									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<AlignLeftIcon width="25" height="25" />
-									</button>
-									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<AlignCenterIcon width="25" height="25" />
-									</button>
-									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300">
-										<AlignRightIcon width="25" height="25" />
-									</button> */}
-									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("ul")}>
-										<BulletIcon width="25" height="25" />
-									</button>
-									<button className="flex aspect-square items-center rounded-[3.5px] px-[3.5px] py-[3.5px] hover:bg-gray-300" onClick={() => style("ol")}>
-										<NumberingIcon width="25" height="25" />
-									</button>
-								</div>
-							</div>
-						</Switch.Case>
-						<Switch.Case of="viewer">
-							<div className="m-[-1px] flex items-center justify-between">
-								<div className="flex items-center text-lg font-normal text-gray-500">
-									<Switch.Jump to="editor">
-										<button className="border border-transparent px-[16px] py-[8px]">Write</button>
-									</Switch.Jump>
-									<button className="rounded-t-[10px] border border-gray-300 border-b-white bg-white px-[16px] py-[8px]">Preview</button>
-								</div>
-							</div>
-						</Switch.Case>
-					</div>
-					<div className="mx-[10px] my-[10px] grow">
-						<Switch.Case of="editor">
-							<textarea
-								ref={input}
-								rows={1}
-								defaultValue={data}
-								className="h-full min-h-[100px] w-full rounded-[10px] border border-gray-300 px-[10px] py-[10px] text-lg font-normal text-gray-500"
-								onChange={(event) => {
-									setData(event.target.value);
-									adjust();
-								}}
-							></textarea>
-						</Switch.Case>
-						<Switch.Case of="viewer">
-							<div
-								className="h-full min-h-[100px] w-full rounded-[10px] border border-gray-300 px-[10px] py-[10px] text-lg font-normal text-gray-500"
-								dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(data)).parse() }}
-							/>
-						</Switch.Case>
-					</div>
-				</div>
-			</Switch>
+		<div className="relative flex h-max w-full rounded-[10px] border bg-white drop-shadow-sm">
+			<div
+				ref={helper}
+				className="absolute flex h-[35px] items-center justify-center overflow-hidden rounded-[7.5px] border bg-white px-[3px] drop-shadow-sm [&>button:hover]:bg-gray-200 [&>button]:flex [&>button]:aspect-square [&>button]:items-center [&>button]:rounded-[5px] [&>button]:px-[1.5px] [&>button]:py-[1.5px]"
+				style={getStyle()}
+			>
+				<button onClick={() => style("bold")}>
+					<BoldIcon width="25" height="25" />
+				</button>
+				<button onClick={() => style("italic")}>
+					<ItalicIcon width="25" height="25" />
+				</button>
+				<button onClick={() => style("underline")}>
+					<UnderlineIcon width="25" height="25" />
+				</button>
+				<button>
+					<ColoringIcon width="25" height="25" />
+				</button>
+				<button>
+					<AlignLeftIcon width="25" height="25" />
+				</button>
+				<button>
+					<AlignCenterIcon width="25" height="25" />
+				</button>
+				<button>
+					<AlignRightIcon width="25" height="25" />
+				</button>
+				<button onClick={() => style("ul")}>
+					<BulletIcon width="25" height="25" />
+				</button>
+				<button onClick={() => style("ol")}>
+					<NumberingIcon width="25" height="25" />
+				</button>
+			</div>
+			<div
+				ref={editor}
+				contentEditable={!readonly}
+				data-placeholder="내용을 입력해주세요"
+				className="mx-[5px] my-[5px] inline-block grow resize-y overflow-auto break-all rounded-[10px] border-[2.5px] border-dashed border-transparent bg-white px-[10px] py-[5px] outline-none before:text-gray-300 [&:not(:focus):empty]:before:content-[attr(data-placeholder)]"
+				//
+				// feat: drop & drop
+				//
+				onDrop={onDrop}
+				onDragEnd={onDrop}
+				onDragEnter={onDragEnter}
+				onDragLeave={onDragLeave}
+				//
+				// feat: toolbar
+				//
+				onSelect={onSelectionChanged}
+				//
+				// feat: prevent html
+				//
+				onKeyDown={(event) => {
+					switch (event.key) {
+						case "Enter": {
+							// fuck off
+							event.preventDefault();
+							// insert <br>
+							document.execCommand("insertLineBreak");
+							break;
+						}
+					}
+				}}
+				onInput={(event) => {
+					// @ts-ignore
+					const text = event.target.innerHTML.replace(/<br>/g, "\n");
+
+					// @ts-ignore
+					if (event.target.children.length === 1 && event.target.lastChild.nodeName === "BR") {
+						// @ts-ignore
+						event.target.lastChild.remove();
+					}
+					// phew...
+					setData(text);
+				}}
+			/>
 		</div>
 	);
 }
