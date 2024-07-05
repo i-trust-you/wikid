@@ -1,5 +1,13 @@
 import API from "@/_api";
-import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+
+
+
+import Parser from "@/_components/common/Markdown/parser";
+import Scanner, { Token } from "@/_components/common/Markdown/scanner";
+import Switch from "@/_components/general/Switch";
+
+
 
 import AlignCenterIcon from "../../../../public/icons/AlignCenterIcon";
 import AlignLeftIcon from "../../../../public/icons/AlignLeftIcon";
@@ -11,65 +19,66 @@ import ItalicIcon from "../../../../public/icons/ItalicIcon";
 import NumberingIcon from "../../../../public/icons/NumberingIcon";
 import UnderlineIcon from "../../../../public/icons/UnderlineIcon";
 
+
 const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
 export default function Markdown() {
-	const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
-	const [isVisible, setIsVisible] = useState(false);
-
 	const [data, setData] = useState("");
 
 	const helper = useRef<HTMLDivElement>(null);
 	const editor = useRef<HTMLDivElement>(null);
+	const outline = useRef<HTMLDivElement>(null);
 
-	const onSelectionChanged = () => {
-		setTimeout(() => {
-			const editorRef = editor.current;
-			if (!editorRef) return;
+	const [size, setSize] = useState<DOMRect>();
 
-			const selection = window.getSelection();
-			if (!selection || selection.rangeCount === 0) return;
-
-			const selectionRect = selection.getRangeAt(0).getBoundingClientRect();
-			const editorRect = editorRef.getBoundingClientRect();
-
-			// The toolbar shouldn't be positioned directly on top of the selected text,
-			// but rather with a small offset so the caret doesn't overlap with the text.
-			const extraTopOffset = -5;
-
-			const newPosition = {
-				top: selectionRect.top - editorRect.top - (helper.current?.getBoundingClientRect().height ?? 0) + extraTopOffset,
-				left: selectionRect.left - editorRect.left + selectionRect.width / 2,
-			};
-
-			setPosition(newPosition);
-			setIsVisible(!selection.isCollapsed && selection.getRangeAt(0).toString().length > 0);
-		});
-	};
-
-	const getStyle = (): CSSProperties => {
-		if (!position) return { visibility: "hidden", transform: "translate(-50%) scale(0)" };
-
-		const style: CSSProperties = { ...position };
-
-		if (isVisible) {
-			style.visibility = "visible";
-			style.transform = "translate(-50%) scale(1)";
-			style.transition = "transform 0.15s cubic-bezier(.3,1.2,.2,1)";
-		} else {
-			style.transform = "translate(-50%) scale(0)";
-			style.visibility = "hidden";
+	useLayoutEffect(() => {
+		if (helper.current) {
+			setSize(helper.current.getBoundingClientRect());
 		}
+	}, []);
 
-		return style;
-	};
+	const [style, setStyle] = useState<React.CSSProperties>({ opacity: 0, pointerEvents: "none" });
+
+	const onSelectionChange = useCallback(
+		(event: Event) => {
+			setTimeout(() => {
+				if (size && editor.current && document.activeElement === editor.current) {
+					// cache
+					const html = editor.current;
+
+					const area = window.getSelection();
+
+					if (area && 0 < area.rangeCount) {
+						const [buffer, r1, r2] = [{} as typeof style, area.getRangeAt(0).getBoundingClientRect(), html.getBoundingClientRect()];
+
+						buffer.top = r1.top - r2.top - size.height - 5;
+						buffer.left = r1.left - r2.left + r1.width / 2;
+
+						if (!area.isCollapsed && 0 < area.getRangeAt(0).toString().length) {
+							// show
+							buffer.visibility = "visible";
+							buffer.transform = "translate(-50%) scale(1)";
+						} else {
+							// hide
+							buffer.visibility = "hidden";
+							buffer.transform = "translate(-50%) scale(0)";
+						}
+						// reflect
+						setStyle(buffer);
+					}
+				} else {
+					// reset
+					setStyle({ opacity: 0, pointerEvents: "none" });
+				}
+			});
+		},
+		[size],
+	);
 
 	useEffect(() => {
-		document.addEventListener("selectionchange", onSelectionChanged);
-		return () => {
-			document.removeEventListener("selectionchange", onSelectionChanged);
-		};
-	}, []);
+		document.addEventListener("selectionchange", onSelectionChange);
+		return () => document.removeEventListener("selectionchange", onSelectionChange);
+	}, [onSelectionChange]);
 
 	const [readonly, setReadOnly] = useState(false);
 
@@ -125,6 +134,7 @@ export default function Markdown() {
 					});
 				}
 			}
+			outline.current?.style.setProperty("border-color", null);
 		},
 		[data],
 	);
@@ -134,7 +144,7 @@ export default function Markdown() {
 		event.preventDefault();
 		event.stopPropagation();
 
-		editor.current?.style.setProperty("border-color", "#8F95B2");
+		outline.current?.style.setProperty("border-color", "#8F95B2");
 	}, []);
 
 	const onDragLeave = useCallback((event: React.DragEvent) => {
@@ -142,87 +152,118 @@ export default function Markdown() {
 		event.preventDefault();
 		event.stopPropagation();
 
-		editor.current?.style.setProperty("border-color", "transparent");
+		outline.current?.style.setProperty("border-color", null);
 	}, []);
 
 	return (
 		<div className="relative flex h-max w-full rounded-[10px] border bg-white drop-shadow-sm">
-			<div
-				ref={helper}
-				className="absolute flex h-[35px] items-center justify-center overflow-hidden rounded-[7.5px] border bg-white px-[3px] drop-shadow-sm [&>button:hover]:bg-gray-200 [&>button]:flex [&>button]:aspect-square [&>button]:items-center [&>button]:rounded-[5px] [&>button]:px-[1.5px] [&>button]:py-[1.5px]"
-				style={getStyle()}
-			>
-				<button onClick={() => style("bold")}>
-					<BoldIcon width="25" height="25" />
-				</button>
-				<button onClick={() => style("italic")}>
-					<ItalicIcon width="25" height="25" />
-				</button>
-				<button onClick={() => style("underline")}>
-					<UnderlineIcon width="25" height="25" />
-				</button>
-				<button>
-					<ColoringIcon width="25" height="25" />
-				</button>
-				<button>
-					<AlignLeftIcon width="25" height="25" />
-				</button>
-				<button>
-					<AlignCenterIcon width="25" height="25" />
-				</button>
-				<button>
-					<AlignRightIcon width="25" height="25" />
-				</button>
-				<button onClick={() => style("ul")}>
-					<BulletIcon width="25" height="25" />
-				</button>
-				<button onClick={() => style("ol")}>
-					<NumberingIcon width="25" height="25" />
-				</button>
-			</div>
-			<div
-				ref={editor}
-				contentEditable={!readonly}
-				data-placeholder="내용을 입력해주세요"
-				className="mx-[5px] my-[5px] inline-block grow resize-y overflow-auto break-all rounded-[10px] border-[2.5px] border-dashed border-transparent bg-white px-[10px] py-[5px] outline-none before:text-gray-300 [&:not(:focus):empty]:before:content-[attr(data-placeholder)]"
-				//
-				// feat: drop & drop
-				//
-				onDrop={onDrop}
-				onDragEnd={onDrop}
-				onDragEnter={onDragEnter}
-				onDragLeave={onDragLeave}
-				//
-				// feat: toolbar
-				//
-				onSelect={onSelectionChanged}
-				//
-				// feat: prevent html
-				//
-				onKeyDown={(event) => {
-					switch (event.key) {
-						case "Enter": {
-							// fuck off
-							event.preventDefault();
-							// insert <br>
-							document.execCommand("insertLineBreak");
-							break;
-						}
-					}
-				}}
-				onInput={(event) => {
-					// @ts-ignore
-					const text = event.target.innerHTML.replace(/<br>/g, "\n");
+			<Switch case="editor">
+				<div className="flex h-full w-full flex-col">
+					<div className="overflow-hidden rounded-t-[10px] border-b border-gray-300 bg-gray-200">
+						<Switch.Case of="editor">
+							<div className="m-[-1px] flex items-center">
+								<button className="rounded-t-[10px] border border-gray-300 border-b-white bg-white px-[16px] py-[8px]">Write</button>
+								<Switch.Jump to="viewer">
+									<button className="border border-transparent px-[16px] py-[8px]">Preview</button>
+								</Switch.Jump>
+							</div>
+						</Switch.Case>
+						<Switch.Case of="viewer">
+							<div className="m-[-1px] flex items-center">
+								<Switch.Jump to="editor">
+									<button className="border border-transparent px-[16px] py-[8px]">Write</button>
+								</Switch.Jump>
+								<button className="rounded-t-[10px] border border-gray-300 border-b-white bg-white px-[16px] py-[8px]">Preview</button>
+							</div>
+						</Switch.Case>
+					</div>
+					<div className="mx-[10px] my-[10px] grow">
+						<Switch.Case of="editor">
+							<div className="relative flex">
+								<div
+									ref={helper}
+									className="absolute flex h-[35px] items-center justify-center overflow-hidden rounded-[7.5px] border bg-white px-[3px] drop-shadow-sm [&>button:hover]:bg-gray-200 [&>button]:flex [&>button]:aspect-square [&>button]:items-center [&>button]:rounded-[5px] [&>button]:px-[1.5px] [&>button]:py-[1.5px]"
+									style={style}
+								>
+									<button>
+										<BoldIcon width="25" height="25" />
+									</button>
+									<button>
+										<ItalicIcon width="25" height="25" />
+									</button>
+									<button>
+										<UnderlineIcon width="25" height="25" />
+									</button>
+									<button>
+										<ColoringIcon width="25" height="25" />
+									</button>
+									<button>
+										<AlignLeftIcon width="25" height="25" />
+									</button>
+									<button>
+										<AlignCenterIcon width="25" height="25" />
+									</button>
+									<button>
+										<AlignRightIcon width="25" height="25" />
+									</button>
+									<button>
+										<BulletIcon width="25" height="25" />
+									</button>
+									<button>
+										<NumberingIcon width="25" height="25" />
+									</button>
+								</div>
+								<div
+									ref={editor}
+									contentEditable={!readonly}
+									data-placeholder="내용을 입력해주세요"
+									className="inline-block h-full min-h-[100px] w-full grow resize-y overflow-auto break-all rounded-[10px] border border-gray-300 bg-white px-[10px] py-[10px] text-lg text-gray-500 before:text-gray-300 [&:not(:focus):empty]:before:content-[attr(data-placeholder)]"
+									//
+									// feat: drop & drop
+									//
+									onDrop={onDrop}
+									onDragEnd={onDrop}
+									onDragEnter={onDragEnter}
+									onDragLeave={onDragLeave}
+									//
+									// feat: prevent html
+									//
+									onKeyDown={(event) => {
+										switch (event.key) {
+											case "Enter": {
+												// fuck off
+												event.preventDefault();
+												// insert <br>
+												document.execCommand("insertLineBreak");
+												break;
+											}
+										}
+									}}
+									onInput={(event) => {
+										// @ts-ignore
+										const text = event.target.innerHTML.replace(/<br>/g, "\n");
 
-					// @ts-ignore
-					if (event.target.children.length === 1 && event.target.lastChild.nodeName === "BR") {
-						// @ts-ignore
-						event.target.lastChild.remove();
-					}
-					// phew...
-					setData(text);
-				}}
-			/>
+										// @ts-ignore
+										if (event.target.children.length === 1 && event.target.lastChild.nodeName === "BR") {
+											// @ts-ignore
+											event.target.lastChild.remove();
+										}
+										// phew...
+										setData(text);
+									}}
+								/>
+								<div ref={outline} className="pointer-events-none absolute inset-[5px] rounded-[10px] border-[2.5px] border-dashed border-transparent" />
+							</div>
+						</Switch.Case>
+						<Switch.Case of="viewer">
+							<div
+								className="h-full min-h-[100px] w-full rounded-[10px] border border-gray-300 px-[10px] py-[10px] text-lg font-normal text-gray-500"
+								dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(data)).parse() }}
+							/>
+						</Switch.Case>
+					</div>
+				</div>
+			</Switch>
 		</div>
 	);
 }
