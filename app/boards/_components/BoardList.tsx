@@ -1,20 +1,10 @@
+import API from "@/_api";
 import { formatDateToString } from "@/boards/_utilities/formatDateToString";
 import Link from "next/link";
 
 import HeartIcon from "../../../public/icons/HeartIcon";
 
-type BoardType = {
-	id: number;
-	title: string;
-	image: string | null;
-	writer: {
-		name: string;
-		id: number;
-	};
-	likeCount: number;
-	createdAt: string;
-	updatedAt: string;
-};
+type BoardType = Awaited<ReturnType<(typeof API)["{teamId}/articles"]["GET"]>>["list"][number];
 
 type BoardListProps = {
 	boards: BoardType[];
