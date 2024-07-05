@@ -25,6 +25,7 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 		const [text, start, end] = [input.current.value, input.current.selectionStart, input.current.selectionEnd];
 
 		function inline(token: Token) {
+			// TODO: stack함수와 마찬가지로 입력 구간 전체를 파싱하기
 			let insert = false;
 			test: for (let i = 0; i < token.grammar.length; i++) {
 				if (token.grammar[i] !== text[start - i - 1]) {
@@ -46,22 +47,36 @@ export default function Markdown(props: Readonly<{ children?: string }>) {
 		}
 
 		function stack(token: Token) {
-			let insert = false;
+			let Tokens: (string | Token)[] = Scanner.run(text.slice(start, end));
+			let tokenCount = 0;
 
-			test: for (let i = 0; i < token.grammar.length; i++) {
-				if (token.grammar[token.grammar.length - i - 1] !== text[start - i - 1]) {
-					insert = true;
-					break test;
+			const isIndent = (value: Token | string) => {
+				if (typeof value !== "string") {
+					return value.grammar === Token.INDENT_1T.grammar || value.grammar === Token.INDENT_2S.grammar || value.grammar === Token.INDENT_4S.grammar;
+				}
+				return false;
+			};
+			for (let i = 0; i < Tokens.length; i++) {
+				if (isIndent(Tokens[i])) continue;
+				if (Tokens[i] === token) {
+					tokenCount--;
+					Tokens.splice(i, 1);
+					i--;
+				} else {
+					tokenCount++;
+					Tokens.splice(i, 0, token);
+					i++;
+				}
+				while (i < Tokens.length && Tokens[i] !== Token.BREAK) {
+					i++;
 				}
 			}
-
-			if (insert) {
-				input.current!!.value = text.slice(0, start) + token.grammar + text.slice(start);
-				input.current!!.setSelectionRange(start + token.grammar.length, end + token.grammar.length);
-			} else {
-				input.current!!.value = text.slice(0, start - token.grammar.length) + text.slice(start);
-				input.current!!.setSelectionRange(start - token.grammar.length, end - token.grammar.length);
+			for (let i = 0; i < Tokens.length; i++) {
+				let value = Tokens[i];
+				if (typeof value !== "string") Tokens[i] = value.grammar;
 			}
+			input.current!!.value = text.slice(0, start) + Tokens.join("") + text.slice(end);
+			input.current!!.setSelectionRange(start, end + tokenCount * token.grammar.length);
 		}
 
 		switch (type) {
