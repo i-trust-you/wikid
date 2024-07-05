@@ -2,9 +2,7 @@
 
 import API from "@/_api";
 import Modal from "@/_utilities/Modal";
-import { useEffect, useState } from "react";
-
-import useLocalStorage from "@/_hooks/useLocalStorage";
+import { useState } from "react";
 
 import Button from "@/_components/common/Button";
 
@@ -19,14 +17,6 @@ type Props = {
 export default function QuizModal({ code, question, onSuccess }: Props) {
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const [value, setValue] = useState<string>("");
-
-	const [accessToken] = useLocalStorage<string | null>("accessToken", null);
-
-	useEffect(() => {
-		if (accessToken) {
-			API.credential(accessToken);
-		}
-	}, [accessToken]);
 
 	const handleButtonClick = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		event.preventDefault();
