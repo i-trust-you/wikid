@@ -1,46 +1,28 @@
-import Popover from "@/_components/general/Popover";
+"use client";
+
+import { useState } from "react";
+
+import Pagination from "@/_components/general/Pagination";
 
 export default function Page() {
-	const overlay = (
-		<div className="flex w-[120px] flex-col items-center border border-red-200 bg-white shadow-lg">
-			<div>위키목록</div>
-			<div>자유게시판</div>
-			<div>알림</div>
-			<div>마이페이지</div>
-		</div>
-	);
+	const [page, setPage] = useState(0);
+
 	return (
-		<main className="flex h-screen flex-col items-center justify-center gap-[10px]">
-			<Popover gap={5} trigger="click" position="top-right-top-left" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="top-right-bottom-left" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="bottom-right-top-left" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="bottom-right-bottom-left" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="top-left-top-right" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="top-left-bottom-right" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="bottom-left-top-right" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="bottom-left-bottom-right" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="top-left-bottom-left" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
-			<Popover gap={5} trigger="click" position="top-right-bottom-right" overlay={overlay}>
-				<div className="h-[24px] w-[24px] border border-red-200"></div>
-			</Popover>
+		<main className="flex h-screen w-screen flex-col items-center justify-center gap-[25px]">
+			<button onClick={() => setPage((_) => _ + 1)}>클릭! {page}</button>
+			<Pagination page={page} clamp={10} length={25} onChange={(_) => setPage(_)} />
+			<hr />
+			<Pagination page={page} clamp={10} length={100} onChange={(_) => setPage(_)}>
+				<div className="flex gap-[10px]">
+					<Pagination.Generator>
+						{(page) => (
+							<Pagination.Jump key={page} to={page}>
+								<div className="flex h-[25px] w-[25px] items-center justify-center rounded-full bg-primary-300">{page + 1}</div>
+							</Pagination.Jump>
+						)}
+					</Pagination.Generator>
+				</div>
+			</Pagination>
 		</main>
 	);
 }

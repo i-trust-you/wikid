@@ -1,14 +1,11 @@
 import capsule from "@/_utilities/capsule";
+import Image from "next/image";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-
-import ArrowLeftIcon from "../../../public/icons/ArrowLeftIcon";
-import ArrowRightIcon from "../../../public/icons/ArrowRightIcon";
 
 interface Props {
 	page: number;
 	clamp: number;
 	length: number;
-	onChange: (page: number) => void;
 }
 
 interface State {
@@ -16,7 +13,7 @@ interface State {
 }
 
 // @ts-ignore
-const CTX = createContext<{ props: Omit<Props, "onChange">; state: State }>();
+const CTX = createContext<{ props: Props; state: State }>();
 
 function useCTX() {
 	const ctx = useContext(CTX);
@@ -27,12 +24,16 @@ function useCTX() {
 }
 
 // TODO: pass id, class, style
-export default function Pagination(props: Readonly<React.PropsWithChildren & Props>) {
+export default function Pagination(props: Readonly<React.PropsWithChildren & Props & { onChange: (_: number) => void }>) {
 	const [page, setPage] = useState(props.page);
 
 	useEffect(() => {
 		props.onChange(page);
 	}, [page]);
+
+	useEffect(() => {
+		setPage(Math.min(Math.max(0, props.page), props.length - 1));
+	}, [props.page, props.length]);
 
 	const children = useMemo(() => {
 		// early return
@@ -41,7 +42,7 @@ export default function Pagination(props: Readonly<React.PropsWithChildren & Pro
 		return (
 			<div className="flex gap-[15px] [&_button:disabled]:border-primary-200 [&_button:disabled]:bg-primary-100 [&_button:disabled]:text-primary-200 [&_button:not(:disabled)]:bg-white [&_button:not(:disabled)]:text-gray-400 hover:[&_button:not(:disabled)]:text-primary-200 [&_button]:flex [&_button]:aspect-square [&_button]:w-[40px] [&_button]:items-center [&_button]:justify-center [&_button]:rounded-[10px] [&_button]:border [&_button]:border-transparent [&_button]:text-xs [&_button]:font-normal [&_button]:shadow-[0_4px_20px_-0px_rgba(0,0,0,0.1)] tablet:[&_button]:w-[45px] tablet:[&_button]:text-2lg">
 				<Pagination.Jump to="prev">
-					<ArrowLeftIcon width="24" height="24" />
+					<Image src="/icons/arrow_left.svg" alt="prev" width={24} height={24} />
 				</Pagination.Jump>
 				<Pagination.Generator>
 					{(page) => (
@@ -51,7 +52,7 @@ export default function Pagination(props: Readonly<React.PropsWithChildren & Pro
 					)}
 				</Pagination.Generator>
 				<Pagination.Jump to="next">
-					<ArrowRightIcon width="24" height="24" />
+					<Image src="/icons/arrow_right.svg" alt="next" width={24} height={24} />
 				</Pagination.Jump>
 			</div>
 		);
