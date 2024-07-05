@@ -46,8 +46,13 @@ export default {
 			transparent: "transparent",
 		},
 		boxShadow: {
-			basic: '0px 4px 20px 0px rgba(0, 0, 0, 0.08)',
-		}
+			basic: "0px 4px 20px 0px rgba(0, 0, 0, 0.08)",
+		},
+		extend: {
+			fontFamily: {
+				nexon: ['"NEXON Lv1 Gothic OTF"', "sans-serif"],
+			},
+		},
 	},
 	content: ["./pages/**/*.{js,ts,jsx,tsx,mdx}", "./components/**/*.{js,ts,jsx,tsx,mdx}", "./app/**/*.{js,ts,jsx,tsx,mdx}"],
 };
