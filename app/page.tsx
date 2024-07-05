@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import Footer from "@/_components/common/Footer";
 
 export default function Page() {
-	const [code, setCode] = useState<string>("");
+	const [code, setCode] = useState<string>();
 
 	useEffect(() => {
 		const getCode = async () => {
@@ -29,7 +29,7 @@ export default function Page() {
 						<h2 className="font-nexon text-[60px] font-bold leading-[1.15] text-gray-500 tablet:text-[90px]">나만의 위키</h2>
 					</div>
 					<Link
-						href={`/wiki/${code}`}
+						href={code ? `/wiki/${code}` : "/login"}
 						className="mt-10 rounded-[15px] bg-gray-500 px-[30px] py-[15px] text-xl font-bold leading-6 text-white transition hover:bg-gray-600 tablet:text-2xl"
 					>
 						위키 만들기
@@ -113,7 +113,7 @@ export default function Page() {
 				<section className="flex flex-col items-center bg-gray-500 py-[100px] tablet:py-[160px] desktop:py-[200px]">
 					<h2 className="font-nexon text-[30px] font-bold leading-[1.15] text-white tablet:text-[60px]">나만의 위키 만들어 보기</h2>
 					<Link
-						href={`/wiki/${code}`}
+						href={code ? `/wiki/${code}` : "/login"}
 						className="mt-10 rounded-[15px] bg-white px-[30px] py-[15px] text-xl font-bold leading-4 text-gray-500 transition hover:bg-gray-200 active:bg-gray-300 tablet:text-2xl"
 					>
 						지금 시작하기
