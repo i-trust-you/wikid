@@ -7,10 +7,6 @@ export default function Page() {
 		<main className="flex justify-center px-[10px] py-[10px]">
 			<div className="w-[800px]">
 				<Markdown/>
-				ad
-				da
-				d
-				d
 			</div>
 		</main>
 	);

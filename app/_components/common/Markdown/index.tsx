@@ -114,7 +114,7 @@ export default function Markdown() {
 				}
 				const buffer = files.map((_) => `![Uploading ${_.name}...]()`);
 				// render
-				html.innerHTML = [data.replace(/\n/g, "<br>"), ...buffer].join("<br>");
+				html.innerHTML = (0 < data.length ? [data.replace(/\n/g, "<br>"), ...buffer] : buffer).join("<br>");
 
 				let done = 0;
 
@@ -123,7 +123,7 @@ export default function Markdown() {
 						// alter
 						buffer[i] = `![${files[i].name}](${response.url})`;
 						// render
-						html.innerHTML = [data.replace(/\n/g, "<br>"), ...buffer].join("<br>");
+						html.innerHTML = (0 < data.length ? [data.replace(/\n/g, "<br>"), ...buffer] : buffer).join("<br>");
 						// resolve
 						if (++done === files.length) {
 							// unseal

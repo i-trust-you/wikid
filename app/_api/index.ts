@@ -72,9 +72,8 @@ export default abstract class API {
 
 				Cookie.set("accessToken", Codec.encode(data.accessToken));
 
-				return API.GET(type, url, retries + 1);
+				return resolve(await API.GET(type, url, retries + 1));
 			}
-
 			const data = await response.json();
 
 			return response.ok ? resolve(data) : reject(data);
@@ -90,9 +89,8 @@ export default abstract class API {
 
 				Cookie.set("accessToken", Codec.encode(data.accessToken));
 
-				return API.PUT(type, url, body, retries + 1);
+				return resolve(await API.PUT(type, url, body, retries + 1));
 			}
-
 			const data = await response.json();
 
 			return response.ok ? resolve(data) : reject(data);
@@ -108,9 +106,8 @@ export default abstract class API {
 
 				Cookie.set("accessToken", Codec.encode(data.accessToken));
 
-				return API.POST(type, url, body, retries + 1);
+				return resolve(await API.POST(type, url, body, retries + 1));
 			}
-
 			const data = await response.json();
 
 			return response.ok ? resolve(data) : reject(data);
@@ -126,9 +123,8 @@ export default abstract class API {
 
 				Cookie.set("accessToken", Codec.encode(data.accessToken));
 
-				return API.PATCH(type, url, body, retries + 1);
+				return resolve(await API.PATCH(type, url, body, retries + 1));
 			}
-
 			const data = await response.json();
 
 			return response.ok ? resolve(data) : reject(data);
@@ -144,9 +140,8 @@ export default abstract class API {
 
 				Cookie.set("accessToken", Codec.encode(data.accessToken));
 
-				return API.DELETE(type, url, retries + 1);
+				return resolve(await API.DELETE(type, url, retries + 1));
 			}
-
 			const data = await response.json();
 
 			return response.ok ? resolve(data) : reject(data);
