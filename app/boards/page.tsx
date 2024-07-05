@@ -42,10 +42,13 @@ export default function Page() {
 		});
 	}, []);
 
-	const handleFormClick = (value: string) => {
-		setPage(1);
-		getAllBoards(1, order, value);
-	};
+	const handleFormClick = useCallback(
+		(value: string) => {
+			setPage(1);
+			getAllBoards(1, order, value);
+		},
+		[order],
+	);
 
 	useEffect(() => {
 		getAllBoards(page, order);
@@ -62,13 +65,16 @@ export default function Page() {
 		},
 	];
 
-	const handleDropdownClick = (value: string) => {
+	const handleDropdownClick = useCallback((value: string) => {
 		setOrder(value as Order);
-	};
+	}, []);
 
-	const handlePagination = (page: number) => {
-		setPage(page + 1);
-	};
+	const handlePagination = useCallback(
+		(page: number) => {
+			setPage(page + 1);
+		},
+		[page],
+	);
 
 	useEffect(() => {
 		getAllBoards(page, order);
