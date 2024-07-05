@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
+
 const [CACHE, TARGET, CHANNEL] = [new Map<string, unknown>(), new EventTarget(), new BroadcastChannel("useCrossState")];
 
 const enum Protocol {
@@ -19,7 +20,7 @@ class Message<T> {
 //
 // overloads
 //
-export default function useCrossState<T>(key: string): [T | null, (value: T | ((_: T) => T)) => void];
+export default function useCrossState<T>(key: string): [T | null, (value: T | null | ((_: T | null) => T | null)) => void];
 export default function useCrossState<T>(key: string, fallback?: T | (() => T)): [T, (value: T | ((_: T) => T)) => void];
 //
 // implementation

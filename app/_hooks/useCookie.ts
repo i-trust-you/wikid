@@ -7,7 +7,7 @@ import useCrossState from "@/_hooks/useCrossState";
 //
 // overloads
 //
-export default function useCookie<T>(key: string): [T | null, (value: T | ((_: T) => T)) => void];
+export default function useCookie<T>(key: string): [T | null, (value: T | null | ((_: T | null) => T | null)) => void];
 export default function useCookie<T>(key: string, fallback?: T | (() => T)): [T, (value: T | ((_: T) => T)) => void];
 //
 // implementation
