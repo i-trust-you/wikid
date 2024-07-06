@@ -2,23 +2,27 @@
 
 import API from "@/_api";
 import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import Footer from "@/_components/common/Footer";
 
 export default function Page() {
-	const [code, setCode] = useState<string>();
+	const router = useRouter();
 
-	useEffect(() => {
-		const getCode = async () => {
-			await API["{teamId}/users/me"].GET({}).then((response) => {
-				setCode(response.profile.code);
+	const goWiki = async () => {
+		await API["{teamId}/users/me"]
+			.GET({})
+			.then((response) => {
+				if (!response.profile) {
+					router.push("/mypage");
+				} else {
+					router.push(`/wiki/${response.profile.code}`);
+				}
+			})
+			.catch(() => {
+				router.push("/login");
 			});
-		};
-
-		getCode();
-	}, []);
+	};
 
 	return (
 		<>
@@ -28,12 +32,12 @@ export default function Page() {
 						<h2 className="font-nexon text-4xl font-light leading-[1.15] text-gray-500 tablet:text-[60px]">남들이 만드는</h2>
 						<h2 className="font-nexon text-[60px] font-bold leading-[1.15] text-gray-500 tablet:text-[90px]">나만의 위키</h2>
 					</div>
-					<Link
-						href={code ? `/wiki/${code}` : "/login"}
+					<button
 						className="mt-10 rounded-[15px] bg-gray-500 px-[30px] py-[15px] text-xl font-bold leading-6 text-white transition hover:bg-gray-600 tablet:text-2xl"
+						onClick={goWiki}
 					>
 						위키 만들기
-					</Link>
+					</button>
 					<Image className="z-10 mt-[44px]" src="/images/profile.png" width={498} height={590} alt="프로필 이미지" />
 					<div className="absolute bottom-0 h-[180px] w-[120vw] rounded-t-[70%] bg-gray-500 pb-20" />
 				</section>
@@ -112,12 +116,12 @@ export default function Page() {
 				</section>
 				<section className="flex flex-col items-center bg-gray-500 py-[100px] tablet:py-[160px] desktop:py-[200px]">
 					<h2 className="font-nexon text-[30px] font-bold leading-[1.15] text-white tablet:text-[60px]">나만의 위키 만들어 보기</h2>
-					<Link
-						href={code ? `/wiki/${code}` : "/login"}
+					<button
 						className="mt-10 rounded-[15px] bg-white px-[30px] py-[15px] text-xl font-bold leading-4 text-gray-500 transition hover:bg-gray-200 active:bg-gray-300 tablet:text-2xl"
+						onClick={goWiki}
 					>
 						지금 시작하기
-					</Link>
+					</button>
 				</section>
 			</main>
 			<Footer />
