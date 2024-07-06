@@ -26,7 +26,7 @@ export default function Page() {
 
 	return (
 		<>
-			<main className="bg-[#F1F4FD]">
+			<main className="overflow-x-hidden bg-[#F1F4FD]">
 				<section className="relative flex flex-col items-center pt-[100px] tablet:pt-[120px]">
 					<div className="flex flex-col items-center justify-center gap-[15px]">
 						<h2 className="font-nexon text-4xl font-light leading-[1.15] text-gray-500 tablet:text-[60px]">남들이 만드는</h2>
