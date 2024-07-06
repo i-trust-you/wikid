@@ -110,7 +110,7 @@ export default function Page() {
 					</div>
 				</div>
 				<div className="mt-6 tablet:mt-8">
-					<BackLink>https://dkjfaklfd</BackLink>
+					<BackLink code={code} />
 				</div>
 				<div className="mt-3 flex tablet:mt-[15px] desktop:absolute desktop:-right-[320px] desktop:top-0 desktop:mt-10 desktop:pb-10">
 					<Profile profile={wiki} />
