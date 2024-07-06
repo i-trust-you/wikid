@@ -1,5 +1,6 @@
-import WikiLink from "@/wikilist/_components/WikiLink";
 import Image from "next/image";
+
+import BackLink from "@/_components/common/BackLink";
 
 type ProfileCardProps = {
 	profile: {
@@ -37,7 +38,7 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
 					<p className="text-md font-normal text-gray-400">{job}</p>
 				</div>
 				<div className="flex h-full items-end">
-					<WikiLink code={code} />
+					<BackLink code={code} />
 				</div>
 			</div>
 		</div>
