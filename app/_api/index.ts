@@ -67,16 +67,18 @@ export default abstract class API {
 		return new Promise<T>(async (resolve, reject) => {
 			const response = await fetch(url, { method: "GET", headers: API.headers(type) });
 
-			if (response.status === 401 && retries < 1 && Token.REFRESH) {
-				const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
+			try {
+				const data = await response.json();
+				return response.ok ? resolve(data) : reject(data);
+			} catch (error) {
+				if (response.status === 401 && retries < 1 && Token.REFRESH) {
+					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-				Cookie.set("accessToken", Codec.encode(data.accessToken));
+					Cookie.set("accessToken", Codec.encode(data.accessToken));
 
-				return resolve(await API.GET(type, url, retries + 1));
+					return resolve(await API.GET(type, url, retries + 1));
+				}
 			}
-			const data = await response.json();
-
-			return response.ok ? resolve(data) : reject(data);
 		});
 	}
 
@@ -84,16 +86,18 @@ export default abstract class API {
 		return new Promise<T>(async (resolve, reject) => {
 			const response = await fetch(url, { method: "PUT", headers: API.headers(type), body: API.payload(body) });
 
-			if (response.status === 401 && retries < 1 && Token.REFRESH) {
-				const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
+			try {
+				const data = await response.json();
+				return response.ok ? resolve(data) : reject(data);
+			} catch (error) {
+				if (response.status === 401 && retries < 1 && Token.REFRESH) {
+					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-				Cookie.set("accessToken", Codec.encode(data.accessToken));
+					Cookie.set("accessToken", Codec.encode(data.accessToken));
 
-				return resolve(await API.PUT(type, url, body, retries + 1));
+					return resolve(await API.PUT(type, url, body, retries + 1));
+				}
 			}
-			const data = await response.json();
-
-			return response.ok ? resolve(data) : reject(data);
 		});
 	}
 
@@ -101,16 +105,18 @@ export default abstract class API {
 		return new Promise<T>(async (resolve, reject) => {
 			const response = await fetch(url, { method: "POST", headers: API.headers(type), body: API.payload(body) });
 
-			if (response.status === 401 && retries < 1 && Token.REFRESH) {
-				const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
+			try {
+				const data = await response.json();
+				return response.ok ? resolve(data) : reject(data);
+			} catch (error) {
+				if (response.status === 401 && retries < 1 && Token.REFRESH) {
+					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-				Cookie.set("accessToken", Codec.encode(data.accessToken));
+					Cookie.set("accessToken", Codec.encode(data.accessToken));
 
-				return resolve(await API.POST(type, url, body, retries + 1));
+					return resolve(await API.POST(type, url, body, retries + 1));
+				}
 			}
-			const data = await response.json();
-
-			return response.ok ? resolve(data) : reject(data);
 		});
 	}
 
@@ -118,16 +124,18 @@ export default abstract class API {
 		return new Promise<T>(async (resolve, reject) => {
 			const response = await fetch(url, { method: "PATCH", headers: API.headers(type), body: API.payload(body) });
 
-			if (response.status === 401 && retries < 1 && Token.REFRESH) {
-				const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
+			try {
+				const data = await response.json();
+				return response.ok ? resolve(data) : reject(data);
+			} catch (error) {
+				if (response.status === 401 && retries < 1 && Token.REFRESH) {
+					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-				Cookie.set("accessToken", Codec.encode(data.accessToken));
+					Cookie.set("accessToken", Codec.encode(data.accessToken));
 
-				return resolve(await API.PATCH(type, url, body, retries + 1));
+					return resolve(await API.PATCH(type, url, body, retries + 1));
+				}
 			}
-			const data = await response.json();
-
-			return response.ok ? resolve(data) : reject(data);
 		});
 	}
 
@@ -135,16 +143,18 @@ export default abstract class API {
 		return new Promise<T>(async (resolve, reject) => {
 			const response = await fetch(url, { method: "DELETE", headers: API.headers(type) });
 
-			if (response.status === 401 && retries < 1 && Token.REFRESH) {
-				const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
+			try {
+				const data = await response.json();
+				return response.ok ? resolve(data) : reject(data);
+			} catch (error) {
+				if (response.status === 401 && retries < 1 && Token.REFRESH) {
+					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-				Cookie.set("accessToken", Codec.encode(data.accessToken));
+					Cookie.set("accessToken", Codec.encode(data.accessToken));
 
-				return resolve(await API.DELETE(type, url, retries + 1));
+					return resolve(await API.DELETE(type, url, retries + 1));
+				}
 			}
-			const data = await response.json();
-
-			return response.ok ? resolve(data) : reject(data);
 		});
 	}
 
