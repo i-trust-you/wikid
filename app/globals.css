@@ -9,10 +9,6 @@
 	font-family: Pretendard;
 }
 
-input:focus {
-	outline: 2px solid #4cbfa4;
-}
-
 @layer utilities {
 	.text-3xl.font-bold {
 		line-height: 46px;
