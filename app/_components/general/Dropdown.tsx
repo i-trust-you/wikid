@@ -59,7 +59,7 @@ export default function Dropdown({ options, onSelect, children }: DropdownProps 
 Dropdown.Trigger = function Trigger({ children }: React.PropsWithChildren) {
 	const { toggleOptions } = useDropdownContext();
 
-	return <button onClick={toggleOptions}>{children}</button>;
+	return <div onClick={toggleOptions}>{children}</div>;
 };
 
 Dropdown.Current = function Current() {
