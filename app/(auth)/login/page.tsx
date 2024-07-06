@@ -68,7 +68,7 @@ export default function Page() {
 						</div>
 					</div>
 					<div className="mt-[32px] h-[45px] w-full tablet:mt-[30px]">
-						<Form.Submit>가입하기</Form.Submit>
+						<Form.Submit>로그인</Form.Submit>
 					</div>
 				</Form>
 			</div>

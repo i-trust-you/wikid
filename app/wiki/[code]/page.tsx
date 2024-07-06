@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import BackLink from "@/_components/common/BackLink";
 import Button from "@/_components/common/Button";
+import Markdown from "@/_components/common/Markdown";
 import Parser from "@/_components/common/Markdown/parser";
 import Scanner from "@/_components/common/Markdown/scanner";
 
@@ -21,11 +22,15 @@ export default function Page() {
 
 	const [wiki, setWiki] = useState<WikiType | undefined>();
 	const [isEditing, setIsEditing] = useState<boolean>(false);
+	const [isMe, setIsMe] = useState<boolean>();
 
 	useEffect(() => {
 		const getWiki = async () => {
 			await API["{teamId}/profiles/{code}"].GET({ code: code }).then((response) => {
 				setWiki(response);
+			});
+			await API["{teamId}/users/me"].GET({}).then((response) => {
+				setIsMe(code === response.profile.code);
 			});
 		};
 
@@ -45,12 +50,34 @@ export default function Page() {
 		return newModal;
 	}, [wiki]);
 
+	if (!wiki) return null;
+
 	if (isEditing) {
 		return (
 			<main className="desktop:pr-[400px]">
-				<div className="relative m-auto max-w-[860px] px-5 py-10 tablet:px-[60px] tablet:py-[60px]">
-					<div className="mt-3 flex tablet:mt-[15px] desktop:absolute desktop:-right-[320px] desktop:top-0 desktop:mt-10">
-						{wiki && (
+				<div className="relative m-auto max-w-[860px] px-5 py-10 tablet:px-[60px] tablet:py-10">
+					<div className="flex w-full items-center justify-between rounded-[10px] bg-gray-100 px-5 py-[10px] desktop:px-[30px]">
+						<h1 className="text-xl font-semibold text-gray-500">{wiki.name}</h1>
+						<div className="flex gap-[10px]">
+							<div className="h-10 w-[70px]">
+								<Button
+									style="outline"
+									onClick={() => {
+										setIsEditing(false);
+									}}
+								>
+									취소
+								</Button>
+							</div>
+							<div className="h-10 w-[70px]">
+								<Button>저장</Button>
+							</div>
+						</div>
+					</div>
+					<div className="mt-3 flex tablet:mt-[15px] desktop:absolute desktop:-right-[320px] desktop:top-0 desktop:mt-10 desktop:pb-10">
+						{!isMe ? (
+							<Profile profile={wiki} />
+						) : (
 							<ProfileForm
 								profile={wiki}
 								onCancle={() => {
@@ -58,6 +85,9 @@ export default function Page() {
 								}}
 							/>
 						)}
+					</div>
+					<div className="mt-[15px] flex flex-col">
+						<Markdown />
 					</div>
 				</div>
 			</main>
@@ -82,11 +112,11 @@ export default function Page() {
 				<div className="mt-6 tablet:mt-8">
 					<BackLink>https://dkjfaklfd</BackLink>
 				</div>
-				<div className="mt-3 flex tablet:mt-[15px] desktop:absolute desktop:-right-[320px] desktop:top-0 desktop:mt-10">
-					{wiki && <Profile profile={wiki} />}
+				<div className="mt-3 flex tablet:mt-[15px] desktop:absolute desktop:-right-[320px] desktop:top-0 desktop:mt-10 desktop:pb-10">
+					<Profile profile={wiki} />
 				</div>
 				<div className="mt-10 w-full tablet:mt-[60px]">
-					{wiki?.content ? (
+					{wiki.content ? (
 						<div className="text-gray-500" dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(wiki.content)).parse() }} />
 					) : (
 						<div className="flex flex-col items-center justify-center rounded-[10px] bg-gray-100 p-10">
