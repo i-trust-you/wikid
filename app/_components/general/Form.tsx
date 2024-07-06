@@ -237,7 +237,7 @@ function ImageInput(props: Readonly<{ id: string; required?: Report<boolean> }>)
 		<div>
 			<label htmlFor={props.id}>
 				<div
-					className="flex aspect-square w-full cursor-pointer items-center justify-center rounded-full bg-gray-200 bg-cover bg-center text-white"
+					className="flex aspect-square w-full items-center justify-center rounded-full bg-gray-200 bg-cover bg-center text-white"
 					style={{ backgroundImage: `url("${preview}")` }}
 				>
 					{preview ? (
