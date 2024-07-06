@@ -1,6 +1,7 @@
 import Codec from "@/_utilities/codec";
 import Cookie from "@/_utilities/cookie";
 
+
 const BASE_URL = "https://wikied-api.vercel.app";
 
 const enum MIME {
@@ -74,7 +75,7 @@ export default abstract class API {
 				if (response.status === 401 && retries < 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-					Cookie.set("accessToken", Codec.encode(data.accessToken));
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
 
 					return resolve(await API.GET(type, url, retries + 1));
 				}
@@ -93,7 +94,7 @@ export default abstract class API {
 				if (response.status === 401 && retries < 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-					Cookie.set("accessToken", Codec.encode(data.accessToken));
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
 
 					return resolve(await API.PUT(type, url, body, retries + 1));
 				}
@@ -112,7 +113,7 @@ export default abstract class API {
 				if (response.status === 401 && retries < 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-					Cookie.set("accessToken", Codec.encode(data.accessToken));
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
 
 					return resolve(await API.POST(type, url, body, retries + 1));
 				}
@@ -131,7 +132,7 @@ export default abstract class API {
 				if (response.status === 401 && retries < 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-					Cookie.set("accessToken", Codec.encode(data.accessToken));
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
 
 					return resolve(await API.PATCH(type, url, body, retries + 1));
 				}
@@ -150,7 +151,7 @@ export default abstract class API {
 				if (response.status === 401 && retries < 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-					Cookie.set("accessToken", Codec.encode(data.accessToken));
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
 
 					return resolve(await API.DELETE(type, url, retries + 1));
 				}

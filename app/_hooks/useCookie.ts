@@ -2,7 +2,10 @@ import Codec from "@/_utilities/codec";
 import Cookie from "@/_utilities/cookie";
 import { useEffect } from "react";
 
+
+
 import useCrossState from "@/_hooks/useCrossState";
+
 
 //
 // overloads
@@ -21,7 +24,7 @@ export default function useCookie<T>(key: string, fallback?: T | (() => T)) {
 		}
 	});
 
-	useEffect(() => Cookie.set(key, Codec.encode(value)), [key, value]);
+	useEffect(() => Cookie.set(key, Codec.encode(value), { path: "/" }), [key, value]);
 
 	return [value, setter] as [T, typeof setter];
 }
