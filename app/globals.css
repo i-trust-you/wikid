@@ -1,4 +1,5 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css");
+@import url("https://webfontworld.github.io/NexonLv1Gothic/NexonLv1Gothic.css");
 
 @tailwind base;
 @tailwind utilities;
@@ -8,6 +9,10 @@
 	font-family: Pretendard;
 }
 
+input:focus {
+	outline: 2px solid #4cbfa4;
+}
+
 @layer utilities {
 	.text-3xl.font-bold {
 		line-height: 46px;
@@ -15,5 +20,33 @@
 
 	.text-xs.font-semibold {
 		line-height: 20px;
+	}
+
+	.md h1 {
+		@apply border-b border-gray-200 pb-[8px] pt-[32px] text-xl first-of-type:pt-0 tablet:pt-[64px] tablet:text-2xl;
+	}
+
+	.md h2 {
+		@apply border-b border-gray-200 pb-[8px] pt-[32px] text-xl first-of-type:pt-0 tablet:pt-[64px] tablet:text-2xl;
+	}
+
+	.md h3 {
+		@apply border-b border-gray-200 pb-[8px] pt-[32px] text-xl first-of-type:pt-0 tablet:pt-[64px] tablet:text-2xl;
+	}
+
+	.md h4 {
+		@apply border-b border-gray-200 pb-[8px] pt-[32px] text-xl first-of-type:pt-0 tablet:pt-[64px] tablet:text-2xl;
+	}
+
+	.md h5 {
+		@apply border-b border-gray-200 pb-[8px] pt-[32px] text-xl first-of-type:pt-0 tablet:pt-[64px] tablet:text-2xl;
+	}
+
+	.md h6 {
+		@apply border-b border-gray-200 pb-[8px] pt-[32px] text-xl first-of-type:pt-0 tablet:pt-[64px] tablet:text-2xl;
+	}
+
+	.md blockquote {
+		@apply border-l-[5px] border-gray-500 pl-[20px];
 	}
 }
