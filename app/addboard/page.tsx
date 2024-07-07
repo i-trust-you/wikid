@@ -13,7 +13,7 @@ import Markdown from "@/_components/common/Markdown";
 
 import CameraIcon from "../../public/icons/CameraIcon";
 
-const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
+const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|gif|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
 export default function Page() {
 	const router = useRouter();
@@ -54,22 +54,26 @@ export default function Page() {
 		event.stopPropagation();
 
 		if (1 < event.dataTransfer.items.length) {
-			return Toast.error("사진은 한번에 1개씩 업로드 가능합니다.");
+			Toast.error("사진은 한번에 1개씩 업로드 가능합니다.");
+			return outline.current?.style.setProperty("border-color", null);
 		}
 
 		const item = event.dataTransfer.items[0];
 
 		if (item.kind !== "file") {
-			return Toast.error("사진을 업로드 해주세요.");
+			Toast.error("사진을 업로드 해주세요.");
+			return outline.current?.style.setProperty("border-color", null);
 		}
 
 		const file = item.getAsFile() as File;
 
 		if (FILE_SIZE < file.size) {
-			return Toast.error("파일의 최대 크기는 5MB 입니다.");
+			Toast.error("파일의 최대 크기는 5MB 입니다.");
+			return outline.current?.style.setProperty("border-color", null);
 		}
 		if (!FILE_NAME.test(file.name)) {
-			return Toast.error("지원하는 형식의 사진이 아닙니다.");
+			Toast.error("지원하는 형식의 사진이 아닙니다.");
+			return outline.current?.style.setProperty("border-color", null);
 		}
 
 		API["{teamId}/images/upload"].POST({}, file).then((response) => setImage(response.url));
@@ -102,7 +106,7 @@ export default function Page() {
 					onClick={() => modal.open()}
 					onDrop={onDrop}
 					onDragEnd={onDrop}
-					onDragOver={onDrop}
+					onDragOver={onDragEnter}
 					onDragEnter={onDragEnter}
 					onDragLeave={onDragLeave}
 					className="relative flex h-[150px] items-center justify-center overflow-hidden tablet:rounded-t-[10px]"
