@@ -5,15 +5,13 @@ import Parser from "@/_components/common/Markdown/parser";
 import Scanner, { Token } from "@/_components/common/Markdown/scanner";
 import Switch from "@/_components/general/Switch";
 
-import AlignCenterIcon from "../../../../public/icons/AlignCenterIcon";
-import AlignLeftIcon from "../../../../public/icons/AlignLeftIcon";
-import AlignRightIcon from "../../../../public/icons/AlignRightIcon";
+import AddPhotoIcon from "../../../../public/icons/AddPhotoIcon";
 import BoldIcon from "../../../../public/icons/BoldIcon";
-import BulletIcon from "../../../../public/icons/BulletIcon";
-import ColoringIcon from "../../../../public/icons/ColoringIcon";
 import ItalicIcon from "../../../../public/icons/ItalicIcon";
-import NumberingIcon from "../../../../public/icons/NumberingIcon";
+import OrderedIcon from "../../../../public/icons/OrderedIcon";
+import StrikeIcon from "../../../../public/icons/StrikeIcon";
 import UnderlineIcon from "../../../../public/icons/UnderlineIcon";
+import UnorderedIcon from "../../../../public/icons/UnorderedIcon";
 
 const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
@@ -33,7 +31,8 @@ export default function Markdown(props: Readonly<{ data: string; onChange?: (_: 
 	}, []);
 
 	// prettier-ignore
-	useEffect(() => setData(props.data), [props.data]); useEffect(() => props.onChange?.(data), [data, props.onChange]); // two-way binding
+	useEffect(() => setData(props.data), [props.data]);
+	useEffect(() => props.onChange?.(data), [data, props.onChange]); // two-way binding
 
 	const [style, setStyle] = useState<React.CSSProperties>({ opacity: 0, pointerEvents: "none" });
 
@@ -42,17 +41,15 @@ export default function Markdown(props: Readonly<{ data: string; onChange?: (_: 
 			setTimeout(() => {
 				if (size && editor.current && document.activeElement === editor.current) {
 					// cache
-					const html = editor.current;
+					const [html, region] = [editor.current, window.getSelection()];
 
-					const area = window.getSelection();
-
-					if (area && 0 < area.rangeCount) {
-						const [buffer, r1, r2] = [{} as typeof style, area.getRangeAt(0).getBoundingClientRect(), html.getBoundingClientRect()];
+					if (region && 0 < region.rangeCount) {
+						const [buffer, r1, r2] = [{} as typeof style, region.getRangeAt(0).getBoundingClientRect(), html.getBoundingClientRect()];
 
 						buffer.top = r1.top - r2.top - size.height - 5;
 						buffer.left = r1.left - r2.left + r1.width / 2;
 
-						if (!area.isCollapsed && 0 < area.getRangeAt(0).toString().length) {
+						if (!region.isCollapsed && 0 < region.getRangeAt(0).toString().length) {
 							// show
 							buffer.visibility = "visible";
 							buffer.transform = "translate(-50%) scale(1)";
@@ -153,6 +150,73 @@ export default function Markdown(props: Readonly<{ data: string; onChange?: (_: 
 		outline.current?.style.setProperty("border-color", null);
 	}, []);
 
+	const stack = useCallback(
+		(token: Token, html: HTMLElement, start: number, end: number) => {
+			// TODO: WIP
+		},
+		[data],
+	);
+	const inline = useCallback(
+		(token: Token, html: HTMLElement, start: number, end: number) => {
+			let insert = false;
+
+			test: for (let i = 0; i < token.grammar.length; i++) {
+				if (token.grammar[i] !== data[start - i - 1]) {
+					insert = true;
+					break test;
+				}
+				if (token.grammar[i] !== data[end + i]) {
+					insert = true;
+					break test;
+				}
+			}
+			const [range, region] = [document.createRange(), window.getSelection()!!];
+			
+			if (insert) {
+				html.innerHTML = (data.slice(0, start) + token.grammar + data.slice(start, end) + token.grammar + data.slice(end)).replace(/\n/g, "<br>");
+				range.setStart(html.firstChild!!, start + token.grammar.length);
+				range.setEnd(html.firstChild!!, end + token.grammar.length);
+			} else {
+				html.innerHTML = (data.slice(0, start - token.grammar.length) + data.slice(start, end) + data.slice(end + token.grammar.length)).replace(/\n/g, "<br>");
+				range.setStart(html.firstChild!!, start - token.grammar.length);
+				range.setEnd(html.firstChild!!, end - token.grammar.length);
+			}
+			region.removeAllRanges();
+			region.addRange(range);
+		},
+		[data],
+	);
+
+	const decorate = useCallback(
+		(token: Token) => {
+			if (editor.current) {
+				// cache
+				const [html, region] = [editor.current, window.getSelection()];
+
+				if (region) {
+					const { startOffset: start, endOffset: end } = region.getRangeAt(0);
+
+					switch (token) {
+						case Token.OL:
+						case Token.UL:
+							stack(token, html, start, end);
+							break;
+						case Token.BOLD:
+						case Token.ITALIC:
+						case Token.UNDERLINE:
+						case Token.STRIKETHROUGH:
+							inline(token, html, start, end);
+							break;
+					}
+					// prettier-ignore
+					html.focus();
+					setData(html.innerHTML.replace(/<br>/g, "\n"));
+				}
+			}
+		},
+		[stack, inline],
+	);
+
 	return (
 		<div className="relative flex h-max w-full rounded-[10px] border border-gray-300 bg-white drop-shadow-sm">
 			<Switch case="editor">
@@ -183,32 +247,26 @@ export default function Markdown(props: Readonly<{ data: string; onChange?: (_: 
 									className="absolute flex h-[35px] items-center justify-center overflow-hidden rounded-[7.5px] border border-gray-300 bg-white px-[3px] drop-shadow-lg [&>button:hover]:bg-gray-200 [&>button]:flex [&>button]:aspect-square [&>button]:items-center [&>button]:rounded-[5px] [&>button]:px-[1.5px] [&>button]:py-[1.5px]"
 									style={style}
 								>
-									<button>
-										<BoldIcon width="25" height="25" />
+									<button onClick={() => decorate(Token.BOLD)}>
+										<BoldIcon width={20} height={20} />
+									</button>
+									<button onClick={() => decorate(Token.ITALIC)}>
+										<ItalicIcon width={20} height={20} />
+									</button>
+									<button onClick={() => decorate(Token.UNDERLINE)}>
+										<UnderlineIcon width={20} height={20} />
+									</button>
+									<button onClick={() => decorate(Token.STRIKETHROUGH)}>
+										<StrikeIcon width={20} height={20} />
 									</button>
 									<button>
-										<ItalicIcon width="25" height="25" />
+										<OrderedIcon width={25} height={25} />
 									</button>
 									<button>
-										<UnderlineIcon width="25" height="25" />
+										<UnorderedIcon width={25} height={25} />
 									</button>
 									<button>
-										<ColoringIcon width="25" height="25" />
-									</button>
-									<button>
-										<AlignLeftIcon width="25" height="25" />
-									</button>
-									<button>
-										<AlignCenterIcon width="25" height="25" />
-									</button>
-									<button>
-										<AlignRightIcon width="25" height="25" />
-									</button>
-									<button>
-										<BulletIcon width="25" height="25" />
-									</button>
-									<button>
-										<NumberingIcon width="25" height="25" />
+										<AddPhotoIcon width={25} height={25} />
 									</button>
 								</div>
 								<div

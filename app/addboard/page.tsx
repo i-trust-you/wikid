@@ -14,14 +14,14 @@ import AlignCenterIcon from "../../public/icons/AlignCenterIcon";
 import AlignLeftIcon from "../../public/icons/AlignLeftIcon";
 import AlignRightIcon from "../../public/icons/AlignRightIcon";
 import BoldIcon from "../../public/icons/BoldIcon";
-import BulletIcon from "../../public/icons/BulletIcon";
 import CameraIcon from "../../public/icons/CameraIcon";
 import ColoringIcon from "../../public/icons/ColoringIcon";
 import ImageIcon from "../../public/icons/ImageIcon";
 import ItalicIcon from "../../public/icons/ItalicIcon";
 import LinkIcon from "../../public/icons/LinkIcon";
-import NumberingIcon from "../../public/icons/NumberingIcon";
+import OrderedIcon from "../../public/icons/OrderedIcon";
 import UnderlineIcon from "../../public/icons/UnderlineIcon";
+import UnorderedIcon from "../../public/icons/UnorderedIcon";
 
 export default function Page() {
 	const router = useRouter();
@@ -98,8 +98,8 @@ export default function Page() {
 						<AlignLeftIcon width="24" height="24" />
 						<AlignCenterIcon width="24" height="24" />
 						<AlignRightIcon width="24" height="24" />
-						<BulletIcon width="24" height="24" />
-						<NumberingIcon width="24" height="24" />
+						<UnorderedIcon width="24" height="24" />
+						<OrderedIcon width="24" height="24" />
 						<ColoringIcon width="24" height="24" />
 						<div onClick={() => modal.open()}>
 							<ImageIcon width="24" height="24" />
