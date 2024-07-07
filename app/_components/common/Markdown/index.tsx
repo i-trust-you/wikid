@@ -286,6 +286,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 									//
 									onDrop={onDrop}
 									onDragEnd={onDrop}
+									onDragOver={onDrop}
 									onDragEnter={onDragEnter}
 									onDragLeave={onDragLeave}
 									//
