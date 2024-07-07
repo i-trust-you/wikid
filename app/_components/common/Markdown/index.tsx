@@ -1,5 +1,5 @@
 import API from "@/_api";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import Parser from "@/_components/common/Markdown/parser";
 import Scanner, { Token } from "@/_components/common/Markdown/scanner";
@@ -216,6 +216,8 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 		[stack, inline],
 	);
 
+	const render = useMemo(() => data && Parser.run(Scanner.run(data)).render(), [data]);
+
 	return (
 		<div className="relative flex h-full min-h-max w-full rounded-[10px] border border-gray-300 bg-white drop-shadow-sm">
 			<Switch case="editor">
@@ -286,6 +288,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 									//
 									onDrop={onDrop}
 									onDragEnd={onDrop}
+									onDragOver={onDrop}
 									onDragEnter={onDragEnter}
 									onDragLeave={onDragLeave}
 									//
@@ -321,7 +324,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 						<Switch.Case of="viewer">
 							<div
 								className="h-full min-h-[130px] w-full rounded-[10px] border border-transparent px-[10px] py-[10px] text-lg font-normal text-gray-500"
-								dangerouslySetInnerHTML={{ __html: data && Parser.run(Scanner.run(data)).render() }}
+								dangerouslySetInnerHTML={{ __html: render }}
 							/>
 						</Switch.Case>
 					</div>

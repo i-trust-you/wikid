@@ -4,7 +4,7 @@ import API from "@/_api";
 import Modal from "@/_utilities/Modal";
 import Toast from "@/_utilities/Toast";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import useCookie from "@/_hooks/useCookie";
 
@@ -13,7 +13,7 @@ import Markdown from "@/_components/common/Markdown";
 
 import CameraIcon from "../../public/icons/CameraIcon";
 
-const [MIN_TITLE, MAX_TITLE] = [1, 30];
+const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
 export default function Page() {
 	const router = useRouter();
@@ -43,24 +43,89 @@ export default function Page() {
 	const [disabled, setDisabled] = useState(true);
 
 	useEffect(() => {
-		setDisabled(!(MIN_TITLE <= title.length && title.length <= MAX_TITLE));
+		setDisabled(!(1 <= title.length && title.length <= 30));
 	}, [title, content]);
+
+	const outline = useRef<HTMLDivElement>(null);
+
+	const onDrop = useCallback((event: React.DragEvent) => {
+		// important
+		event.preventDefault();
+		event.stopPropagation();
+
+		if (1 < event.dataTransfer.items.length) {
+			return Toast.error("사진은 한번에 1개씩 업로드 가능합니다.");
+		}
+
+		const item = event.dataTransfer.items[0];
+
+		if (item.kind !== "file") {
+			return Toast.error("사진을 업로드 해주세요.");
+		}
+
+		const file = item.getAsFile() as File;
+
+		if (FILE_SIZE < file.size) {
+			return Toast.error("파일의 최대 크기는 5MB 입니다.");
+		}
+		if (!FILE_NAME.test(file.name)) {
+			return Toast.error("지원하는 형식의 사진이 아닙니다.");
+		}
+
+		API["{teamId}/images/upload"].POST({}, file).then((response) => setImage(response.url));
+
+		outline.current?.style.setProperty("border-color", null);
+	}, []);
+
+	const onDragEnter = useCallback((event: React.DragEvent) => {
+		// important
+		event.preventDefault();
+		event.stopPropagation();
+
+		outline.current?.style.setProperty("border-color", "#474d66");
+	}, []);
+
+	const onDragLeave = useCallback((event: React.DragEvent) => {
+		// important
+		event.preventDefault();
+		event.stopPropagation();
+
+		outline.current?.style.setProperty("border-color", null);
+	}, []);
 
 	const modal = useMemo(() => new Modal(<Page.Modal onUpload={(response) => setImage(response.url)} />, (modal) => modal.shake()), []);
 
 	return (
 		<main className="flex w-full flex-col items-center tablet:px-[60px] tablet:py-[30px] desktop:pt-[60px]">
-			<form className="tablet:shadow-lg h-full w-full overflow-hidden desktop:container tablet:rounded-[10px]" onSubmit={onSubmit}>
-				<div className="relative flex h-[150px] items-center justify-center overflow-hidden tablet:rounded-t-[10px]" onClick={() => modal.open()}>
-					<div style={{ backgroundImage: `url("${image}")` }} className="absolute inset-0 bg-gray-400 bg-cover bg-center" />
-					<div className="absolute inset-0 flex items-center justify-center text-3xl text-gray-300">대표 사진</div>
+			<form className="h-full w-full overflow-hidden desktop:container tablet:rounded-[10px] tablet:shadow-lg" onSubmit={onSubmit}>
+				<div
+					onClick={() => modal.open()}
+					onDrop={onDrop}
+					onDragEnd={onDrop}
+					onDragOver={onDrop}
+					onDragEnter={onDragEnter}
+					onDragLeave={onDragLeave}
+					className="relative flex h-[150px] items-center justify-center overflow-hidden tablet:rounded-t-[10px]"
+				>
+					<div
+						style={{ backgroundImage: `url("${image}")` }}
+						className="pointer-events-none absolute inset-0 bg-gray-400 bg-cover bg-center transition-colors hover:bg-gray-500"
+					/>
+					<div
+						ref={outline}
+						className="pointer-events-none absolute inset-[5px] flex items-center justify-center rounded-[10px] border-[2.5px] border-dashed border-transparent text-3xl text-gray-300"
+					>
+						대표 사진
+					</div>
 				</div>
 				<div className="mx-[15px] mt-[15px] flex h-[45px] items-center gap-[15px]">
-					<input
-						onChange={(event) => setTitle(event.target.value)}
-						className="h-full grow rounded-[10px] border border-gray-300 px-[10px] outline-none"
-						placeholder="제목을 입력해주세요"
-					/>
+					<div className="flex h-full grow items-center gap-[10px] overflow-hidden rounded-[10px] border border-gray-300 px-[10px]">
+						<input className="h-full grow outline-none" placeholder="제목을 입력해주세요" onChange={(event) => setTitle(event.target.value)} />
+						{/* @ts-ignore */}
+						<div className="right-[10px] text-red-200" style={{ display: 30 >= title.length && "none" }}>
+							-{title.length - 30}
+						</div>
+					</div>
 					<div>
 						<Button disabled={disabled} href="/boards">
 							작성하기
@@ -88,11 +153,11 @@ Page.Modal = function UploadModal(props: Readonly<{ onUpload: (response: Awaited
 		const file = event.target.files?.[0];
 
 		if (file) {
-			if (!/^[a-zA-Z0-9._\-\s]+\.(png|jpe?g)$/.test(file.name)) {
-				return Toast.error("이미지의 확장자를 확인해주세요");
+			if (FILE_SIZE < file.size) {
+				return Toast.error("파일의 최대 크기는 5MB 입니다.");
 			}
-			if (file.size > 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5) {
-				return Toast.error("최대 5MB의 이미지만 업로그 가능합니다");
+			if (!FILE_NAME.test(file.name)) {
+				return Toast.error("지원하는 형식의 사진이 아닙니다.");
 			}
 			const reader = new FileReader();
 
@@ -119,7 +184,7 @@ Page.Modal = function UploadModal(props: Readonly<{ onUpload: (response: Awaited
 				API["{teamId}/images/upload"].POST({}, file).then((response) => props.onUpload(response));
 			}
 		},
-		[file, preview],
+		[props, file],
 	);
 
 	return (
