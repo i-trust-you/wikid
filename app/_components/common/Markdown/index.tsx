@@ -1,13 +1,9 @@
 import API from "@/_api";
-import { CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-
-
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import Parser from "@/_components/common/Markdown/parser";
 import Scanner, { Token } from "@/_components/common/Markdown/scanner";
 import Switch from "@/_components/general/Switch";
-
-
 
 import AlignCenterIcon from "../../../../public/icons/AlignCenterIcon";
 import AlignLeftIcon from "../../../../public/icons/AlignLeftIcon";
@@ -19,11 +15,10 @@ import ItalicIcon from "../../../../public/icons/ItalicIcon";
 import NumberingIcon from "../../../../public/icons/NumberingIcon";
 import UnderlineIcon from "../../../../public/icons/UnderlineIcon";
 
-
 const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
-export default function Markdown() {
-	const [data, setData] = useState("");
+export default function Markdown(props: Readonly<{ data: string; onChange?: (_: string) => void }>) {
+	const [data, setData] = useState(props.data ?? "");
 
 	const helper = useRef<HTMLDivElement>(null);
 	const editor = useRef<HTMLDivElement>(null);
@@ -36,6 +31,9 @@ export default function Markdown() {
 			setSize(helper.current.getBoundingClientRect());
 		}
 	}, []);
+
+	// prettier-ignore
+	useEffect(() => setData(props.data), [props.data]); useEffect(() => props.onChange?.(data), [data, props.onChange]); // two-way binding
 
 	const [style, setStyle] = useState<React.CSSProperties>({ opacity: 0, pointerEvents: "none" });
 
@@ -156,10 +154,10 @@ export default function Markdown() {
 	}, []);
 
 	return (
-		<div className="relative flex h-max w-full rounded-[10px] border bg-white drop-shadow-sm">
+		<div className="relative flex h-max w-full rounded-[10px] border border-gray-300 bg-white drop-shadow-sm">
 			<Switch case="editor">
 				<div className="flex h-full w-full flex-col">
-					<div className="overflow-hidden rounded-t-[10px] border-b border-gray-300 bg-gray-200">
+					<div className="overflow-hidden rounded-t-[10px] bg-gray-200">
 						<Switch.Case of="editor">
 							<div className="m-[-1px] flex items-center">
 								<button className="rounded-t-[10px] border border-gray-300 border-b-white bg-white px-[16px] py-[8px]">Write</button>
@@ -177,12 +175,12 @@ export default function Markdown() {
 							</div>
 						</Switch.Case>
 					</div>
-					<div className="mx-[10px] my-[10px] grow">
+					<div className="px-[10px] py-[10px]">
 						<Switch.Case of="editor">
 							<div className="relative flex">
 								<div
 									ref={helper}
-									className="absolute flex h-[35px] items-center justify-center overflow-hidden rounded-[7.5px] border bg-white px-[3px] drop-shadow-sm [&>button:hover]:bg-gray-200 [&>button]:flex [&>button]:aspect-square [&>button]:items-center [&>button]:rounded-[5px] [&>button]:px-[1.5px] [&>button]:py-[1.5px]"
+									className="absolute flex h-[35px] items-center justify-center overflow-hidden rounded-[7.5px] border border-gray-300 bg-white px-[3px] drop-shadow-lg [&>button:hover]:bg-gray-200 [&>button]:flex [&>button]:aspect-square [&>button]:items-center [&>button]:rounded-[5px] [&>button]:px-[1.5px] [&>button]:py-[1.5px]"
 									style={style}
 								>
 									<button>
@@ -258,7 +256,7 @@ export default function Markdown() {
 						<Switch.Case of="viewer">
 							<div
 								className="h-full min-h-[100px] w-full rounded-[10px] border border-gray-300 px-[10px] py-[10px] text-lg font-normal text-gray-500"
-								dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(data)).render() }}
+								dangerouslySetInnerHTML={{ __html: data && Parser.run(Scanner.run(data)).render() }}
 							/>
 						</Switch.Case>
 					</div>
