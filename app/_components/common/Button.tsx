@@ -17,7 +17,7 @@ const Button: React.FC<ButtonProps> = ({ children, href, style = "basic", onClic
 			break;
 		case "outline":
 			buttonStyle =
-				"bg-white border border-primary-200 text-primary-200 hover:border-primary-300 hover:text-primary-300 active:text-primary-400 hover:bg-gray-100 active:bg-gray-200";
+				"border border-primary-200 text-primary-200 hover:border-primary-300 hover:text-primary-300 active:text-primary-400 hover:bg-gray-200 active:bg-gray-300";
 			break;
 		case "cancel":
 			buttonStyle = "bg-red-200 text-white hover:bg-red-300 active:bg-red-400";

@@ -72,7 +72,9 @@ export default function Page() {
 				</div>
 			</form>
 			<div className="mt-[32px] h-[45px] w-[140px]">
-				<Button style="outline" href="/boards">목록으로</Button>
+				<Button style="outline" href="/boards">
+					목록으로
+				</Button>
 			</div>
 		</main>
 	);

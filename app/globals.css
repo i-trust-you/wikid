@@ -1,4 +1,5 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css");
+@import url("https://webfontworld.github.io/NexonLv1Gothic/NexonLv1Gothic.css");
 
 @tailwind base;
 @tailwind utilities;
@@ -45,8 +46,7 @@
 		@apply border-l-[5px] border-gray-500 pl-[20px];
 	}
 
-	.md img
-	{
+	.md img {
 		@apply rounded-[10px];
 	}
 }

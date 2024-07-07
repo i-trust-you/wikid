@@ -2,7 +2,6 @@
 
 import API from "@/_api";
 import Toast from "@/_utilities/Toast";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
@@ -16,8 +15,8 @@ export default function Page() {
 	const [accessToken, setAccessToken] = useCookie<string>("accessToken");
 	const [refreshoken, setRefreshToken] = useCookie<string>("refreshToken");
 
-	if (!accessToken && !refreshoken) {
-		router.push("/");
+	if (!accessToken || !refreshoken) {
+		router.push("/login");
 	}
 
 	const changePassword = useCallback((data: FormData) => {

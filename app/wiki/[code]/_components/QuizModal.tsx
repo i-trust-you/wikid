@@ -30,9 +30,9 @@ export default function QuizModal({ code, question, onSuccess }: Props) {
 			})
 			.catch((error) => {
 				if (error.response && error.response.status === 401) {
-					setErrorMessage("정답이 아닙니다. 다시 시도해 주세요.");
+					setErrorMessage("권한이 없습니다. 로그인해주세요.");
 				}
-				setErrorMessage("권한이 없습니다. 로그인해주세요.");
+				setErrorMessage("정답이 아닙니다. 다시 시도해 주세요.");
 			});
 	};
 

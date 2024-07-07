@@ -22,7 +22,7 @@ export default function SearchBar({ onChange }: SearchBarProps) {
 				<SearchIcon width={22} height={22} />
 			</div>
 			<input
-				className="h-[45px] w-full rounded-[10px] bg-gray-100 py-[10px] pl-[57px] pr-[20px] text-xl font-medium text-gray-500"
+				className="h-[45px] w-full rounded-[10px] bg-gray-100 py-[10px] pl-[57px] pr-[20px] text-xl font-medium text-gray-500 outline-primary-200"
 				value={value}
 				onChange={(e) => setValue(e.target.value)}
 			/>
