@@ -150,7 +150,7 @@ export default function Popover(
 	const onMouseLeave = useCallback(
 		(event: React.MouseEvent) => {
 			if (props.trigger === "hover") {
-				timeout.current = setTimeout(() => setToggle(false), 500);
+				timeout.current = setTimeout(() => setToggle(false), 250);
 			}
 		},
 		[props.trigger],
