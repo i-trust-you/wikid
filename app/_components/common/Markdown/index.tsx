@@ -1,9 +1,13 @@
 import API from "@/_api";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
+
+
 import Parser from "@/_components/common/Markdown/parser";
 import Scanner, { Token } from "@/_components/common/Markdown/scanner";
 import Switch from "@/_components/general/Switch";
+
+
 
 import AddPhotoIcon from "../../../../public/icons/AddPhotoIcon";
 import BoldIcon from "../../../../public/icons/BoldIcon";
@@ -12,6 +16,7 @@ import OrderedIcon from "../../../../public/icons/OrderedIcon";
 import StrikeIcon from "../../../../public/icons/StrikeIcon";
 import UnderlineIcon from "../../../../public/icons/UnderlineIcon";
 import UnorderedIcon from "../../../../public/icons/UnorderedIcon";
+
 
 const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
@@ -294,6 +299,14 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 									//
 									// feat: prevent html
 									//
+									onPaste={(event) => {
+										// fuck off
+										event.preventDefault();
+										// get raw data
+										const raw = event.clipboardData.getData("Text");
+										// inset raw data
+										document.execCommand("insertHTML", false, raw.replace(/\r?\n/g, "<br>"));
+									}}
 									onKeyDown={(event) => {
 										switch (event.key) {
 											case "Enter": {
