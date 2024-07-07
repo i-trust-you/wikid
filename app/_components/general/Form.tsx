@@ -1,11 +1,15 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
+
+
 import Dropdown from "@/_components/general/Dropdown";
+
+
 
 import CameraIcon from "../../../public/icons/CameraIcon";
 
-const NO = crypto.randomUUID();
-const OK = "ok";
+
+const [OK, NO] = [crypto.randomUUID(), crypto.randomUUID()];
 
 interface Context {
 	values: Readonly<Record<string, FormDataEntryValue>>;
@@ -127,7 +131,7 @@ function Text(
 ) {
 	const ctx = useCTX();
 
-	const [blur, setBlur] = useState(0);
+	const [focus, setFocus] = useState(0);
 	const [value, setValue] = useState("");
 	const [error, setError] = useState(NO);
 	const [sync, setSync] = useState("");
@@ -143,7 +147,7 @@ function Text(
 	}, [value]);
 
 	useEffect(() => {
-		if (!blur) return;
+		if (!focus) return;
 
 		if (props.sync?.value && sync !== value) {
 			return setError(props.sync.message);
@@ -161,7 +165,7 @@ function Text(
 			return setError(props.maxlength.message);
 		}
 		setError(OK);
-	}, [blur, props, blur, error, sync, value]);
+	}, [focus, props, error, sync, value]);
 
 	useEffect(() => {
 		if (props.sync?.value) setSync(ctx.values[props.sync.value] as string);
@@ -191,7 +195,7 @@ function Text(
 		<input
 			ref={self}
 			id={props.id}
-			onBlur={() => setBlur((_) => _ + 1)}
+			onFocus={() => setFocus((_) => _ + 1)}
 			placeholder={props.placeholder ?? props.required?.message}
 			// @ts-ignore
 			onPaste={(event) => setValue(event.target.value)}
