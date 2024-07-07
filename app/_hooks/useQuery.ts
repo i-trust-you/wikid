@@ -1,172 +1,163 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-const CONCURRENT = new Set<string>();
 
-const enum RequestType
-{
+const ON_GOING = new Set<string>();
+
+const enum RequestType {
 	SYNC = "sync",
 	ASSIGN = "assign",
-	ALLOCATE = "allocate",
 }
 
-interface Request<T>
-{
+interface Request<T> {
 	readonly type: RequestType;
 	readonly path: string;
 	readonly data?: T;
+	// dont forget me..!
+	readonly life?: number;
 }
 
-const enum ResponseType
-{
+const enum ResponseType {
 	EMPTY = "empty",
 	LOADING = "loading",
 	SUCCESS = "success",
 }
 
-interface Response<T>
-{
+interface Response<T> {
 	readonly type: ResponseType;
 	readonly path: string;
 	readonly data: T;
 }
 
 /** @see https://developer.mozilla.org/en-US/docs/Glossary/Base64#the_unicode_problem */
-const WORKER = new SharedWorker("data:text/javascript;base64," + btoa(String.fromCodePoint(...new TextEncoder().encode(
-	"(" +
-	// start
-	function ()
-	{
-		const ports: MessagePort[] = []; const storage = new Map<string, { since: number; value: unknown; } | "init">();
+const WORKER = new SharedWorker(
+	"data:text/javascript;base64," +
+		btoa(
+			String.fromCodePoint(
+				...new TextEncoder().encode(
+					"(" +
+						// start
+						function () {
+							const INIT = Symbol();
 
-		// @ts-ignore
-		self.addEventListener("connect", (event: MessageEvent) =>
-		{
-			const port = event.ports[0];
+							const [ports, storage] = [[] as MessagePort[], new Map<string, unknown | typeof INIT>()];
 
-			ports.push(port);
+							// @ts-ignore
+							self.addEventListener("connect", (event: MessageEvent) => {
+								const port = event.ports[0];
 
-			port.addEventListener("message", (event) =>
-			{
-				const request = event.data as Request<unknown>;
+								ports.push(port);
 
-				switch (request.type)
-				{
-					case RequestType.SYNC:
-					{
-						if (!storage.has(request.path))
-						{
-							port.postMessage({ type: ResponseType.EMPTY, path: request.path, data: null } as Response<unknown>);
-						}
-						else
-						{
-							const cache = storage.get(request.path)!;
+								port.addEventListener("message", (event) => {
+									const request = event.data as Request<unknown>;
 
-							if (cache === "init")
-							{
-								port.postMessage({ type: ResponseType.LOADING, path: request.path, data: null } as Response<unknown>);
-							}
-							else
-							{
-								port.postMessage({ type: ResponseType.SUCCESS, path: request.path, data: cache.value } as Response<unknown>);
-							}
-						}
-						break;
-					}
-					case RequestType.ASSIGN:
-					{
-						storage.set(request.path, { since: Date.now(), value: request.data });
+									switch (request.type) {
+										case RequestType.SYNC: {
+											if (!storage.has(request.path)) {
+												// allocate
+												storage.set(request.path, INIT);
 
-						for (const port of ports)
-						{
-							port.postMessage({ type: ResponseType.SUCCESS, path: request.path, data: request.data } as Response<unknown>);
-						}
-						break;
-					}
-					case RequestType.ALLOCATE:
-					{
-						storage.set(request.path, "init");
+												port.postMessage({ type: ResponseType.EMPTY, path: request.path, data: null } as Response<unknown>);
+											} else {
+												// read cache
+												const cache = storage.get(request.path);
 
-						for (const port of ports)
-						{
-							port.postMessage({ type: ResponseType.LOADING, path: request.path, data: request.data } as Response<unknown>);
-						}
-						break;
-					}
-				}
-			});
-			// ..!
-			port.start();
-		});
-	}
-	.toString()
-	// close
-	+ ")()",
-))));
+												if (cache === INIT) {
+													port.postMessage({ type: ResponseType.LOADING, path: request.path, data: null } as Response<unknown>);
+												} else {
+													port.postMessage({ type: ResponseType.SUCCESS, path: request.path, data: cache } as Response<unknown>);
+												}
+											}
+											break;
+										}
+										case RequestType.ASSIGN: {
+											// write cache
+											storage.set(request.path, request.data);
+
+											for (const port of ports) {
+												port.postMessage({ type: ResponseType.SUCCESS, path: request.path, data: request.data } as Response<unknown>);
+											}
+											// expire
+											if (0 < (request?.life ?? 0)) {
+												// delete cache
+												setTimeout(() => storage.delete(request.path), request.life);
+											}
+											break;
+										}
+									}
+								});
+								// ..!
+								port.start();
+							});
+						}.toString() +
+						// close
+						")()",
+				),
+			),
+		),
+);
 // ..!
 WORKER.port.start();
 
-export default function useQuery<T>(key: string, fetcher: () => Promise<T>, options: { retry?: number; lifespan?: number; refresh_on_focus?: boolean; refresh_on_interval?: number; refresh_on_reconnect?: boolean; } = {})
-{
+interface Options {
+	retry?: number;
+	lifespan?: number;
+	refresh_on_focus?: boolean;
+	refresh_on_interval?: number;
+	refresh_on_reconnect?: boolean;
+}
+
+export default function useQuery<T>(
+	key: string,
+	fetcher: () => Promise<T>,
+	{ retry = 0, lifespan = NaN, refresh_on_focus = true, refresh_on_interval = NaN, refresh_on_reconnect = true }: Options = {},
+) {
 	const [data, set_data] = useState<T>();
 
 	/** @see https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker */
-	useEffect(() =>
-	{
-		function handle(event: MessageEvent)
-		{
+	useEffect(() => {
+		function handle(event: MessageEvent) {
 			const response = event.data as Response<T>;
 			//
 			// STEP 2. match key & value
 			//
-			if (response.path === key)
-			{
-				switch (response.type)
-				{
-					case ResponseType.EMPTY:
-					{
+			if (response.path === key) {
+				switch (response.type) {
+					case ResponseType.EMPTY: {
 						//
 						// STEP 3. dedupe
 						//
-						if (!CONCURRENT.has(key))
-						{
+						if (!ON_GOING.has(key)) {
 							//
-							// STEP 4. prevent duplication
+							// STEP 4. allocate (page wise)
 							//
-							CONCURRENT.add(key);
-							//
-							// STEP 5. allocate cache
-							//
-							WORKER.port.postMessage({ type: RequestType.ALLOCATE, path: key } as Request<T>);
+							ON_GOING.add(key);
 							//
 							// STEP 6. fetch data
 							//
-							fetcher().then((data) =>
-							{
+							fetcher().then((data) => {
 								//
-								// STEP 7. reflect fetcher
+								// STEP 7. assignment (page wise)
 								//
 								set_data(data);
 								//
-								// STEP 8. allow duplication
+								// STEP 8. unaullocate (page wise)
 								//
-								CONCURRENT.delete(key);
+								ON_GOING.delete(key);
 								//
-								// STEP 9. update cache
+								// STEP 9. assignment (tabs wise)
 								//
-								WORKER.port.postMessage({ type: RequestType.ASSIGN, path: key, data: data } as Request<T>);
+								WORKER.port.postMessage({ type: RequestType.ASSIGN, path: key, data: data, life: lifespan } as Request<T>);
 							});
 						}
 						break;
 					}
-					case ResponseType.SUCCESS:
-					{
+					case ResponseType.SUCCESS: {
 						//
 						// STEP 3. compare data
 						//
-						if (response.data !== data)
-						{
+						if (response.data !== data) {
 							//
-							// STEP 4. reflect response
+							// STEP 4. assignment (page wise)
 							//
 							set_data(response.data);
 						}
@@ -178,53 +169,42 @@ export default function useQuery<T>(key: string, fetcher: () => Promise<T>, opti
 		}
 		WORKER.port.addEventListener("message", handle);
 		return () => WORKER.port.removeEventListener("message", handle);
-	},
-	[key, data, fetcher]);
+	}, [key, data, fetcher, lifespan]);
+
+	//
+	// STEP 1. synchronize
+	//
+	const sync = useCallback(() => WORKER.port.postMessage({ type: RequestType.SYNC, path: key } as Request<T>), [key]);
 
 	/** @see https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API */
-	useEffect(() =>
-	{
-		function handle(event: Event)
-		{
-			if (!document.hidden)
-			{
-				//
-				// STEP 1. synchronize
-				//
-				WORKER.port.postMessage({ type: RequestType.SYNC, path: key } as Request<T>);
-			}
+	useEffect(() => {
+		function handle(event: Event) {
+			if (!document.hidden && refresh_on_focus) sync();
 		}
 		document.addEventListener("visibilitychange", handle);
 		return () => document.removeEventListener("visibilitychange", handle);
-	},
-	[key]);
+	}, [sync, refresh_on_focus]);
 
 	/** @see https://developer.mozilla.org/en-US/docs/Web/API/Navigator/onLine */
-	useEffect(() =>
-	{
-		function handle(event: Event)
-		{
-			//
-			// STEP 1. synchronize
-			//
-			WORKER.port.postMessage({ type: RequestType.SYNC, path: key } as Request<T>);
+	useEffect(() => {
+		function handle(event: Event) {
+			if (refresh_on_reconnect) sync();
 		}
 		window.addEventListener("online", handle);
 		return () => window.removeEventListener("online", handle);
-	},
-	[key]);
+	}, [sync, refresh_on_reconnect]);
 
-	useEffect(() =>
-	{
-		//
-		// STEP 1. synchronize
-		//
-		if (navigator.onLine)
-		{
-			WORKER.port.postMessage({ type: RequestType.SYNC, path: key, data: null } as Request<T>);
+	useEffect(() => {
+		if (0 < refresh_on_interval) {
+			const id = setInterval(sync, refresh_on_interval);
+
+			return () => clearInterval(id);
 		}
-	},
-	[]);
+	}, [sync, refresh_on_interval]);
 
-	return { data } as { data: T; };
+	useEffect(() => {
+		if (navigator.onLine) sync();
+	}, []);
+
+	return data;
 }

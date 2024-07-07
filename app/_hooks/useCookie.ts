@@ -24,7 +24,7 @@ export default function useCookie<T>(key: string, fallback?: T | (() => T)) {
 		}
 	});
 
-	useEffect(() => Cookie.set(key, Codec.encode(value), { path: "/" }), [key, value]);
+	useEffect(() => Cookie.set(key, Codec.encode(value), { path: "/", samesite: "Strict" }), [key, value]);
 
 	return [value, setter] as [T, typeof setter];
 }

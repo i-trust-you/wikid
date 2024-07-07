@@ -1,5 +1,6 @@
 "use client";
 
+import { Notification } from "@/_utilities/Notification";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,6 +11,7 @@ import useCookie from "@/_hooks/useCookie";
 import Popover from "@/_components/general/Popover";
 
 import MenuIcon from "../../../public/icons/MenuIcon";
+import Toast from "@/_utilities/Toast";
 
 export default function Header() {
 	const router = useRouter();
@@ -19,6 +21,8 @@ export default function Header() {
 	const logout = useCallback(() => {
 		setAccessToken(null);
 		setRefreshToken(null);
+		
+		Toast.success("로그아웃이 완료되었습니다")
 	}, []);
 
 	return (
@@ -35,17 +39,33 @@ export default function Header() {
 				</Link>
 			</div>
 			<div className="flex items-center gap-[24px]">
-				{accessToken ? (
+				{accessToken && refreshoken ? (
 					<>
-						<button className="hidden tablet:block" onClick={() => router.push("/notifications")}>
+						<button className="hidden tablet:block" onClick={() => Notification.toggle()}>
 							<Image src="/icons/alarm.svg" alt="logo" width={32} height={32} />
 						</button>
-						<button className="hidden tablet:block" onClick={() => router.push("/mypage")}>
-							<Image src="/icons/profile.svg" alt="logo" width={32} height={32} />
-						</button>
+						<Popover
+							gap={5}
+							trigger="hover"
+							position="bottom"
+							overlay={
+								<div className="flex w-[120px] flex-col items-center overflow-hidden rounded-[10px] bg-white shadow-[0px_4px_8px_0px_#00000014]">
+									<Link className="flex h-[44px] w-full items-center justify-center hover:bg-gray-100" href="/mypage">
+										마이페이지
+									</Link>
+									<div className="flex h-[44px] w-full items-center justify-center hover:bg-gray-100" onClick={logout}>
+										로그아웃
+									</div>
+								</div>
+							}
+						>
+							<button className="hidden tablet:block" onClick={() => router.push("/mypage")}>
+								<Image src="/icons/profile.svg" alt="logo" width={32} height={32} />
+							</button>
+						</Popover>
 					</>
 				) : (
-					<Link href="/login" className="hidden text-gray-400 tablet:block hover:text-primary-200 transition-colors">
+					<Link href="/login" className="hidden text-gray-400 transition-colors hover:text-primary-200 tablet:block">
 						로그인
 					</Link>
 				)}
@@ -65,9 +85,11 @@ export default function Header() {
 							<Link href="/mypage">
 								<div className="flex h-[44px] w-full items-center justify-center hover:bg-gray-100">마이페이지</div>
 							</Link>
-							<div className="flex h-[44px] w-full items-center justify-center hover:bg-gray-100" onClick={logout}>
-								로그아웃
-							</div>
+							{accessToken && refreshoken && (
+								<div className="flex h-[44px] w-full items-center justify-center hover:bg-gray-100" onClick={logout}>
+									로그아웃
+								</div>
+							)}
 						</div>
 					}
 				>
