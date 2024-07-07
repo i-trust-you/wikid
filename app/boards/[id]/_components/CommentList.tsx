@@ -23,14 +23,6 @@ export default function CommentList({ articleId }: { articleId: number }) {
 		getInitialCommentData();
 	}, [articleId]);
 
-	const getNextComment = () => {
-		if (nextComment === 0) return;
-		API["{teamId}/articles/{articleId}/comments"].GET({ articleId, limit: 10, cursor: nextComment }).then((value) => {
-			setCommentData([...commentData, ...value.list]);
-			setNextComment(value.nextCursor ?? 0);
-		});
-	}, [articleId]);
-
 	useObserver(
 		target,
 		0.3,
