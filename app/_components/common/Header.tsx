@@ -47,8 +47,8 @@ export default function Header() {
 							position="bottom"
 							overlay={
 								<div className="flex w-[120px] flex-col items-center overflow-hidden rounded-[10px] bg-white shadow-[0px_4px_8px_0px_#00000014]">
-									<Link href="/mypage">
-										<div className="flex h-[44px] w-full items-center justify-center hover:bg-gray-100">마이페이지</div>
+									<Link className="flex h-[44px] w-full items-center justify-center hover:bg-gray-100" href="/mypage">
+										마이페이지
 									</Link>
 									<div className="flex h-[44px] w-full items-center justify-center hover:bg-gray-100" onClick={logout}>
 										로그아웃

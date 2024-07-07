@@ -135,18 +135,33 @@ export default function Popover(
 		}
 	}, [toggle, props.trigger]);
 
+	const timeout = useRef<NodeJS.Timeout>();
+
+	const onMouseEnter = useCallback(
+		(event: React.MouseEvent) => {
+			if (props.trigger === "hover") {
+				setToggle(true);
+				timeout.current = clearTimeout(timeout.current) as undefined;
+			}
+		},
+		[props.trigger],
+	);
+
+	const onMouseLeave = useCallback(
+		(event: React.MouseEvent) => {
+			if (props.trigger === "hover") {
+				timeout.current = setTimeout(() => setToggle(false), 500);
+			}
+		},
+		[props.trigger],
+	);
+
 	return (
-		<div
-			ref={pop}
-			className="relative"
-			onClick={() => props.trigger === "click" && setToggle(!toggle)}
-			onMouseEnter={() => props.trigger === "hover" && setToggle(true)}
-			onMouseLeave={() => props.trigger === "hover" && setToggle(false)}
-		>
+		<div ref={pop} className="relative" onClick={() => props.trigger === "click" && setToggle(!toggle)} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
 			{props.children}
 			{cloneElement(props.overlay, {
 				ref: over,
-				style: { position: "absolute", display: !toggle && "none", top: getTop(), left: getLeft(), right: getRight(), bottom: getBottom() },
+				style: { zIndex: 69, position: "absolute", display: !toggle && "none", top: getTop(), left: getLeft(), right: getRight(), bottom: getBottom() },
 			})}
 		</div>
 	);
