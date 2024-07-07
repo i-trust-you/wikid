@@ -11,20 +11,9 @@ import useCookie from "@/_hooks/useCookie";
 import Button from "@/_components/common/Button";
 import Markdown from "@/_components/common/Markdown";
 
-import AlignCenterIcon from "../../public/icons/AlignCenterIcon";
-import AlignLeftIcon from "../../public/icons/AlignLeftIcon";
-import AlignRightIcon from "../../public/icons/AlignRightIcon";
-import BoldIcon from "../../public/icons/BoldIcon";
 import CameraIcon from "../../public/icons/CameraIcon";
-import ColoringIcon from "../../public/icons/ColoringIcon";
-import ImageIcon from "../../public/icons/ImageIcon";
-import ItalicIcon from "../../public/icons/ItalicIcon";
-import LinkIcon from "../../public/icons/LinkIcon";
-import OrderedIcon from "../../public/icons/OrderedIcon";
-import UnderlineIcon from "../../public/icons/UnderlineIcon";
-import UnorderedIcon from "../../public/icons/UnorderedIcon";
 
-const [MIN_TITLE, MAX_TITLE] = [5, 30];
+const [MIN_TITLE, MAX_TITLE] = [1, 30];
 
 export default function Page() {
 	const router = useRouter();
@@ -83,7 +72,7 @@ export default function Page() {
 				</div>
 			</form>
 			<div className="mt-[32px] h-[45px] w-[140px]">
-				<Button href="/boards">목록으로</Button>
+				<Button style="outline" href="/boards">목록으로</Button>
 			</div>
 		</main>
 	);

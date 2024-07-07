@@ -68,7 +68,7 @@ export default abstract class API {
 			const response = await fetch(url, { method: "GET", headers: API.headers(type) });
 
 			if (!response.ok) {
-				if (response.status === 401 && retries < 1 && Token.REFRESH) {
+				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
 					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
@@ -86,7 +86,7 @@ export default abstract class API {
 			const response = await fetch(url, { method: "PUT", headers: API.headers(type), body: API.payload(body) });
 
 			if (!response.ok) {
-				if (response.status === 401 && retries < 1 && Token.REFRESH) {
+				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
 					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
@@ -104,7 +104,7 @@ export default abstract class API {
 			const response = await fetch(url, { method: "POST", headers: API.headers(type), body: API.payload(body) });
 
 			if (!response.ok) {
-				if (response.status === 401 && retries < 1 && Token.REFRESH) {
+				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
 					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
@@ -122,7 +122,7 @@ export default abstract class API {
 			const response = await fetch(url, { method: "PATCH", headers: API.headers(type), body: API.payload(body) });
 
 			if (!response.ok) {
-				if (response.status === 401 && retries < 1 && Token.REFRESH) {
+				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
 					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
@@ -140,7 +140,7 @@ export default abstract class API {
 			const response = await fetch(url, { method: "DELETE", headers: API.headers(type) });
 
 			if (!response.ok) {
-				if (response.status === 401 && retries < 1 && Token.REFRESH) {
+				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
 					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
