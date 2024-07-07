@@ -13,7 +13,7 @@ import StrikeIcon from "../../../../public/icons/StrikeIcon";
 import UnderlineIcon from "../../../../public/icons/UnderlineIcon";
 import UnorderedIcon from "../../../../public/icons/UnorderedIcon";
 
-const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
+const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|gif|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
 export default function Markdown(props: Readonly<{ data?: string; placeholder?: string; onChange?: (_: string) => void }>) {
 	const [data, setData] = useState(props.data ?? "");
@@ -93,15 +93,17 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 				loop: for (const item of event.dataTransfer.items) {
 					scan: switch (item.kind) {
 						case "file": {
-							const file = item.getAsFile() as File;
-
-							if (FILE_SIZE < file.size) {
-								break scan;
+							const file = item.getAsFile();
+							// wtf why cant it be null???
+							if (file) {
+								if (FILE_SIZE < file.size) {
+									break scan;
+								}
+								if (!FILE_NAME.test(file.name)) {
+									break scan;
+								}
+								files.push(file);
 							}
-							if (!FILE_NAME.test(file.name)) {
-								break scan;
-							}
-							files.push(file);
 							break scan;
 						}
 					}
@@ -288,12 +290,20 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 									//
 									onDrop={onDrop}
 									onDragEnd={onDrop}
-									onDragOver={onDrop}
+									onDragOver={onDragEnter}
 									onDragEnter={onDragEnter}
 									onDragLeave={onDragLeave}
 									//
 									// feat: prevent html
 									//
+									onPaste={(event) => {
+										// fuck off
+										event.preventDefault();
+										// get raw data
+										const raw = event.clipboardData.getData("Text");
+										// inset raw data
+										document.execCommand("insertHTML", false, raw.replace(/\r?\n/g, "<br>"));
+									}}
 									onKeyDown={(event) => {
 										switch (event.key) {
 											case "Enter": {
