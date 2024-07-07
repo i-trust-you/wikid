@@ -258,7 +258,7 @@ export default function Markdown() {
 						<Switch.Case of="viewer">
 							<div
 								className="h-full min-h-[100px] w-full rounded-[10px] border border-gray-300 px-[10px] py-[10px] text-lg font-normal text-gray-500"
-								dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(data)).parse() }}
+								dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(data)).render() }}
 							/>
 						</Switch.Case>
 					</div>

@@ -1,7 +1,6 @@
 import Codec from "@/_utilities/codec";
 import Cookie from "@/_utilities/cookie";
 
-
 const BASE_URL = "https://wikied-api.vercel.app";
 
 const enum MIME {
@@ -68,10 +67,7 @@ export default abstract class API {
 		return new Promise<T>(async (resolve, reject) => {
 			const response = await fetch(url, { method: "GET", headers: API.headers(type) });
 
-			try {
-				const data = await response.json();
-				return response.ok ? resolve(data) : reject(data);
-			} catch (error) {
+			if (!response.ok) {
 				if (response.status === 401 && retries < 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
@@ -79,7 +75,9 @@ export default abstract class API {
 
 					return resolve(await API.GET(type, url, retries + 1));
 				}
+				return reject(await response.json());
 			}
+			return resolve(await response.json());
 		});
 	}
 
@@ -87,10 +85,7 @@ export default abstract class API {
 		return new Promise<T>(async (resolve, reject) => {
 			const response = await fetch(url, { method: "PUT", headers: API.headers(type), body: API.payload(body) });
 
-			try {
-				const data = await response.json();
-				return response.ok ? resolve(data) : reject(data);
-			} catch (error) {
+			if (!response.ok) {
 				if (response.status === 401 && retries < 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
@@ -98,7 +93,9 @@ export default abstract class API {
 
 					return resolve(await API.PUT(type, url, body, retries + 1));
 				}
+				return reject(await response.json());
 			}
+			return resolve(await response.json());
 		});
 	}
 
@@ -106,10 +103,7 @@ export default abstract class API {
 		return new Promise<T>(async (resolve, reject) => {
 			const response = await fetch(url, { method: "POST", headers: API.headers(type), body: API.payload(body) });
 
-			try {
-				const data = await response.json();
-				return response.ok ? resolve(data) : reject(data);
-			} catch (error) {
+			if (!response.ok) {
 				if (response.status === 401 && retries < 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
@@ -117,7 +111,9 @@ export default abstract class API {
 
 					return resolve(await API.POST(type, url, body, retries + 1));
 				}
+				return reject(await response.json());
 			}
+			return resolve(await response.json());
 		});
 	}
 
@@ -125,10 +121,7 @@ export default abstract class API {
 		return new Promise<T>(async (resolve, reject) => {
 			const response = await fetch(url, { method: "PATCH", headers: API.headers(type), body: API.payload(body) });
 
-			try {
-				const data = await response.json();
-				return response.ok ? resolve(data) : reject(data);
-			} catch (error) {
+			if (!response.ok) {
 				if (response.status === 401 && retries < 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
@@ -136,7 +129,9 @@ export default abstract class API {
 
 					return resolve(await API.PATCH(type, url, body, retries + 1));
 				}
+				return reject(await response.json());
 			}
+			return resolve(await response.json());
 		});
 	}
 
@@ -144,10 +139,7 @@ export default abstract class API {
 		return new Promise<T>(async (resolve, reject) => {
 			const response = await fetch(url, { method: "DELETE", headers: API.headers(type) });
 
-			try {
-				const data = await response.json();
-				return response.ok ? resolve(data) : reject(data);
-			} catch (error) {
+			if (!response.ok) {
 				if (response.status === 401 && retries < 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
@@ -155,7 +147,9 @@ export default abstract class API {
 
 					return resolve(await API.DELETE(type, url, retries + 1));
 				}
+				return reject(await response.json());
 			}
+			return resolve(await response.json());
 		});
 	}
 
