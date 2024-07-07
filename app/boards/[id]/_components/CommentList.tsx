@@ -12,7 +12,7 @@ export default function CommentList({ articleId }: { articleId: number }) {
 	const [nextComment, setNextComment] = useState<number>(0);
 	useEffect(() => {
 		async function getInitialCommentData() {
-			API["{teamId}/articles/{articleId}/comments"].GET({ teamId: "6-11", articleId, limit: 10 }).then((value) => {
+			API["{teamId}/articles/{articleId}/comments"].GET({ articleId, limit: 10 }).then((value) => {
 				setCommentData(value.list);
 				setNextComment(value.nextCursor ?? 0);
 			});
@@ -22,7 +22,7 @@ export default function CommentList({ articleId }: { articleId: number }) {
 
 	const getNextComment = () => {
 		if (nextComment === 0) return;
-		API["{teamId}/articles/{articleId}/comments"].GET({ teamId: "6-11", articleId, limit: 10, cursor: nextComment }).then((value) => {
+		API["{teamId}/articles/{articleId}/comments"].GET({ articleId, limit: 10, cursor: nextComment }).then((value) => {
 			setCommentData([...commentData, ...value.list]);
 			setNextComment(value.nextCursor ?? 0);
 		});
@@ -40,7 +40,7 @@ export default function CommentList({ articleId }: { articleId: number }) {
 				{commentData && commentData.length > 0 ? (
 					commentData.map((comment) => <Comment key={comment.id} comment={comment} />)
 				) : (
-					<div className="flex h-[128px] items-center justify-center rounded-[10px] font-normal text-gray-400 shadow-basic tablet:h-[134px] tablet:text-xl desktop:h-[136px]">
+					<div className="flex h-[128px] items-center justify-center rounded-[10px] font-normal text-gray-400 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.1)] tablet:h-[134px] tablet:text-xl desktop:h-[136px]">
 						작성된 댓글이 없습니다.
 					</div>
 				)}

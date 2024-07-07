@@ -53,7 +53,7 @@ function Overlay(props: Readonly<React.PropsWithChildren>) {
 Overlay.Info = function Info(props: Readonly<{ message: string }>) {
 	return (
 		<div className="flex h-[50px] gap-[15px] rounded-[10px] border border-purple bg-gray-100 px-[20px] py-[13px] text-md font-semibold text-purple">
-			<CheckIcon width="20" height="20" color="#8e66ff" />
+			<CheckIcon width={20} height={20} color="#8e66ff" />
 			{props.message}
 		</div>
 	);
@@ -62,7 +62,7 @@ Overlay.Info = function Info(props: Readonly<{ message: string }>) {
 Overlay.Error = function Error(props: Readonly<{ message: string }>) {
 	return (
 		<div className="flex h-[50px] gap-[15px] rounded-[10px] border border-red-200 bg-red-100 px-[20px] py-[13px] text-md font-semibold text-red-200">
-			<CheckIcon width="20" height="20" color="#d14343" />
+			<CheckIcon width={20} height={20} color="#8e66ff" />
 			{props.message}
 		</div>
 	);
@@ -71,7 +71,7 @@ Overlay.Error = function Error(props: Readonly<{ message: string }>) {
 Overlay.Warning = function Warning(props: Readonly<{ message: string }>) {
 	return (
 		<div className="flex h-[50px] gap-[15px] rounded-[10px] border border-yellow bg-gray-100 px-[20px] py-[13px] text-md font-semibold text-yellow">
-			<CheckIcon width="20" height="20" color="#fdd181" />
+			<CheckIcon width={20} height={20} color="#8e66ff" />
 			{props.message}
 		</div>
 	);
@@ -80,7 +80,7 @@ Overlay.Warning = function Warning(props: Readonly<{ message: string }>) {
 Overlay.Success = function Success(props: Readonly<{ message: string }>) {
 	return (
 		<div className="flex h-[50px] gap-[15px] rounded-[10px] border border-primary-200 bg-primary-100 px-[20px] py-[13px] text-md font-semibold text-primary-200">
-			<CheckIcon width="20" height="20" color="#4cbfa4" />
+			<CheckIcon width={20} height={20} color="#8e66ff" />
 			{props.message}
 		</div>
 	);

@@ -40,7 +40,7 @@ export default function QuizModal({ code, question, onSuccess }: Props) {
 		<div className="flex flex-col">
 			<div className="flex flex-col items-center">
 				<div className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-gray-100">
-					<LockIcon width="20" height="20" />
+					<LockIcon width={20} height={20} />
 				</div>
 				<p className="mt-[10px] text-center text-md font-normal text-gray-400">
 					다음 퀴즈를 맞추고

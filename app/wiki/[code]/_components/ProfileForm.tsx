@@ -29,7 +29,7 @@ export default function ProfileForm({ profile, onCancle }: Props) {
 						<Form.Submit>저장</Form.Submit>
 					</div>
 				</div>
-				<div className="flex flex-col rounded-[10px] bg-white px-5 py-[15px] shadow-basic tablet:px-[30px] tablet:py-5 desktop:w-[320px] desktop:py-[60px]">
+				<div className="flex flex-col rounded-[10px] bg-white px-5 py-[15px] shadow-[0px_4px_20px_0px_rgba(0,0,0,0.1)] tablet:px-[30px] tablet:py-5 desktop:w-[320px] desktop:py-[60px]">
 					<div className="m-auto h-[62px] w-[62px] tablet:h-[71px] tablet:w-[71px] desktop:h-[200px] desktop:w-[200px]">
 						<Form.Input.Image id="image" />
 					</div>

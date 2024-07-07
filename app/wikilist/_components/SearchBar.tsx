@@ -19,7 +19,7 @@ export default function SearchBar({ onChange }: SearchBarProps) {
 	return (
 		<div className="relative flex items-center">
 			<div className="absolute left-[20px]">
-				<SearchIcon width="22" height="22" />
+				<SearchIcon width={22} height={22} />
 			</div>
 			<input
 				className="h-[45px] w-full rounded-[10px] bg-gray-100 py-[10px] pl-[57px] pr-[20px] text-xl font-medium text-gray-500"

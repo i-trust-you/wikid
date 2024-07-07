@@ -15,7 +15,7 @@ import UnorderedIcon from "../../../../public/icons/UnorderedIcon";
 
 const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
-export default function Markdown(props: Readonly<{ data: string; onChange?: (_: string) => void }>) {
+export default function Markdown(props: Readonly<{ data?: string; placeholder?: string; onChange?: (_: string) => void }>) {
 	const [data, setData] = useState(props.data ?? "");
 
 	const helper = useRef<HTMLDivElement>(null);
@@ -30,8 +30,7 @@ export default function Markdown(props: Readonly<{ data: string; onChange?: (_: 
 		}
 	}, []);
 
-	// prettier-ignore
-	useEffect(() => setData(props.data), [props.data]);
+	useEffect(() => setData(props.data ?? ""), [props.data]); // two-way binding
 	useEffect(() => props.onChange?.(data), [data, props.onChange]); // two-way binding
 
 	const [style, setStyle] = useState<React.CSSProperties>({ opacity: 0, pointerEvents: "none" });
@@ -171,7 +170,7 @@ export default function Markdown(props: Readonly<{ data: string; onChange?: (_: 
 				}
 			}
 			const [range, region] = [document.createRange(), window.getSelection()!!];
-			
+
 			if (insert) {
 				html.innerHTML = (data.slice(0, start) + token.grammar + data.slice(start, end) + token.grammar + data.slice(end)).replace(/\n/g, "<br>");
 				range.setStart(html.firstChild!!, start + token.grammar.length);
@@ -218,24 +217,32 @@ export default function Markdown(props: Readonly<{ data: string; onChange?: (_: 
 	);
 
 	return (
-		<div className="relative flex h-max w-full rounded-[10px] border border-gray-300 bg-white drop-shadow-sm">
+		<div className="relative flex h-full min-h-max w-full rounded-[10px] border border-gray-300 bg-white drop-shadow-sm">
 			<Switch case="editor">
 				<div className="flex h-full w-full flex-col">
 					<div className="overflow-hidden rounded-t-[10px] bg-gray-200">
 						<Switch.Case of="editor">
 							<div className="m-[-1px] flex items-center">
-								<button className="rounded-t-[10px] border border-gray-300 border-b-white bg-white px-[16px] py-[8px]">Write</button>
+								<button type="button" className="rounded-t-[10px] border border-gray-300 border-b-white bg-white px-[16px] py-[8px]">
+									Write
+								</button>
 								<Switch.Jump to="viewer">
-									<button className="border border-transparent px-[16px] py-[8px]">Preview</button>
+									<button type="button" className="border border-transparent px-[16px] py-[8px]">
+										Preview
+									</button>
 								</Switch.Jump>
 							</div>
 						</Switch.Case>
 						<Switch.Case of="viewer">
 							<div className="m-[-1px] flex items-center">
 								<Switch.Jump to="editor">
-									<button className="border border-transparent px-[16px] py-[8px]">Write</button>
+									<button type="button" className="border border-transparent px-[16px] py-[8px]">
+										Write
+									</button>
 								</Switch.Jump>
-								<button className="rounded-t-[10px] border border-gray-300 border-b-white bg-white px-[16px] py-[8px]">Preview</button>
+								<button type="button" className="rounded-t-[10px] border border-gray-300 border-b-white bg-white px-[16px] py-[8px]">
+									Preview
+								</button>
 							</div>
 						</Switch.Case>
 					</div>
@@ -247,33 +254,33 @@ export default function Markdown(props: Readonly<{ data: string; onChange?: (_: 
 									className="absolute flex h-[35px] items-center justify-center overflow-hidden rounded-[7.5px] border border-gray-300 bg-white px-[3px] drop-shadow-lg [&>button:hover]:bg-gray-200 [&>button]:flex [&>button]:aspect-square [&>button]:items-center [&>button]:rounded-[5px] [&>button]:px-[1.5px] [&>button]:py-[1.5px]"
 									style={style}
 								>
-									<button onClick={() => decorate(Token.BOLD)}>
+									<button type="button" onClick={() => decorate(Token.BOLD)}>
 										<BoldIcon width={20} height={20} />
 									</button>
-									<button onClick={() => decorate(Token.ITALIC)}>
+									<button type="button" onClick={() => decorate(Token.ITALIC)}>
 										<ItalicIcon width={20} height={20} />
 									</button>
-									<button onClick={() => decorate(Token.UNDERLINE)}>
+									<button type="button" onClick={() => decorate(Token.UNDERLINE)}>
 										<UnderlineIcon width={20} height={20} />
 									</button>
-									<button onClick={() => decorate(Token.STRIKETHROUGH)}>
+									<button type="button" onClick={() => decorate(Token.STRIKETHROUGH)}>
 										<StrikeIcon width={20} height={20} />
 									</button>
-									<button>
+									<button type="button">
 										<OrderedIcon width={25} height={25} />
 									</button>
-									<button>
+									<button type="button">
 										<UnorderedIcon width={25} height={25} />
 									</button>
-									<button>
+									<button type="button">
 										<AddPhotoIcon width={25} height={25} />
 									</button>
 								</div>
 								<div
 									ref={editor}
 									contentEditable={!readonly}
-									data-placeholder="내용을 입력해주세요"
-									className="inline-block h-full min-h-[100px] w-full grow resize-y overflow-auto break-all rounded-[10px] border border-gray-300 bg-white px-[10px] py-[10px] text-lg text-gray-500 before:text-gray-300 [&:not(:focus):empty]:before:content-[attr(data-placeholder)]"
+									data-placeholder={props.placeholder}
+									className="inline-block h-full min-h-[130px] w-full grow resize-y overflow-auto break-all rounded-[10px] border border-gray-300 bg-white px-[10px] py-[10px] text-lg text-gray-500 before:text-gray-300 [&:not(:focus):empty]:before:content-[attr(data-placeholder)]"
 									//
 									// feat: drop & drop
 									//
@@ -313,7 +320,7 @@ export default function Markdown(props: Readonly<{ data: string; onChange?: (_: 
 						</Switch.Case>
 						<Switch.Case of="viewer">
 							<div
-								className="h-full min-h-[100px] w-full rounded-[10px] border border-gray-300 px-[10px] py-[10px] text-lg font-normal text-gray-500"
+								className="h-full min-h-[130px] w-full rounded-[10px] border border-transparent px-[10px] py-[10px] text-lg font-normal text-gray-500"
 								dangerouslySetInnerHTML={{ __html: data && Parser.run(Scanner.run(data)).render() }}
 							/>
 						</Switch.Case>

@@ -21,7 +21,7 @@ export default function BoardDropdown({ options, onSelect }: BoardDropdownProps)
 						<p className="truncate text-md font-normal text-gray-500">
 							<Dropdown.Current />
 						</p>
-						<TriangleDownIcon width="22" height="22" />
+						<TriangleDownIcon width={22} height={22} />
 					</Dropdown.Trigger>
 				</div>
 				<div className="absolute z-10 mt-1 flex w-full flex-col rounded-[10px] bg-scroll">

@@ -70,7 +70,7 @@ export default function Header() {
 					}
 				>
 					<div className="tablet:hidden">
-						<MenuIcon width="24" height="24"></MenuIcon>
+						<MenuIcon width={24} height={24}></MenuIcon>
 					</div>
 				</Popover>
 			</div>

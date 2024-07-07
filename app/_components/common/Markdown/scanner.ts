@@ -114,8 +114,9 @@ export abstract class Token {
 }
 
 interface Route {
+	[key: string]: Token | Route;
 	// @ts-ignore
-	[key: string]: Token | Route; default?: Token;
+	default?: Token;
 }
 
 const __TABLE__: Record<Context, Route> = {

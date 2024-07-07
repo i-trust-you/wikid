@@ -87,7 +87,7 @@ export default function Page() {
 				</div>
 				<div className="mt-10 w-full tablet:mt-[60px]">
 					{wiki?.content ? (
-						<div className="text-gray-500" dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(wiki.content)).parse() }} />
+						<div className="text-gray-500" dangerouslySetInnerHTML={{ __html: Parser.run(Scanner.run(wiki.content)).render() }} />
 					) : (
 						<div className="flex flex-col items-center justify-center rounded-[10px] bg-gray-100 p-10">
 							<p className="text-md font-normal text-gray-400 tablet:text-lg">
