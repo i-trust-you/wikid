@@ -6,19 +6,12 @@ import Toast from "@/_utilities/Toast";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-
-
 import useCookie from "@/_hooks/useCookie";
-
-
 
 import Button from "@/_components/common/Button";
 import Markdown from "@/_components/common/Markdown";
 
-
-
 import CameraIcon from "../../public/icons/CameraIcon";
-
 
 const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|gif|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
@@ -108,7 +101,7 @@ export default function Page() {
 
 	return (
 		<main className="flex w-full flex-col items-center tablet:px-[60px] tablet:py-[30px] desktop:pt-[60px]">
-			<form className="h-full w-full overflow-hidden desktop:container tablet:rounded-[10px] tablet:shadow-lg" onSubmit={onSubmit}>
+			<form className="tablet:shadow-lg h-full w-full overflow-hidden desktop:container tablet:rounded-[10px]" onSubmit={onSubmit}>
 				<div
 					onClick={() => modal.open()}
 					onDrop={onDrop}
@@ -138,9 +131,7 @@ export default function Page() {
 						</div>
 					</div>
 					<div>
-						<Button disabled={disabled}>
-							작성하기
-						</Button>
+						<Button disabled={disabled}>작성하기</Button>
 					</div>
 				</div>
 				<div className="px-[15px] py-[15px]">
