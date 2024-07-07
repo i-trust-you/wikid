@@ -151,6 +151,16 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 		outline.current?.style.setProperty("border-color", null);
 	}, []);
 
+	const serialize = useCallback((html: HTMLElement) => {
+		return html.innerHTML
+			.replace(/<br>/g, "\n")
+			.replace(/&nbsp;/g, " ")
+			.replace(/&lt;/g, "<")
+			.replace(/&gt;/g, ">")
+			.replace(/&amp;/g, "&")
+			.replace(/&#035;/g, "#");
+	}, []);
+
 	const stack = useCallback(
 		(token: Token, html: HTMLElement, start: number, end: number) => {
 			// TODO: WIP
@@ -211,7 +221,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 					}
 					// prettier-ignore
 					html.focus();
-					setData(html.innerHTML.replace(/<br>/g, "\n"));
+					setData(serialize(html));
 				}
 			}
 		},
@@ -219,6 +229,8 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 	);
 
 	const render = useMemo(() => data && Parser.run(Scanner.run(data)).render(), [data]);
+
+	console.log(data);
 
 	return (
 		<div className="relative flex h-full min-h-max w-full rounded-[10px] border border-gray-300 bg-white drop-shadow-sm">
@@ -284,7 +296,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 									ref={editor}
 									contentEditable={!readonly}
 									data-placeholder={props.placeholder}
-									className="inline-block h-full min-h-[130px] w-full grow resize-y overflow-auto break-all rounded-[10px] border border-gray-300 bg-white px-[10px] py-[10px] text-lg text-gray-500 before:text-gray-300 [&:not(:focus):empty]:before:content-[attr(data-placeholder)]"
+									className="inline-block h-full min-h-[130px] w-full grow resize-y overflow-auto whitespace-pre break-all rounded-[10px] border border-gray-300 bg-white px-[10px] py-[10px] text-lg text-gray-500 before:text-gray-300 [&:not(:focus):empty]:before:content-[attr(data-placeholder)]"
 									//
 									// feat: drop & drop
 									//
@@ -317,7 +329,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 									}}
 									onInput={(event) => {
 										// @ts-ignore
-										const text = event.target.innerHTML.replace(/<br>/g, "\n");
+										const text = serialize(event.target);
 
 										// @ts-ignore
 										if (event.target.children.length === 1 && event.target.lastChild.nodeName === "BR") {
