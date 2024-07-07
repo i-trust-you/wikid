@@ -11,6 +11,7 @@ import useCookie from "@/_hooks/useCookie";
 import Popover from "@/_components/general/Popover";
 
 import MenuIcon from "../../../public/icons/MenuIcon";
+import Toast from "@/_utilities/Toast";
 
 export default function Header() {
 	const router = useRouter();
@@ -20,6 +21,8 @@ export default function Header() {
 	const logout = useCallback(() => {
 		setAccessToken(null);
 		setRefreshToken(null);
+		
+		Toast.success("로그아웃이 완료되었습니다")
 	}, []);
 
 	return (
