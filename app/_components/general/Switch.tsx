@@ -1,6 +1,5 @@
 import capsule from "@/_utilities/capsule";
-import { Children, cloneElement, createContext, useContext, useState } from "react";
-
+import { createContext, useContext, useState } from "react";
 
 interface Context {
 	index: ReturnType<typeof capsule<string>>;

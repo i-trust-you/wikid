@@ -1,13 +1,11 @@
-const enum Context
-{
+const enum Context {
 	// HTML = "html",
 	BLOCK = "block",
 	STACK = "stack",
 	INLINE = "inline",
 }
 
-export abstract class Token
-{
+export abstract class Token {
 	// @ts-ignore
 	private static readonly __MAP__ = new Map<Context, Token[]>([
 		// auto-generate
@@ -20,17 +18,16 @@ export abstract class Token
 		[Context.INLINE, []],
 	]);
 
-	private constructor(public readonly ctx: Context, public readonly grammar: string)
-	{
+	private constructor(
+		public readonly ctx: Context,
+		public readonly grammar: string,
+	) {
 		Token.__MAP__.get(ctx)!!.push(this);
 	}
 
-	public static of(ctx: Context)
-	{
-		switch (ctx)
-		{
-			case Context.BLOCK:
-			{
+	public static of(ctx: Context) {
+		switch (ctx) {
+			case Context.BLOCK: {
 				return [
 					// @ts-ignore
 					...Token.__MAP__.get(null)!!,
@@ -42,8 +39,7 @@ export abstract class Token
 					...Token.__MAP__.get(Context.INLINE)!!,
 				];
 			}
-			case Context.STACK:
-			{
+			case Context.STACK: {
 				return [
 					// @ts-ignore
 					...Token.__MAP__.get(null)!!,
@@ -53,8 +49,7 @@ export abstract class Token
 					...Token.__MAP__.get(Context.INLINE)!!,
 				];
 			}
-			case Context.INLINE:
-			{
+			case Context.INLINE: {
 				return [
 					// @ts-ignore
 					...Token.__MAP__.get(null)!!,
@@ -67,93 +62,64 @@ export abstract class Token
 	//
 	// core
 	//
-	public static readonly BREAK = new (class BREAK extends Token {})
-	(null as never, "\n");
-	public static readonly COMMENT_L = new (class COMMENT_L extends Token {})
-	(null as never, "/*");
-	public static readonly COMMENT_R = new (class COMMENT_R extends Token {})
-	(null as never, "*/");
+	public static readonly BREAK = new (class BREAK extends Token {})(null as never, "\n");
+	public static readonly COMMENT_L = new (class COMMENT_L extends Token {})(null as never, "/*");
+	public static readonly COMMENT_R = new (class COMMENT_R extends Token {})(null as never, "*/");
 	//
 	// block
 	//
-	public static readonly H1 = new (class H1 extends Token {})
-	(Context.BLOCK, "#\u0020");
-	public static readonly H2 = new (class H2 extends Token {})
-	(Context.BLOCK, "##\u0020");
-	public static readonly H3 = new (class H3 extends Token {})
-	(Context.BLOCK, "###\u0020");
-	public static readonly H4 = new (class H4 extends Token {})
-	(Context.BLOCK, "####\u0020");
-	public static readonly H5 = new (class H5 extends Token {})
-	(Context.BLOCK, "#####\u0020");
-	public static readonly H6 = new (class H6 extends Token {})
-	(Context.BLOCK, "######\u0020");
-	public static readonly HR_A = new (class HR_A extends Token {})
-	(Context.BLOCK, "___\n");
-	public static readonly HR_B = new (class HR_B extends Token {})
-	(Context.BLOCK, "---\n");
-	public static readonly HR_C = new (class HR_C extends Token {})
-	(Context.BLOCK, "===\n");
+	public static readonly H1 = new (class H1 extends Token {})(Context.BLOCK, "#\u0020");
+	public static readonly H2 = new (class H2 extends Token {})(Context.BLOCK, "##\u0020");
+	public static readonly H3 = new (class H3 extends Token {})(Context.BLOCK, "###\u0020");
+	public static readonly H4 = new (class H4 extends Token {})(Context.BLOCK, "####\u0020");
+	public static readonly H5 = new (class H5 extends Token {})(Context.BLOCK, "#####\u0020");
+	public static readonly H6 = new (class H6 extends Token {})(Context.BLOCK, "######\u0020");
+	public static readonly HR_A = new (class HR_A extends Token {})(Context.BLOCK, "___\n");
+	public static readonly HR_B = new (class HR_B extends Token {})(Context.BLOCK, "---\n");
+	public static readonly HR_C = new (class HR_C extends Token {})(Context.BLOCK, "===\n");
 	//
 	// stack
 	//
-	public static readonly INDENT_1T = new (class INDENT_1T extends Token {})
-	(Context.STACK, "	");
-	public static readonly INDENT_2S = new (class INDENT_2S extends Token {})
-	(Context.STACK, "  ");
-	public static readonly INDENT_4S = new (class INDENT_4S extends Token {})
-	(Context.STACK, "    ");
-	public static readonly BQ = new (class BQ extends Token {})
-	(Context.STACK, ">\u0020");
-	public static readonly OL = new (class OL extends Token {})
-	(Context.STACK, "-\u0020");
-	public static readonly UL = new (class UL extends Token {})
-	(Context.STACK, "~\u0020");
+	public static readonly INDENT_1T = new (class INDENT_1T extends Token {})(Context.STACK, "	");
+	public static readonly INDENT_2S = new (class INDENT_2S extends Token {})(Context.STACK, "  ");
+	public static readonly INDENT_4S = new (class INDENT_4S extends Token {})(Context.STACK, "    ");
+	public static readonly BQ_A = new (class BQ_A extends Token {})(Context.STACK, ">");
+	public static readonly BQ_B = new (class BQ_B extends Token {})(Context.STACK, ">\u0020");
+	public static readonly OL = new (class OL extends Token {})(Context.STACK, "-\u0020");
+	public static readonly UL = new (class UL extends Token {})(Context.STACK, "~\u0020");
 	//
 	// inline
 	//
-	public static readonly BOLD = new (class BOLD extends Token {})
-	(Context.INLINE, "**");
-	public static readonly ITALIC = new (class ITALIC extends Token {})
-	(Context.INLINE, "*");
-	public static readonly UNDERLINE = new (class UNDERLINE extends Token {})
-	(Context.INLINE, "__");
-	public static readonly STRIKETHROUGH = new (class STRIKETHROUGH extends Token {})
-	(Context.INLINE, "~~");
-	public static readonly UNCHECKED_BOX = new (class UNCHECKED_BOX extends Token {})
-	(Context.INLINE, "[ ]");
-	public static readonly CHECKED_BOX = new (class CHECKED_BOX extends Token {})
-	(Context.INLINE, "[x]");
-	public static readonly ARROW_ALL = new (class ARROW_ALL extends Token {})
-	(Context.INLINE, "<->");
-	public static readonly ARROW_LEFT = new (class ARROW_LEFT extends Token {})
-	(Context.INLINE, "<-");
-	public static readonly ARROW_RIGHT = new (class ARROW_RIGHT extends Token {})
-	(Context.INLINE, "->");
-	public static readonly FAT_ARROW_ALL = new (class FAT_ARROW_ALL extends Token {})
-	(Context.INLINE, "<=>");
-	public static readonly FAT_ARROW_LEFT = new (class FAT_ARROW_LEFT extends Token {})
-	(Context.INLINE, "<==");
-	public static readonly FAT_ARROW_RIGHT = new (class FAT_ARROW_RIGHT extends Token {})
-	(Context.INLINE, "=>");
-	public static readonly MATH_APX = new (class MATH_APX extends Token {})
-	(Context.INLINE, "~=");
-	public static readonly MATH_NET = new (class MATH_NET extends Token {})
-	(Context.INLINE, "!=");
-	public static readonly MATH_LTOET = new (class MATH_LTOET extends Token {})
-	(Context.INLINE, "<=");
-	public static readonly MATH_GTOET = new (class MATH_GTOET extends Token {})
-	(Context.INLINE, ">=");
+	public static readonly BOLD = new (class BOLD extends Token {})(Context.INLINE, "**");
+	public static readonly ITALIC = new (class ITALIC extends Token {})(Context.INLINE, "*");
+	public static readonly UNDERLINE = new (class UNDERLINE extends Token {})(Context.INLINE, "__");
+	public static readonly STRIKETHROUGH = new (class STRIKETHROUGH extends Token {})(Context.INLINE, "~~");
+	public static readonly UNCHECKED_BOX = new (class UNCHECKED_BOX extends Token {})(Context.INLINE, "[ ]");
+	public static readonly CHECKED_BOX = new (class CHECKED_BOX extends Token {})(Context.INLINE, "[x]");
+	public static readonly ARROW_ALL = new (class ARROW_ALL extends Token {})(Context.INLINE, "<->");
+	public static readonly ARROW_LEFT = new (class ARROW_LEFT extends Token {})(Context.INLINE, "<-");
+	public static readonly ARROW_RIGHT = new (class ARROW_RIGHT extends Token {})(Context.INLINE, "->");
+	public static readonly FAT_ARROW_ALL = new (class FAT_ARROW_ALL extends Token {})(Context.INLINE, "<=>");
+	public static readonly FAT_ARROW_LEFT = new (class FAT_ARROW_LEFT extends Token {})(Context.INLINE, "<==");
+	public static readonly FAT_ARROW_RIGHT = new (class FAT_ARROW_RIGHT extends Token {})(Context.INLINE, "=>");
+	public static readonly MATH_APX = new (class MATH_APX extends Token {})(Context.INLINE, "~=");
+	public static readonly MATH_NET = new (class MATH_NET extends Token {})(Context.INLINE, "!=");
+	public static readonly MATH_LTOET = new (class MATH_LTOET extends Token {})(Context.INLINE, "<=");
+	public static readonly MATH_GTOET = new (class MATH_GTOET extends Token {})(Context.INLINE, ">=");
+	public static readonly EXCLAMATION = new (class EXCLAMATION extends Token {})(Context.INLINE, "!");
+	public static readonly BRACKET_L = new (class BRACKET_L extends Token {})(Context.INLINE, "[");
+	public static readonly BRACKET_R = new (class BRACKET_R extends Token {})(Context.INLINE, "]");
+	public static readonly PAREN_L = new (class PAREN_L extends Token {})(Context.INLINE, "(");
+	public static readonly PAREN_R = new (class PAREN_R extends Token {})(Context.INLINE, ")");
 }
 
-interface Route
-{
+interface Route {
+	[key: string]: Token | Route;
 	// @ts-ignore
-	[key: string]: Token | Route; default?: Token;
+	default?: Token;
 }
 
-const __TABLE__: Record<Context, Route> =
-{
+const __TABLE__: Record<Context, Route> = {
 	// auto generate
 	[Context.BLOCK]: {},
 	// auto generate
@@ -194,49 +160,31 @@ e.g.
 	}
 }
 */
-for (const ctx of [Context.BLOCK, Context.STACK, Context.INLINE])
-{
-	for (const token of Token.of(ctx))
-	{
+for (const ctx of [Context.BLOCK, Context.STACK, Context.INLINE]) {
+	for (const token of Token.of(ctx)) {
 		let node = __TABLE__[ctx];
 
-		for (let i = 0; i < token.grammar.length; i++)
-		{
+		for (let i = 0; i < token.grammar.length; i++) {
 			const char = token.grammar[i];
 
-			if (i + 1 < token.grammar.length)
-			{
-				if (char in node)
-				{
-					if (node[char] instanceof Token)
-					{
-						node = (node[char] = { default: node[char] });
-					}
-					else
-					{
+			if (i + 1 < token.grammar.length) {
+				if (char in node) {
+					if (node[char] instanceof Token) {
+						node = node[char] = { default: node[char] };
+					} else {
 						node = node[char];
 					}
+				} else {
+					node = node[char] = {};
 				}
-				else
-				{
-					node = (node[char] = {});
-				}
-			}
-			else
-			{
-				if (char in node)
-				{
-					if (node[char] instanceof Token)
-					{
-						throw new Error(`Token [${node[char].constructor.name}] and [${token.constructor.name}] has exact syntax`)
-					}
-					else
-					{
+			} else {
+				if (char in node) {
+					if (node[char] instanceof Token) {
+						throw new Error(`Token [${node[char].constructor.name}] and [${token.constructor.name}] has exact syntax`);
+					} else {
 						node[char].default = token;
 					}
-				}
-				else
-				{
+				} else {
 					node[char] = token;
 				}
 			}
@@ -244,51 +192,39 @@ for (const ctx of [Context.BLOCK, Context.STACK, Context.INLINE])
 	}
 }
 
-export default class Scanner
-{
-	private constructor()
-	{
+export default class Scanner {
+	private constructor() {
 		// final
 	}
-	
-	public static run(input: string)
-	{
+
+	public static run(input: string) {
 		const [tokens, buffer] = [[] as (string | Token)[], [] as string[]];
 
-		let [ctx, node, depth, escape] = [Context.BLOCK, null as (null | Route), 0, false];
+		let [ctx, node, depth, escape] = [Context.BLOCK, null as null | Route, 0, false];
 
 		// Greninja transformed into the Grass Type!
-		function protean(token: Token)
-		{
-			if (token.grammar[token.grammar.length - 1] === "\n")
-			{
+		function protean(token: Token) {
+			if (token.grammar[token.grammar.length - 1] === "\n") {
 				// <unknown> -> block
 				ctx = Context.BLOCK;
-			}
-			else
-			{
-				switch (token.ctx)
-				{
-					case null:
-					{
+			} else {
+				switch (token.ctx) {
+					case null: {
 						// core -> inline
 						ctx = Context.INLINE;
 						break;
 					}
-					case Context.BLOCK:
-					{
+					case Context.BLOCK: {
 						// block -> inline
 						ctx = Context.INLINE;
 						break;
 					}
-					case Context.STACK:
-					{
+					case Context.STACK: {
 						// stack -> stack
 						ctx = Context.STACK;
 						break;
 					}
-					case Context.INLINE:
-					{
+					case Context.INLINE: {
 						// inline -> inline
 						ctx = Context.INLINE;
 						break;
@@ -297,8 +233,7 @@ export default class Scanner
 			}
 		}
 
-		function handle(char: string)
-		{
+		function handle(char: string) {
 			if (node === null) throw new Error();
 			//
 			// <into the deep>
@@ -307,8 +242,7 @@ export default class Scanner
 			//
 			// <examine token>
 			//
-			if (node[char] instanceof Token)
-			{
+			if (node[char] instanceof Token) {
 				const token = node[char];
 				//
 				// <ctx/switch>
@@ -317,9 +251,8 @@ export default class Scanner
 				//
 				// <buffer/flush>
 				//
-				if (depth < buffer.length)
-				{
-					tokens.push(buffer.join("").slice(0, - depth));
+				if (depth < buffer.length) {
+					tokens.push(buffer.join("").slice(0, -depth));
 				}
 				//
 				// <token/build>
@@ -329,9 +262,7 @@ export default class Scanner
 				// <state/reset>
 				//
 				[node, depth, buffer.length] = [null, 0, 0];
-			}
-			else
-			{
+			} else {
 				//
 				// <branch/delve>
 				//
@@ -339,14 +270,11 @@ export default class Scanner
 			}
 		}
 
-		main:
-		for (const char of input.replace(/\r\n?/g, "\n"))
-		{
+		main: for (const char of input.replace(/\r?\n/g, "\n")) {
 			//
 			// <escape>
 			//
-			if (!escape && char === "\\")
-			{
+			if (!escape && char === "\\") {
 				//
 				// <state/reset>
 				//
@@ -361,8 +289,7 @@ export default class Scanner
 			//
 			// <unescape>
 			//
-			if (escape)
-			{
+			if (escape) {
 				//
 				// <state/reset>
 				//
@@ -373,14 +300,10 @@ export default class Scanner
 			//
 			// <branch/delve>
 			//
-			if (char in (node ??= __TABLE__[ctx]))
-			{
+			if (char in (node ??= __TABLE__[ctx])) {
 				handle(char);
-			}
-			else
-			{
-				if (node.default)
-				{
+			} else {
+				if (node.default) {
 					const token = node.default;
 					//
 					// <ctx/switch>
@@ -389,10 +312,8 @@ export default class Scanner
 					//
 					// <buffer/manipulate>
 					//
-					if (depth < buffer.length)
-					{
-						if (depth + 1 < buffer.length)
-						{
+					if (depth < buffer.length - 0) {
+						if (depth < buffer.length - 1) {
 							/*
 							e.g. token=<ITALIC { grammar: "*" }>, depth=1
 
@@ -419,16 +340,20 @@ export default class Scanner
 					// <token/build>
 					//
 					tokens.push(token);
+				} else {
+					//
+					// <ctx/switch>
+					//
+					ctx = Context.INLINE;
 				}
 				//
 				// <state/reset>
 				//
-				[ctx, node, depth] = [Context.INLINE, null, 0];
+				[node, depth] = [null, 0];
 				//
 				// <branch/delve>
 				//
-				if (char in (node ??= __TABLE__[ctx]))
-				{
+				if (char in (node ??= __TABLE__[ctx])) {
 					handle(char);
 				}
 			}
@@ -436,11 +361,10 @@ export default class Scanner
 		//
 		// <buffer/flush>
 		//
-		if (0 < buffer.length)
-		{
+		if (0 < buffer.length) {
 			tokens.push(buffer.join(""));
 		}
-		
+
 		return tokens;
 	}
 }

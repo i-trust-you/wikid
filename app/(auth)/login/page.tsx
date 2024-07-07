@@ -1,19 +1,23 @@
 "use client";
 
 import API from "@/_api";
+import Toast from "@/_utilities/Toast";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 
-import useLocalStorage from "@/_hooks/useLocalStorage";
+import useCookie from "@/_hooks/useCookie";
 
 import Form from "@/_components/general/Form";
 
 export default function Page() {
-	const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
+	const router = useRouter();
 
-	if (accessToken) {
-		redirect("/");
+	const [accessToken, setAccessToken] = useCookie<string>("accessToken");
+	const [refreshoken, setRefreshToken] = useCookie<string>("refreshToken");
+
+	if (accessToken && refreshoken) {
+		router.push("/");
 	}
 
 	const handle = useCallback((data: FormData) => {
@@ -27,21 +31,20 @@ export default function Page() {
 		API["{teamId}/auth/signIn"]
 			.POST({}, payload)
 			.then((response) => {
-				alert("로그인이 완료되었습니다");
+				Toast.success("로그인이 완료되었습니다");
 				setAccessToken(response.accessToken);
-				// apply token
-				API.credential(response.accessToken);
-				// redirect("/");
+				setRefreshToken(response.refreshToken);
+				router.push("/");
 			})
 			.catch((error) => {
-				alert("로그인 실패");
+				Toast.error("로그인 실패");
 			});
 	}, []);
 
 	return (
 		<main className="flex flex-col items-center">
-			<div className="mt-[143px] text-2xl font-semibold text-gray-500 tablet:mt-[281px] desktop:mt-[261px]">로그인</div>
-			<div className="mt-[32px] tablet:mt-[48px] desktop:mt-[64px]">
+			<div className="mt-[170px] text-2xl font-semibold text-gray-500 tablet:mt-[212px] desktop:mt-[140px]">로그인</div>
+			<div className="mt-[64px] flex w-full flex-col gap-[32px] px-[20px] tablet:max-w-[400px] tablet:px-0">
 				<Form onSubmit={handle}>
 					<div className="flex flex-col gap-[24px]">
 						<div className="flex flex-col gap-[10px]">
@@ -65,11 +68,11 @@ export default function Page() {
 						</div>
 					</div>
 					<div className="mt-[32px] h-[45px] w-full tablet:mt-[30px]">
-						<Form.Submit>가입하기</Form.Submit>
+						<Form.Submit>로그인</Form.Submit>
 					</div>
 				</Form>
 			</div>
-			<div className="mt-[40px] text-md font-normal text-gray-400 mb-[203px] tablet:mb-[387px] desktop:mb-[334px]">
+			<div className="mb-[203px] mt-[40px] text-md font-normal text-gray-400 tablet:mb-[387px] desktop:mb-[334px]">
 				처음이신가요?{" "}
 				<Link href="/signup" className="text-primary-200">
 					회원가입

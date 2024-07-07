@@ -6,6 +6,7 @@ export default function Layout({ children }: Readonly<React.PropsWithChildren>) 
 	return (
 		<html lang="ko">
 			<body>
+				<Header />
 				{children}
 				<div id="toast" />
 				<div id="alert" />

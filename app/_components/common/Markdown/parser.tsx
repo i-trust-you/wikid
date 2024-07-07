@@ -1,350 +1,690 @@
 import Scanner, { Token } from "./scanner";
 
-abstract class AST {
-	public abstract parse(): string;
-}
+const EOF = Symbol();
 
-abstract class Branch extends AST {
-	constructor(
-		public readonly parent: Branch,
-		public readonly children: AST[] = [],
-	) {
-		super();
+abstract class AST {
+	public readonly children: (string | AST)[] = [];
+
+	constructor(...children: AST["children"]) {
+		this.children.push(...children);
 	}
 
-	public first() {
+	public get first() {
 		return this.children[0];
 	}
 
-	public last() {
+	public get last() {
 		return this.children[this.children.length - 1];
 	}
 
-	protected parseAndMergeChildren() {
-		return this.children.map((child) => child.parse()).join("");
+	public get body() {
+		return this.children.map((child) => (typeof child === "string" ? child : child.render())).join("");
 	}
-}
 
-abstract class Leaf<T> extends AST {
-	constructor(public readonly data: T) {
-		super();
-	}
-}
-//
-// core
-//
-class BREAK extends Leaf<never> {
-	override parse() {
-		return "<br />";
-	}
+	public abstract render(): string;
 }
 //
 // block
 //
-class H1 extends Branch {
-	override parse() {
-		return `<h1>${this.parseAndMergeChildren()}</h1>`;
+class H1 extends AST {
+	override render() {
+		return `<h1>${this.body}</h1>`;
 	}
 }
 
-class H2 extends Branch {
-	override parse() {
-		return `<h2>${this.parseAndMergeChildren()}</h2>`;
+class H2 extends AST {
+	override render() {
+		return `<h2>${this.body}</h2>`;
 	}
 }
 
-class H3 extends Branch {
-	override parse() {
-		return `<h3>${this.parseAndMergeChildren()}</h3>`;
+class H3 extends AST {
+	override render() {
+		return `<h3>${this.body}</h3>`;
 	}
 }
 
-class H4 extends Branch {
-	override parse() {
-		return `<h4>${this.parseAndMergeChildren()}</h4>`;
+class H4 extends AST {
+	override render() {
+		return `<h4>${this.body}</h4>`;
 	}
 }
 
-class H5 extends Branch {
-	override parse() {
-		return `<h5>${this.parseAndMergeChildren()}</h5>`;
+class H5 extends AST {
+	override render() {
+		return `<h5>${this.body}</h5>`;
 	}
 }
 
-class H6 extends Branch {
-	override parse() {
-		return `<h6>${this.parseAndMergeChildren()}</h6>`;
+class H6 extends AST {
+	override render() {
+		return `<h6>${this.body}</h6>`;
 	}
 }
 
-class HR extends Branch {
-	override parse() {
-		return "<hr />";
+class HR extends AST {
+	override render() {
+		return `<hr/>`;
 	}
 }
 //
 // stack
 //
-class BQ extends Branch {
-	override parse() {
-		return `<blockquote>${this.parseAndMergeChildren()}</blockquote>`;
+class BQ extends AST {
+	override render() {
+		return `<blockquote>${this.body}</blockquote>`;
 	}
 }
 
-class OL extends Branch {
-	override parse() {
-		return `<ol>${this.parseAndMergeChildren()}</ol>`;
+class OL extends AST {
+	override render() {
+		return `<ol>${this.body}</ol>`;
 	}
 }
 
-class UL extends Branch {
-	override parse() {
-		return `<ul>${this.parseAndMergeChildren()}</ul>`;
+class UL extends AST {
+	override render() {
+		return `<ul>${this.body}</ul>`;
 	}
 }
 
-class LI extends Branch {
-	override parse() {
-		return `<li>${this.parseAndMergeChildren()}</li>`;
+class LI extends AST {
+	override render() {
+		return `<li>${this.body}</li>`;
 	}
 }
 //
 // inline
 //
-class TEXT extends Leaf<{ value: string; bold?: boolean; italic?: boolean; underline?: boolean; strikethrough?: boolean }> {
-	override parse() {
-		let buffer = this.data.value;
-
-		if (this.data.bold) buffer = `<strong>${buffer}</strong>`;
-		if (this.data.italic) buffer = `<i>${buffer}</i>`;
-		if (this.data.underline) buffer = `<u>${buffer}</u>`;
-		if (this.data.strikethrough) buffer = `<s>${buffer}</s>`;
-
-		return buffer;
+class BR extends AST {
+	override render() {
+		return `<br>`;
 	}
 }
 
-class CHECKBOX extends Leaf<boolean> {
-	override parse() {
-		if (!this.data) {
-			return '<input type="checkbox" readOnly />';
-		} else {
-			return '<input type="checkbox" checked readOnly />';
-		}
+class PR extends AST {
+	override render() {
+		return `<p>${this.body}</p>`;
+	}
+}
+
+class BOLD extends AST {
+	override render() {
+		return `<strong>${this.body}</strong>`;
+	}
+}
+
+class ITALIC extends AST {
+	override render() {
+		return `<i>${this.body}</i>`;
+	}
+}
+
+class UNDERLINE extends AST {
+	override render() {
+		return `<u>${this.body}</u>`;
+	}
+}
+
+class STRIKETHROUGH extends AST {
+	override render() {
+		return `<s>${this.body}</s>`;
+	}
+}
+
+class UNCHECKED_BOX extends AST {
+	override render() {
+		return `<input type="checkbox" onClick="return false"/>`;
+	}
+}
+
+class CHECKED_BOX extends AST {
+	override render() {
+		return `<input type="checkbox" checked onClick="return false"/>`;
+	}
+}
+
+class IMAGE extends AST {
+	constructor(
+		private readonly alt: string,
+		private readonly src: string,
+	) {
+		super();
+	}
+
+	override render() {
+		return `<img alt="${this.alt}" src="${this.src}">`;
+	}
+}
+
+class BACKLINK extends AST {
+	constructor(
+		private readonly text: string,
+		private readonly href: string,
+	) {
+		super();
+	}
+
+	override render() {
+		return `<a href="${this.href}">${this.text}</>`;
 	}
 }
 
 export default class Parser {
 	public static run(tokens: ReturnType<typeof Scanner.run>) {
-		const origin = new (class ROOT extends Branch {
-			override parse() {
-				return `<article class="md text-md font-normal text-gray-500 tablet:text-lg">${this.parseAndMergeChildren()}</article>`;
+		return new Parser(tokens).run();
+	}
+
+	private readonly origin = new (class ROOT extends AST {
+		override render() {
+			return `<article class="md">${this.body}</article>`;
+		}
+	})();
+	//
+	// pointer
+	//
+	private i = 0;
+	private node: AST = this.origin;
+
+	private constructor(private readonly tokens: ReturnType<typeof Scanner.run>) {
+		// final
+	}
+
+	private run() {
+		main: while (this.peek() !== EOF) {
+			const ast = this._block();
+			// ast may be null due to edge cases
+			if (ast) this.node.children.push(ast);
+		}
+		return this.origin;
+	}
+
+	private peek() {
+		return (this.tokens[this.i] ?? EOF) as string | Token | typeof EOF;
+	}
+
+	private consume(token?: "string" | Token) {
+		if (token && (token === "string" ? typeof this.peek() !== "string" : this.peek() !== token)) {
+			throw new Error(`Unexpected token ${this.peek().constructor.name} at position ${this.i}`);
+		}
+		return (this.tokens[this.i++] ?? EOF) as string | Token | typeof EOF;
+	}
+
+	private _block() {
+		main: switch (this.peek()) {
+			case Token.BREAK: {
+				this.consume();
+				this.node = this.origin;
+				return null;
 			}
-		})(null as never);
+			case Token.H1: {
+				this.consume();
+				return new H1(this._inline());
+			}
+			case Token.H2: {
+				this.consume();
+				return new H2(this._inline());
+			}
+			case Token.H3: {
+				this.consume();
+				return new H3(this._inline());
+			}
+			case Token.H4: {
+				this.consume();
+				return new H4(this._inline());
+			}
+			case Token.H5: {
+				this.consume();
+				return new H5(this._inline());
+			}
+			case Token.H6: {
+				this.consume();
+				return new H6(this._inline());
+			}
+			case Token.HR_A:
+			case Token.HR_B:
+			case Token.HR_C: {
+				this.consume();
+				return new HR(); // no children
+			}
+			default: {
+				return this._stack();
+			}
+		}
+	}
 
-		let node = origin;
-
-		let [bold, italic, underline, strikethrough] = [false, false, false, false];
-
-		let comment = false;
-
-		main: for (const token of tokens) {
-			if (comment) {
-				switch (token) {
-					case Token.COMMENT_R: {
-						comment = false;
-						break;
+	private _stack() {
+		switch (this.peek()) {
+			case Token.INDENT_1T:
+			case Token.INDENT_2S:
+			case Token.INDENT_4S: {
+				indent: while (true) {
+					switch (this.peek()) {
+						// redundant lookup... im sorry :(
+						case Token.INDENT_1T:
+						case Token.INDENT_2S:
+						case Token.INDENT_4S: {
+							switch (this.node.last?.constructor) {
+								case OL:
+								case UL: {
+									this.consume();
+									// pickup
+									this.node = this.node.last as AST;
+									break;
+								}
+								default: {
+									// fuck
+									this.node = this.origin;
+									// insert
+									this.node.children.push(this._inline());
+									// indent level mismatch, exit
+									break indent;
+								}
+							}
+							// more to go
+							continue indent;
+						}
+						default: {
+							const ast = this._stack();
+							// insert
+							if (ast) this.node.children.push(ast);
+							// no more indent, exit
+							break indent;
+						}
 					}
 				}
-				continue main;
+				return null;
 			}
-			switch (token) {
-				//
-				// core
-				//
+			case Token.BQ_A:
+			case Token.BQ_B: {
+				this.consume();
+				return this._bq();
+			}
+			case Token.OL: {
+				this.consume();
+				return this._ol();
+			}
+			case Token.UL: {
+				this.consume();
+				return this._ul();
+			}
+			default: {
+				return this._inline();
+			}
+		}
+	}
+
+	private _bq() {
+		const node = new PR();
+
+		switch (this.node.last?.constructor) {
+			case BQ: {
+				// skip
+				break;
+			}
+			default: {
+				this.node.children.push(new BQ());
+				break;
+			}
+		}
+		// pickup
+		this.node = this.node.last as AST;
+
+		const ast = this._stack();
+
+		switch (ast?.constructor) {
+			case OL:
+			case UL:
+			case LI: {
+				this.node.children.push(ast);
+				this.node = this.node.last as AST;
+				break;
+			}
+			case PR: {
+				node.children.push(...(ast as AST).children);
+				break;
+			}
+			default: {
+				if (ast) node.children.push(ast);
+				break;
+			}
+		}
+
+		if (node.children.length) {
+			this.node.children.push(node);
+		}
+		return null;
+	}
+
+	private _ol() {
+		const [node, ast] = [new LI(), this._stack()];
+
+		if (ast) node.children.push(...ast.children);
+
+		switch (this.node.last?.constructor) {
+			case OL:
+			case UL: {
+				// pickup
+				this.node = this.node.last as AST;
+				this.node.children.push(node);
+				break;
+			}
+			default: {
+				// insert
+				this.node.children.push(new OL(node));
+				break;
+			}
+		}
+		return null;
+	}
+
+	private _ul() {
+		const [node, ast] = [new LI(), this._stack()];
+
+		if (ast) node.children.push(...ast.children);
+
+		switch (this.node.last?.constructor) {
+			case OL:
+			case UL: {
+				// pickup
+				this.node = this.node.last as AST;
+				this.node.children.push(node);
+				break;
+			}
+			default: {
+				// insert
+				this.node.children.push(new UL(node));
+				break;
+			}
+		}
+		return null;
+	}
+
+	private _inline() {
+		const node = new PR();
+
+		main: while (true) {
+			switch (this.peek()) {
+				case EOF:
 				case Token.BREAK: {
-					[bold, italic, underline, strikethrough] = [false, false, false, false]; // reset styles
-
-					switch (node.constructor) {
-						case H1:
-						case H2:
-						case H3:
-						case H4:
-						case H5:
-						case H6:
-						case HR: {
-							break; // block-level, ignore
-						}
-						default: {
-							node.children.push(new BREAK(null as never)); // others, continue
-							break;
-						}
-					}
-					// i'll be back
-					node = origin;
-					break;
+					break main; // let block handle Token.BREAK
 				}
+				//
+				// "Exhaust every possibility until none are left." - Raphael
+				//
 				case Token.COMMENT_L: {
-					comment = true;
-					break;
-				}
-				//
-				// block
-				//
-				case Token.H1: {
-					node.children.push((node = new H1(node)));
-					break;
-				}
-				case Token.H2: {
-					node.children.push((node = new H2(node)));
-					break;
-				}
-				case Token.H3: {
-					node.children.push((node = new H3(node)));
-					break;
-				}
-				case Token.H4: {
-					node.children.push((node = new H4(node)));
-					break;
-				}
-				case Token.H5: {
-					node.children.push((node = new H5(node)));
-					break;
-				}
-				case Token.H6: {
-					node.children.push((node = new H6(node)));
-					break;
-				}
-				case Token.HR_A:
-				case Token.HR_B:
-				case Token.HR_C: {
-					// i'll be back
-					(node = origin).children.push(new HR(node));
-					break;
-				}
-				//
-				// stack
-				//
-				case Token.INDENT_1T:
-				case Token.INDENT_2S:
-				case Token.INDENT_4S: {
-					switch (node.last()?.constructor) {
-						case OL:
-						case UL: {
-							node = node.last() as Branch;
-							break;
-						}
-						default: {
-							// fallback
-							node.children.push(new TEXT({ value: token.grammar }));
-							break;
+					comment: while (true) {
+						switch (this.consume()) {
+							case EOF:
+							case Token.COMMENT_R: {
+								this.consume();
+								break comment;
+							}
 						}
 					}
-					break;
-				}
-				case Token.BQ: {
-					if (node.last() instanceof BQ) {
-						node = node.last() as Branch;
-					} else {
-						node.children.push((node = new BQ(node)));
-					}
-					break;
-				}
-				case Token.OL: {
-					if (node.last() instanceof OL) {
-						node = node.last() as Branch;
-					} else {
-						node.children.push((node = new OL(node)));
-					}
-					// insert
-					node.children.push((node = new LI(node)));
-					break;
-				}
-				case Token.UL: {
-					if (node.last() instanceof UL) {
-						node = node.last() as Branch;
-					} else {
-						node.children.push((node = new UL(node)));
-					}
-					// insert
-					node.children.push((node = new LI(node)));
-					break;
+					continue main;
 				}
 				//
-				// inline
+				// ![alt](url)
 				//
+				case Token.EXCLAMATION: {
+					/* this.consume(); */ node.children.push(this._image());
+					continue main;
+				}
+				//
+				// [text](url)
+				//
+				case Token.BRACKET_L: {
+					/* this.consume(); */ node.children.push(this._backlink());
+					continue main;
+				}
 				case Token.BOLD: {
-					bold = !bold;
-					break;
+					this.consume();
+					node.children.push(this._bold());
+					continue main;
 				}
 				case Token.ITALIC: {
-					italic = !italic;
-					break;
+					this.consume();
+					node.children.push(this._italic());
+					continue main;
 				}
 				case Token.UNDERLINE: {
-					underline = !underline;
-					break;
+					this.consume();
+					node.children.push(this._underline());
+					continue main;
 				}
 				case Token.STRIKETHROUGH: {
-					strikethrough = !strikethrough;
-					break;
+					this.consume();
+					node.children.push(this._strikethrough());
+					continue main;
 				}
 				case Token.UNCHECKED_BOX: {
-					node.children.push(new CHECKBOX(false));
-					break;
+					this.consume();
+					node.children.push(new UNCHECKED_BOX());
+					continue main;
 				}
 				case Token.CHECKED_BOX: {
-					node.children.push(new CHECKBOX(true));
-					break;
+					this.consume();
+					node.children.push(new CHECKED_BOX());
+					continue main;
 				}
 				case Token.ARROW_ALL: {
-					node.children.push(new TEXT({ value: "↔", bold, italic, underline, strikethrough }));
-					break;
+					this.consume();
+					node.children.push("↔");
+					continue main;
 				}
 				case Token.ARROW_LEFT: {
-					node.children.push(new TEXT({ value: "←", bold, italic, underline, strikethrough }));
-					break;
+					this.consume();
+					node.children.push("←");
+					continue main;
 				}
 				case Token.ARROW_RIGHT: {
-					node.children.push(new TEXT({ value: "→", bold, italic, underline, strikethrough }));
-					break;
+					this.consume();
+					node.children.push("→");
+					continue main;
 				}
 				case Token.FAT_ARROW_ALL: {
-					node.children.push(new TEXT({ value: "⇔", bold, italic, underline, strikethrough }));
-					break;
+					this.consume();
+					node.children.push("⇔");
+					continue main;
 				}
 				case Token.FAT_ARROW_LEFT: {
-					node.children.push(new TEXT({ value: "⇐", bold, italic, underline, strikethrough }));
-					break;
+					this.consume();
+					node.children.push("⇐");
+					continue main;
 				}
 				case Token.FAT_ARROW_RIGHT: {
-					node.children.push(new TEXT({ value: "⇒", bold, italic, underline, strikethrough }));
-					break;
+					this.consume();
+					node.children.push("⇒");
+					continue main;
 				}
 				case Token.MATH_APX: {
-					node.children.push(new TEXT({ value: "≈", bold, italic, underline, strikethrough }));
-					break;
+					this.consume();
+					node.children.push("≈");
+					continue main;
 				}
 				case Token.MATH_NET: {
-					node.children.push(new TEXT({ value: "≠", bold, italic, underline, strikethrough }));
-					break;
+					this.consume();
+					node.children.push("≠");
+					continue main;
 				}
 				case Token.MATH_LTOET: {
-					node.children.push(new TEXT({ value: "≤", bold, italic, underline, strikethrough }));
-					break;
+					this.consume();
+					node.children.push("≤");
+					continue main;
 				}
 				case Token.MATH_GTOET: {
-					node.children.push(new TEXT({ value: "≥", bold, italic, underline, strikethrough }));
-					break;
+					this.consume();
+					node.children.push("≥");
+					continue main;
+				}
+				//
+				// fallback
+				//
+				case Token.INDENT_1T: {
+					this.consume();
+					node.children.push("&nbsp".repeat(4));
+					continue main;
+				}
+				case Token.INDENT_2S: {
+					this.consume();
+					node.children.push("&nbsp".repeat(2));
+					continue main;
+				}
+				case Token.INDENT_4S: {
+					this.consume();
+					node.children.push("&nbsp".repeat(4));
+					continue main;
+				}
+				case Token.COMMENT_R:
+				case Token.BRACKET_R:
+				case Token.PAREN_L:
+				case Token.PAREN_R:
+				case Token.OL:
+				case Token.UL: {
+					node.children.push((this.consume() as Token).grammar);
+					continue main;
 				}
 				default: {
-					if (typeof token === "string") {
-						node.children.push(new TEXT({ value: token, bold, italic, underline, strikethrough }));
+					if (typeof this.peek() === "string") {
+						node.children.push(this.consume() as string);
+						continue main;
+					} else {
+						throw new Error(`Unexpected token ${this.peek().constructor.name} at position ${this.i}`);
+					}
+				}
+			}
+		}
+		return node;
+	}
+
+	private _bold() {
+		const node = new BOLD();
+
+		main: while (true) {
+			switch (this.peek()) {
+				case EOF:
+				case Token.BREAK: {
+					break main; // let block handle Token.BREAK
+				}
+				case Token.BOLD: {
+					this.consume();
+					break main;
+				}
+				default: {
+					if (typeof this.peek() === "string") {
+						node.children.push(this.consume() as string);
+					} else {
+						node.children.push(...this._inline().children);
 					}
 					break;
 				}
 			}
 		}
-		return origin;
+		return node;
+	}
+
+	private _italic() {
+		const node = new ITALIC();
+
+		main: while (true) {
+			switch (this.peek()) {
+				case EOF:
+				case Token.BREAK: {
+					break main; // let block handle Token.BREAK
+				}
+				case Token.ITALIC: {
+					this.consume();
+					break main;
+				}
+				default: {
+					if (typeof this.peek() === "string") {
+						node.children.push(this.consume() as string);
+					} else {
+						node.children.push(...this._inline().children);
+					}
+					break;
+				}
+			}
+		}
+		return node;
+	}
+
+	private _underline() {
+		const node = new UNDERLINE();
+
+		main: while (true) {
+			switch (this.peek()) {
+				case EOF:
+				case Token.BREAK: {
+					break main; // let block handle Token.BREAK
+				}
+				case Token.UNDERLINE: {
+					this.consume();
+					break main;
+				}
+				default: {
+					if (typeof this.peek() === "string") {
+						node.children.push(this.consume() as string);
+					} else {
+						node.children.push(...this._inline().children);
+					}
+					break;
+				}
+			}
+		}
+		return node;
+	}
+
+	private _strikethrough() {
+		const node = new STRIKETHROUGH();
+
+		main: while (true) {
+			switch (this.peek()) {
+				case EOF:
+				case Token.BREAK: {
+					break main; // let block handle Token.BREAK
+				}
+				case Token.STRIKETHROUGH: {
+					this.consume();
+					break main;
+				}
+				default: {
+					if (typeof this.peek() === "string") {
+						node.children.push(this.consume() as string);
+					} else {
+						node.children.push(...this._inline().children);
+					}
+					break;
+				}
+			}
+		}
+		return node;
+	}
+
+	private _image() {
+		const fallback: ReturnType<typeof this.consume>[] = [];
+
+		try {
+			for (const syntax of [Token.EXCLAMATION, Token.BRACKET_L, "string" as const, Token.BRACKET_R, Token.PAREN_L, "string" as const, Token.PAREN_R]) {
+				fallback.push(this.consume(syntax));
+			}
+			return new IMAGE(fallback[2] as string, fallback[5] as string);
+		} catch (error) {
+			return fallback.map((_) => (_ instanceof Token ? _.grammar : _.toString())).join("");
+		}
+	}
+
+	private _backlink() {
+		const fallback: ReturnType<typeof this.consume>[] = [];
+
+		try {
+			for (const syntax of [Token.BRACKET_L, "string" as const, Token.BRACKET_R, Token.PAREN_L, "string" as const, Token.PAREN_R]) {
+				fallback.push(this.consume(syntax));
+			}
+			return new BACKLINK(fallback[1] as string, fallback[4] as string);
+		} catch (error) {
+			return fallback.map((_) => (_ instanceof Token ? _.grammar : _.toString())).join("");
+		}
 	}
 }

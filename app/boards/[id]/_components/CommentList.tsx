@@ -13,11 +13,20 @@ type CommentType = Awaited<ReturnType<(typeof API)["{teamId}/articles/{articleId
 export default function CommentList({ articleId }: { articleId: number }) {
 	const [commentData, setCommentData] = useState<CommentType[]>([] as CommentType[]);
 	const [nextComment, setNextComment] = useState<number>(0);
-	const target = useRef<HTMLDivElement>(null);
-
 	useEffect(() => {
-		API["{teamId}/articles/{articleId}/comments"].GET({ teamId: "6-11", articleId: articleId, limit: 3 }).then((value) => {
-			setCommentData(value.list);
+		async function getInitialCommentData() {
+			API["{teamId}/articles/{articleId}/comments"].GET({ articleId, limit: 10 }).then((value) => {
+				setCommentData(value.list);
+				setNextComment(value.nextCursor ?? 0);
+			});
+		}
+		getInitialCommentData();
+	}, [articleId]);
+
+	const getNextComment = () => {
+		if (nextComment === 0) return;
+		API["{teamId}/articles/{articleId}/comments"].GET({ articleId, limit: 10, cursor: nextComment }).then((value) => {
+			setCommentData([...commentData, ...value.list]);
 			setNextComment(value.nextCursor ?? 0);
 		});
 	}, [articleId]);

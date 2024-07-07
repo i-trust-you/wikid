@@ -11,7 +11,7 @@ export default function Comment({ comment }: Readonly<{ comment: CommentType }>)
 	return (
 		<div
 			key={comment.id}
-			className="m-auto flex w-[335px] gap-[15px] rounded-[10px] px-5 py-4 shadow-basic tablet:w-[624px] tablet:gap-5 desktop:w-[1060px] desktop:py-[22px]"
+			className="m-auto flex w-[335px] gap-[15px] rounded-[10px] px-5 py-4 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.1)] tablet:w-[624px] tablet:gap-5 desktop:w-[1060px] desktop:py-[22px]"
 		>
 			<div className="relative inset-0">
 				{comment.writer.image ? (
@@ -27,10 +27,10 @@ export default function Comment({ comment }: Readonly<{ comment: CommentType }>)
 						<div className="flex gap-[15px] tablet:gap-5">
 							{/* TODO: 사이트 크기에 따라 버튼 크기 변경 24 24 20 */}
 							<button>
-								<EditIcon width="20" height="20" />
+								<EditIcon width={20} height={20} />
 							</button>
 							<button>
-								<DeleteIcon width="20" height="20" />
+								<DeleteIcon width={20} height={20} />
 							</button>
 						</div>
 					</div>

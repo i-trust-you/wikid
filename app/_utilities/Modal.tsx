@@ -1,5 +1,6 @@
-import Image from "next/image";
 import ReactDOM from "react-dom/client";
+
+import CloseIcon from "../../public/icons/CloseIcon";
 
 export default class Modal {
 	private static timeout?: NodeJS.Timeout;
@@ -24,18 +25,13 @@ export default class Modal {
 					}
 				}}
 			>
-				<div data-puppet className="w-[335px] rounded-[10px] border-[1.5px] border-solid bg-white px-[20px] py-[20px] shadow-lg tablet:w-[395px]">
+				<div data-puppet className="rounded-[10px] border-[1.5px] border-solid bg-white px-[20px] py-[20px] shadow-lg">
 					<div className="flex flex-row-reverse">
-						<Image
-							className="aspect-square rounded-full px-[2.5px] py-[2.5px]"
-							src="/icons/close.svg"
-							alt="close"
-							width={30}
-							height={30}
-							onClick={() => this.close()}
-						/>
+						<div className="aspect-square rounded-full px-[2.5px] py-[2.5px]" onClick={() => this.close()}>
+							<CloseIcon width={30} height={30} />
+						</div>
 					</div>
-					<div className="mt-[20px]">{children}</div>
+					<div className="mt-[10px] tablet:mt-[20px]">{children}</div>
 				</div>
 			</div>
 		);

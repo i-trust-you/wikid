@@ -1,3 +1,6 @@
+import Codec from "@/_utilities/codec";
+import Cookie from "@/_utilities/cookie";
+
 const BASE_URL = "https://wikied-api.vercel.app";
 
 const enum MIME {
@@ -5,16 +8,30 @@ const enum MIME {
 	FORM_DATA = "multipart/form-data",
 }
 
-/** @see https://wikied-api.vercel.app/docs/#/ */
-export default abstract class API {
-	private static JWT: string;
+class Token {
+	private static _access?: string;
+	private static _refresh?: string;
 
 	private constructor() {
 		// final
 	}
 
-	public static credential(token: string) {
-		API.JWT = `Bearer ${token}`;
+	public static get ACCESS() {
+		return (Token._access ??= Codec.decode(Cookie.get("accessToken")));
+	}
+
+	public static get REFRESH() {
+		return (Token._refresh ??= Codec.decode(Cookie.get("refreshToken")));
+	}
+}
+
+/** @see https://wikied-api.vercel.app/docs/#/ */
+export default abstract class API {
+	//
+	// TODO: use service worker instead
+	//
+	private constructor() {
+		// final
 	}
 
 	protected static query(data: object) {
@@ -28,59 +45,111 @@ export default abstract class API {
 		return params.toString();
 	}
 
-	protected static GET<T>(type: MIME, url: string) {
+	protected static headers(type: MIME) {
+		const buffer: HeadersInit = { "Content-Type": type, accept: MIME.JSON };
+
+		if (Token.ACCESS) {
+			buffer["Authorization"] = `Bearer ${Token.ACCESS}`;
+		}
+		switch (type) {
+			case MIME.FORM_DATA: {
+				delete buffer["Content-Type"];
+			}
+		}
+		return buffer;
+	}
+
+	protected static payload(body: BodyInit | Object) {
+		return (body instanceof FormData ? body : typeof body === "object" ? JSON.stringify(body) : body) as BodyInit;
+	}
+
+	protected static GET<T>(type: MIME, url: string, retries = 0) {
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, { method: "GET", headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON } });
+			const response = await fetch(url, { method: "GET", headers: API.headers(type) });
 
-			const data = await response.json();
+			if (!response.ok) {
+				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
+					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-			return response.ok ? resolve(data) : reject(data);
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
+
+					return resolve(await API.GET(type, url, retries + 1));
+				}
+				return reject(await response.json());
+			}
+			return resolve(await response.json());
 		});
 	}
 
-	protected static PUT<T>(type: MIME, url: string, body: BodyInit | Object) {
-		const payload = typeof body === "object" ? JSON.stringify(body) : body;
-
+	protected static PUT<T>(type: MIME, url: string, body: BodyInit | Object, retries = 0) {
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, { method: "PUT", headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON }, body: payload });
+			const response = await fetch(url, { method: "PUT", headers: API.headers(type), body: API.payload(body) });
 
-			const data = await response.json();
+			if (!response.ok) {
+				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
+					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-			return response.ok ? resolve(data) : reject(data);
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
+
+					return resolve(await API.PUT(type, url, body, retries + 1));
+				}
+				return reject(await response.json());
+			}
+			return resolve(await response.json());
 		});
 	}
 
-	protected static POST<T>(type: MIME, url: string, body: BodyInit | Object) {
-		const payload = typeof body === "object" ? JSON.stringify(body) : body;
-
+	protected static POST<T>(type: MIME, url: string, body: BodyInit | Object, retries = 0) {
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, { method: "POST", headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON }, body: payload });
+			const response = await fetch(url, { method: "POST", headers: API.headers(type), body: API.payload(body) });
 
-			const data = await response.json();
+			if (!response.ok) {
+				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
+					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-			return response.ok ? resolve(data) : reject(data);
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
+
+					return resolve(await API.POST(type, url, body, retries + 1));
+				}
+				return reject(await response.json());
+			}
+			return resolve(await response.json());
 		});
 	}
 
-	protected static PATCH<T>(type: MIME, url: string, body: BodyInit | Object) {
-		const payload = typeof body === "object" ? JSON.stringify(body) : body;
-
+	protected static PATCH<T>(type: MIME, url: string, body: BodyInit | Object, retries = 0) {
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, { method: "PATCH", headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON }, body: payload });
+			const response = await fetch(url, { method: "PATCH", headers: API.headers(type), body: API.payload(body) });
 
-			const data = await response.json();
+			if (!response.ok) {
+				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
+					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-			return response.ok ? resolve(data) : reject(data);
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
+
+					return resolve(await API.PATCH(type, url, body, retries + 1));
+				}
+				return reject(await response.json());
+			}
+			return resolve(await response.json());
 		});
 	}
 
-	protected static DELETE<T>(type: MIME, url: string) {
+	protected static DELETE<T>(type: MIME, url: string, retries = 0) {
 		return new Promise<T>(async (resolve, reject) => {
-			const response = await fetch(url, { method: "DELETE", headers: { Authorization: API.JWT, "Content-Type": type, accept: MIME.JSON } });
+			const response = await fetch(url, { method: "DELETE", headers: API.headers(type) });
 
-			const data = await response.json();
+			if (!response.ok) {
+				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
+					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-			return response.ok ? resolve(data) : reject(data);
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
+
+					return resolve(await API.DELETE(type, url, retries + 1));
+				}
+				return reject(await response.json());
+			}
+			return resolve(await response.json());
 		});
 	}
 
@@ -127,11 +196,11 @@ export default abstract class API {
 	})();
 
 	public static readonly ["{teamId}/profiles/{code}"] = new (class extends API {
-		public override GET({ teamId = "6-11", code }: TeamId & ProfileCode) {
+		public override GET({ teamId = "6-11", code, ...query }: { teamId?: string; code: string }) {
 			return API.GET<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}`);
 		}
 
-		public override PATCH({ teamId = "6-11", code }: TeamId & ProfileCode, body: UpdateProfileBody) {
+		public override PATCH({ teamId = "6-11", code, ...query }: { teamId?: string; code: string }, body: Partial<UpdateProfileBody>) {
 			return API.PATCH<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}`, body);
 		}
 	})();
@@ -141,7 +210,7 @@ export default abstract class API {
 			return API.GET<PingResponse>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}/ping`);
 		}
 
-		public override POST({ teamId = "6-11", code }: TeamId & ProfileCode, body: PingRequestBody) {
+		public override POST({ teamId = "6-11", code, ...query }: { teamId: string; code: string }, body: PingRequestBody) {
 			return API.POST<PingResponse>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}/ping`, body);
 		}
 	})();
@@ -159,8 +228,12 @@ export default abstract class API {
 	})();
 
 	public static readonly ["{teamId}/images/upload"] = new (class extends API {
-		public override POST({ teamId = "6-11" }: TeamId, body: string) {
-			return API.POST<{ url: string }>(MIME.FORM_DATA, `${BASE_URL}/${teamId}/images/upload`, body);
+		public override POST({ teamId = "6-11", ...query }: { teamId?: string }, body: File) {
+			const data = new FormData();
+
+			data.append("image", body);
+
+			return API.POST<{ url: string }>(MIME.FORM_DATA, `${BASE_URL}/${teamId}/images/upload`, data);
 		}
 	})();
 
@@ -207,7 +280,7 @@ export default abstract class API {
 			return API.POST<ArticleListType>(MIME.JSON, `${BASE_URL}/${teamId}/articles`, body);
 		}
 
-		public override GET({ teamId = "6-11", ...query }: TeamId & GetArticlesQuery) {
+		public override GET({ teamId = "6-11", ...query }: { teamId: string; page?: number; pageSize?: number; orderBy?: "like" | "recent"; keyword?: string }) {
 			return API.GET<OffsetBasedPaginationResponse<ArticleListType>>(MIME.JSON, `${BASE_URL}/${teamId}/articles?${API.query(query)}`);
 		}
 	})();
@@ -238,7 +311,7 @@ export default abstract class API {
 }
 
 interface TeamId {
-	teamId: string;
+	teamId?: string;
 }
 
 interface ArticleId {
@@ -288,7 +361,7 @@ interface User {
 		id: number;
 		code: string;
 	};
-	teamId?: string;
+	teamId: string;
 	updatedAt: string;
 }
 
@@ -309,13 +382,14 @@ interface UpdateProfileBody {
 	city: string;
 	content: string;
 	family: string;
-	image: string;
+	image: string | null;
 	mbti: string;
 	nationality: string;
 	nickname: string;
 	securityAnswer: string;
 	securityQuestion: string;
 	sns: string;
+	job: string;
 }
 
 interface ProfileDetailType {
@@ -334,7 +408,7 @@ interface ProfileDetailType {
 	nickname: string;
 	securityQuestion: string;
 	sns: string;
-	teamId?: string;
+	teamId: string;
 	updatedAt: string;
 }
 
@@ -398,7 +472,7 @@ interface SignUpResponse {
 		id: number;
 		name: string;
 		email: string;
-		teamId?: string;
+		teamId: string;
 		profile: {
 			id: number;
 			code: string;
@@ -420,7 +494,7 @@ interface SignInResponse {
 		id: number;
 		name: string;
 		email: string;
-		teamId?: string;
+		teamId: string;
 		profile: {
 			id: number;
 			code: string;

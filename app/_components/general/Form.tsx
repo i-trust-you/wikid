@@ -1,11 +1,15 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
+
+
 import Dropdown from "@/_components/general/Dropdown";
+
+
 
 import CameraIcon from "../../../public/icons/CameraIcon";
 
-const NO = crypto.randomUUID();
-const OK = "ok";
+
+const [OK, NO] = [crypto.randomUUID(), crypto.randomUUID()];
 
 interface Context {
 	values: Readonly<Record<string, FormDataEntryValue>>;
@@ -126,7 +130,7 @@ function Text(
 ) {
 	const ctx = useCTX();
 
-	const [blur, setBlur] = useState(0);
+	const [focus, setFocus] = useState(0);
 	const [value, setValue] = useState("");
 	const [error, setError] = useState(NO);
 	const [sync, setSync] = useState("");
@@ -142,7 +146,7 @@ function Text(
 	}, [value]);
 
 	useEffect(() => {
-		if (!blur) return;
+		if (!focus) return;
 
 		if (props.sync?.value && sync !== value) {
 			return setError(props.sync.message);
@@ -160,7 +164,7 @@ function Text(
 			return setError(props.maxlength.message);
 		}
 		setError(OK);
-	}, [blur, props, blur, error, sync, value]);
+	}, [focus, props, error, sync, value]);
 
 	useEffect(() => {
 		if (props.sync?.value) setSync(ctx.values[props.sync.value] as string);
@@ -190,12 +194,12 @@ function Text(
 		<input
 			ref={self}
 			id={props.id}
-			onBlur={() => setBlur((_) => _ + 1)}
+			onFocus={() => setFocus((_) => _ + 1)}
 			placeholder={props.placeholder ?? props.required?.message}
 			// @ts-ignore
 			onPaste={(event) => setValue(event.target.value)}
 			onChange={(event) => setValue(event.target.value)}
-			className="w-[335px] rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal text-gray-500 outline-none placeholder:text-gray-400 tablet:w-[400px]"
+			className="w-full rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal text-gray-500 outline-none placeholder:text-gray-400 tablet:w-[400px]"
 		/>
 	);
 }
@@ -240,7 +244,13 @@ function ImageInput(props: Readonly<{ id: string; required?: Report<boolean> }>)
 					className="flex aspect-square w-full items-center justify-center rounded-full bg-gray-200 bg-cover bg-center text-white"
 					style={{ backgroundImage: `url("${preview}")` }}
 				>
-					<CameraIcon width="35" height="35" />
+					{preview ? (
+						<div className="flex aspect-square w-full items-center justify-center rounded-full bg-black opacity-50">
+							<CameraIcon width={35} height={35} />
+						</div>
+					) : (
+						<CameraIcon width={35} height={35} />
+					)}
 				</div>
 				<input id={props.id} type="file" accept=".png,.jpg,.jpeg,.webp" multiple={false} className="hidden" onChange={(event) => upload(event)} />
 			</label>
@@ -287,8 +297,17 @@ function Select(props: Readonly<{ id: string; sync?: Report<string>; required?: 
 			<div className="relative">
 				<Dropdown.Trigger>
 					{/* @ts-ignore */}
-					<div className="w-full rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal" style={{ borderColor: 0 < value.length && "#4CBFA4" }}>
-						{0 < value.length ? <div className="text-gray-500"><Dropdown.Current /></div> : <div className="text-gray-400">{props.required?.message ?? "..."}</div>}
+					<div
+						className="w-full rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal"
+						style={{ borderColor: 0 < value.length ? "#4CBFA4" : "" }}
+					>
+						{0 < value.length ? (
+							<div className="text-gray-500">
+								<Dropdown.Current />
+							</div>
+						) : (
+							<div className="text-gray-400">{props.required?.message ?? "..."}</div>
+						)}
 					</div>
 				</Dropdown.Trigger>
 				<div className="absolute z-20 mt-[5px] w-full overflow-hidden rounded-[10px]">
