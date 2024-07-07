@@ -38,7 +38,7 @@ export default function Header() {
 			<div className="flex items-center gap-[24px]">
 				{accessToken && refreshoken ? (
 					<>
-						<button className="hidden tablet:block" onClick={() => Notification.open()}>
+						<button className="hidden tablet:block" onClick={() => Notification.toggle()}>
 							<Image src="/icons/alarm.svg" alt="logo" width={32} height={32} />
 						</button>
 						<Popover

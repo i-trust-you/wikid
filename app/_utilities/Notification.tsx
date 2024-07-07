@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 
+import CloseIcon from "../../public/icons/CloseIcon";
 
 interface Message {
 	id: number;
@@ -10,6 +11,7 @@ interface Message {
 }
 
 export class Notification {
+	protected static element?: JSX.Element;
 	protected static root?: ReactDOM.Root;
 
 	private static render(children: Readonly<React.PropsWithChildren["children"]>) {
@@ -17,12 +19,20 @@ export class Notification {
 		(this.root ??= ReactDOM.createRoot(document.querySelector("#alert")!!))?.render(children);
 	}
 
+	public static toggle() {
+		if (this.element) {
+			this.close();
+		} else {
+			this.open();
+		}
+	}
+
 	public static open() {
-		this.render(<Overlay msgs={entries} clamp={5} />);
+		this.render((this.element = <Overlay msgs={entries} clamp={5} />));
 	}
 
 	public static close() {
-		this.render(null);
+		this.render((this.element = undefined));
 	}
 
 	public static read(id: number) {
@@ -47,7 +57,9 @@ function Overlay(props: Readonly<{ msgs: Message[]; clamp: number }>) {
 			<div className="flex flex-col gap-[16px] rounded-[10px] bg-[#CED8D5] px-[20px] py-[20px]">
 				<div className="flex items-center justify-between text-xl font-bold">
 					알림
-					<Image src="/icons/close.svg" alt="close" width={24} height={24} onClick={() => Notification.close()} />
+					<div onClick={() => Notification.close()}>
+						<CloseIcon width={24} height={24} />
+					</div>
 				</div>
 				<div className="flex flex-col gap-[8px]">
 					{props.clamp < props.msgs.length && (
