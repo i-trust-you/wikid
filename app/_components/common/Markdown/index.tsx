@@ -1,8 +1,6 @@
 import API from "@/_api";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
-
-
 import Parser from "@/_components/common/Markdown/parser";
 import Scanner, { Token } from "@/_components/common/Markdown/scanner";
 import Switch from "@/_components/general/Switch";
