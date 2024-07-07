@@ -119,11 +119,13 @@ export default function Page() {
 					</div>
 				</div>
 				<div className="mx-[15px] mt-[15px] flex h-[45px] items-center gap-[15px]">
-					<input
-						onChange={(event) => setTitle(event.target.value)}
-						className="h-full grow rounded-[10px] border border-gray-300 px-[10px] outline-none"
-						placeholder="제목을 입력해주세요"
-					/>
+					<div className="flex h-full grow items-center gap-[10px] overflow-hidden rounded-[10px] border border-gray-300 px-[10px]">
+						<input className="h-full grow outline-none" placeholder="제목을 입력해주세요" onChange={(event) => setTitle(event.target.value)} />
+						{/* @ts-ignore */}
+						<div className="right-[10px] text-red-200" style={{ display: 30 >= title.length && "none" }}>
+							-{title.length - 30}
+						</div>
+					</div>
 					<div>
 						<Button disabled={disabled} href="/boards">
 							작성하기
@@ -182,7 +184,7 @@ Page.Modal = function UploadModal(props: Readonly<{ onUpload: (response: Awaited
 				API["{teamId}/images/upload"].POST({}, file).then((response) => props.onUpload(response));
 			}
 		},
-		[file, preview],
+		[props, file],
 	);
 
 	return (
