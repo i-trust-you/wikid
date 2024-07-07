@@ -1,6 +1,7 @@
 import Codec from "@/_utilities/codec";
 import Cookie from "@/_utilities/cookie";
 
+
 const BASE_URL = "https://wikied-api.vercel.app";
 
 const enum MIME {

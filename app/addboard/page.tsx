@@ -6,12 +6,19 @@ import Toast from "@/_utilities/Toast";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+
+
 import useCookie from "@/_hooks/useCookie";
+
+
 
 import Button from "@/_components/common/Button";
 import Markdown from "@/_components/common/Markdown";
 
+
+
 import CameraIcon from "../../public/icons/CameraIcon";
+
 
 const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|gif|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
@@ -30,7 +37,7 @@ export default function Page() {
 	const [content, setContent] = useState("");
 
 	const onSubmit = useCallback(
-		async (event: React.FormEvent<HTMLFormElement>) => {
+		(event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
 			API["{teamId}/articles"].POST({}, { image, title, content }).then((response) => {
@@ -43,8 +50,8 @@ export default function Page() {
 	const [disabled, setDisabled] = useState(true);
 
 	useEffect(() => {
-		setDisabled(!(1 <= title.length && title.length <= 30));
-	}, [title, content]);
+		setDisabled(0 < image.length && !(1 <= title.length && title.length <= 30));
+	}, [image, title, content]);
 
 	const outline = useRef<HTMLDivElement>(null);
 
@@ -131,7 +138,7 @@ export default function Page() {
 						</div>
 					</div>
 					<div>
-						<Button disabled={disabled} href="/boards">
+						<Button disabled={disabled}>
 							작성하기
 						</Button>
 					</div>
