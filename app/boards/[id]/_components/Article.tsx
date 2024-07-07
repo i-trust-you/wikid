@@ -50,7 +50,7 @@ export default function Article({ articleId }: { articleId: number }) {
 		});
 
 	return (
-		<div className="w-[335px] rounded-[10px] py-5 shadow-basic tablet:w-[624px] tablet:py-10 desktop:w-[1060px]">
+		<div className="w-[335px] rounded-[10px] py-5 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.1)] tablet:w-[624px] tablet:py-10 desktop:w-[1060px]">
 			{article && (
 				<div className="m-auto flex w-[295px] flex-col tablet:w-[564px] tablet:gap-3 desktop:w-[1000px]">
 					<div className="flex flex-col justify-between gap-[14px]">
@@ -78,7 +78,7 @@ export default function Article({ articleId }: { articleId: number }) {
 							</div>
 							<div className="flex h-[18px] items-center gap-1 text-xs font-normal text-gray-400 tablet:h-6 tablet:text-md" onClick={likeArticle}>
 								{/* // TODO: 이미지가 일그러짐, 기기 크기에 따른 사이즈 변화 필요 */}
-								<HeartIcon height="16" width="16" />
+								<HeartIcon height={16} width={16} />
 								<span>{article.likeCount}</span>
 							</div>
 						</div>

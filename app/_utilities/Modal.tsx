@@ -28,7 +28,7 @@ export default class Modal {
 				<div data-puppet className="rounded-[10px] border-[1.5px] border-solid bg-white px-[20px] py-[20px] shadow-lg">
 					<div className="flex flex-row-reverse">
 						<div className="aspect-square rounded-full px-[2.5px] py-[2.5px]" onClick={() => this.close()}>
-							<CloseIcon width="30" height="30" />
+							<CloseIcon width={30} height={30} />
 						</div>
 					</div>
 					<div className="mt-[10px] tablet:mt-[20px]">{children}</div>

@@ -19,7 +19,7 @@ export default function Profile({ profile }: Props) {
 	const isLargeScreen = useMediaQuery("(min-width: 1200px)");
 
 	return (
-		<div className="flex w-full flex-col rounded-[10px] bg-white px-5 py-[15px] shadow-basic tablet:px-[30px] tablet:py-5 desktop:w-[320px] desktop:py-[60px]">
+		<div className="flex w-full flex-col rounded-[10px] bg-white px-5 py-[15px] shadow-[0px_4px_20px_0px_rgba(0,0,0,0.1)] tablet:px-[30px] tablet:py-5 desktop:w-[320px] desktop:py-[60px]">
 			<div className="flex desktop:flex-col">
 				<Image
 					src={profile?.image ?? "/images/not_found.png"}
@@ -74,7 +74,7 @@ export default function Profile({ profile }: Props) {
 					className={`${isOpen && "rotate-180"} m-auto cursor-pointer rounded-[5px] transition hover:bg-gray-100 active:bg-gray-200`}
 					onClick={() => setIsOpen((prev) => !prev)}
 				>
-					<ArrowDownIcon width="24" height="24" />
+					<ArrowDownIcon width={24} height={24} />
 				</div>
 			)}
 		</div>

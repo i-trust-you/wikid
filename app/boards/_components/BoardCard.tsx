@@ -36,7 +36,7 @@ export default function BoardCard({ board }: Props) {
 							<p className="ml-2">{formatDateToString(new Date(board.createdAt))}</p>
 						</div>
 						<div className="flex items-center">
-							<HeartIcon width="16" height="16" />
+							<HeartIcon width={16} height={16} />
 							<p className="ml-1">{board.likeCount}</p>
 						</div>
 					</div>

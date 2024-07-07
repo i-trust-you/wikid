@@ -45,7 +45,7 @@ export default function EditProfile({ setProfile, profile, setImageFile }: Props
 
 	return (
 		<div className="flex w-full flex-col gap-4 tablet:gap-5 desktop:flex-col-reverse desktop:gap-6">
-			<div className="flex flex-col rounded-[10px] bg-white px-5 py-[15px] shadow-basic tablet:px-[30px] tablet:py-5 desktop:w-[320px] desktop:py-[60px]">
+			<div className="flex flex-col rounded-[10px] bg-white px-5 py-[15px] shadow-[0px_4px_20px_0px_rgba(0,0,0,0.1)] tablet:px-[30px] tablet:py-5 desktop:w-[320px] desktop:py-[60px]">
 				<div className="m-auto h-[62px] w-[62px] tablet:h-[71px] tablet:w-[71px] desktop:h-[200px] desktop:w-[200px]">
 					<label htmlFor="image">
 						<div
@@ -54,10 +54,10 @@ export default function EditProfile({ setProfile, profile, setImageFile }: Props
 						>
 							{preview ? (
 								<div className="flex aspect-square w-full items-center justify-center rounded-full bg-black opacity-50">
-									<CameraIcon width="35" height="35" />
+									<CameraIcon width={35} height={35} />
 								</div>
 							) : (
-								<CameraIcon width="35" height="35" />
+								<CameraIcon width={35} height={35} />
 							)}
 						</div>
 						<input id="image" type="file" accept=".png,.jpg,.jpeg,.webp" multiple={false} className="hidden" onChange={handleImageChange} />

@@ -45,4 +45,8 @@
 	.md blockquote {
 		@apply border-l-[5px] border-gray-500 pl-[20px];
 	}
+
+	.md img {
+		@apply rounded-[10px];
+	}
 }

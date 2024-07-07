@@ -42,7 +42,7 @@ function Board({ id, title, writerName, createdAt, likeCount }: BoardProps) {
 						<p className="ml-4">{formatDateToString(createdAt)}</p>
 					</div>
 					<div className="flex items-center">
-						<HeartIcon width="18" height="18" />
+						<HeartIcon width={18} height={18} />
 						<p className="ml-1">{likeCount}</p>
 					</div>
 				</div>

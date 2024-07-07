@@ -34,7 +34,7 @@ export default function BackLink({ code }: Props) {
 
 	return (
 		<button className="flex items-center gap-[5px] rounded-[10px] bg-primary-100 p-[5px_10px] text-md text-primary-200" onClick={onClickCopy}>
-			<LinkIcon height="20" width="20" color="#4CBFA4" />
+			<LinkIcon height={20} width={20} color="#4CBFA4" />
 			<p className="line-clamp-1">{url}</p>
 		</button>
 	);
