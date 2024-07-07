@@ -49,7 +49,7 @@ export default function EditProfile({ setProfile, profile, setImageFile }: Props
 				<div className="m-auto h-[62px] w-[62px] tablet:h-[71px] tablet:w-[71px] desktop:h-[200px] desktop:w-[200px]">
 					<label htmlFor="image">
 						<div
-							className="flex aspect-square w-full items-center justify-center rounded-full bg-gray-200 bg-cover bg-center text-white"
+							className="flex aspect-square w-full cursor-pointer items-center justify-center rounded-full bg-gray-200 bg-cover bg-center text-white"
 							style={{ backgroundImage: `url("${preview}")` }}
 						>
 							{preview ? (
