@@ -10,6 +10,7 @@ import useCookie from "@/_hooks/useCookie";
 import Popover from "@/_components/general/Popover";
 
 import MenuIcon from "../../../public/icons/MenuIcon";
+import { Notification } from "@/_utilities/Notification";
 
 export default function Header() {
 	const router = useRouter();
@@ -37,7 +38,7 @@ export default function Header() {
 			<div className="flex items-center gap-[24px]">
 				{accessToken ? (
 					<>
-						<button className="hidden tablet:block" onClick={() => router.push("/notifications")}>
+						<button className="hidden tablet:block" onClick={() => Notification.open()}>
 							<Image src="/icons/alarm.svg" alt="logo" width={32} height={32} />
 						</button>
 						<button className="hidden tablet:block" onClick={() => router.push("/mypage")}>
