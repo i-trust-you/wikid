@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { MouseEventHandler, useEffect, useState } from "react";
 
 import Button from "@/_components/common/Button";
+import Parser from "@/_components/common/Markdown/parser";
+import Scanner from "@/_components/common/Markdown/scanner";
 
 import HeartIcon from "../../../../public/icons/HeartIcon";
 
@@ -86,7 +88,10 @@ export default function Article({ articleId }: { articleId: number }) {
 					{/* // ISSUE: 테스트 케이스 내의 이미지가 제대로 나오지 않습니다.
                     <Image src={article.image} width={500} height={300} alt="게시글 사진" />
                     */}
-					<div className="text-md font-normal text-gray-500 tablet:text-lg">{article.content}</div>
+					<div
+						className="text-md font-normal text-gray-500 tablet:text-lg"
+						dangerouslySetInnerHTML={{ __html: article.content && Parser.run(Scanner.run(article.content)).render() }}
+					/>
 				</div>
 			)}
 		</div>
