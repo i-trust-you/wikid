@@ -6,7 +6,15 @@ export default class Cookie {
 	public static set(
 		key: string,
 		value: unknown,
-		options: { httpOnly?: boolean; path?: string; domain?: string; secure?: boolean; expires?: Date; ["max-age"]?: number; samesite?: "strict" | "lax" } = {},
+		options: {
+			httpOnly?: boolean;
+			path?: string;
+			domain?: string;
+			secure?: boolean;
+			expires?: Date;
+			["max-age"]?: number;
+			samesite?: "Strict" | "None" | "Lax";
+		} = {},
 	) {
 		const buffer = [`${key}=${value};`];
 

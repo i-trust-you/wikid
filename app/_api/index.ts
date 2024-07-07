@@ -71,7 +71,7 @@ export default abstract class API {
 				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/", samesite: "Strict" });
 
 					return resolve(await API.GET(type, url, retries + 1));
 				}
@@ -89,7 +89,7 @@ export default abstract class API {
 				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/", samesite: "Strict" });
 
 					return resolve(await API.PUT(type, url, body, retries + 1));
 				}
@@ -107,7 +107,7 @@ export default abstract class API {
 				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/", samesite: "Strict" });
 
 					return resolve(await API.POST(type, url, body, retries + 1));
 				}
@@ -125,7 +125,7 @@ export default abstract class API {
 				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/", samesite: "Strict" });
 
 					return resolve(await API.PATCH(type, url, body, retries + 1));
 				}
@@ -143,7 +143,7 @@ export default abstract class API {
 				if (response.status === 401 && retries <= 1 && Token.REFRESH) {
 					const data = await API["{teamId}/auth/refresh-token"].POST({}, { refreshToken: Token.REFRESH });
 
-					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/" });
+					Cookie.set("accessToken", Codec.encode(data.accessToken), { path: "/", samesite: "Strict" });
 
 					return resolve(await API.DELETE(type, url, retries + 1));
 				}
@@ -306,6 +306,15 @@ export default abstract class API {
 
 		public override DELETE({ teamId = "6-11", articleId }: TeamId & ArticleId) {
 			return API.DELETE<ArticleDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/articles/${articleId}/like`);
+		}
+	})();
+
+	public static readonly ["example/example"] = new (class extends API {
+		public override GET() {
+			return new Promise<string>((resolve, reject) => {
+				console.log("%c줄게요", "color:red");
+				setTimeout(() => resolve(":3"), 5000);
+			});
 		}
 	})();
 }
