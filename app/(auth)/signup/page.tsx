@@ -41,7 +41,7 @@ export default function Page() {
 
 	return (
 		<main className="flex flex-col items-center">
-			<div className="mt-[170px] text-2xl font-semibold text-gray-500 tablet:mt-[212px] desktop:mt-[140px]">회원가입</div>
+			<div className="mt-[60px] text-2xl font-semibold text-gray-500 tablet:mt-[170px] desktop:mt-[140px]">회원가입</div>
 			<div className="mt-[64px] flex w-full flex-col gap-[32px] px-[20px] tablet:max-w-[400px] tablet:px-0">
 				<Form onSubmit={handle}>
 					<div className="flex flex-col gap-[24px]">
