@@ -45,7 +45,7 @@ export default function Header() {
 						</button>
 					</>
 				) : (
-					<Link href="/login" className="hidden text-gray-400 tablet:block">
+					<Link href="/login" className="hidden text-gray-400 tablet:block hover:text-primary-200 transition-colors">
 						로그인
 					</Link>
 				)}

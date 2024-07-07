@@ -199,7 +199,7 @@ function Text(
 			// @ts-ignore
 			onPaste={(event) => setValue(event.target.value)}
 			onChange={(event) => setValue(event.target.value)}
-			className="w-[335px] rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal text-gray-500 outline-none placeholder:text-gray-400 tablet:w-[400px]"
+			className="w-full rounded-[10px] border border-transparent bg-gray-100 px-[20px] py-[14px] text-md font-normal text-gray-500 outline-none placeholder:text-gray-400 tablet:w-[400px]"
 		/>
 	);
 }
