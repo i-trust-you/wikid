@@ -2,9 +2,7 @@
 
 import API from "@/_api";
 import Modal from "@/_utilities/Modal";
-import { useEffect, useState } from "react";
-
-import useLocalStorage from "@/_hooks/useLocalStorage";
+import { useState } from "react";
 
 import Button from "@/_components/common/Button";
 
@@ -20,14 +18,6 @@ export default function QuizModal({ code, question, onSuccess }: Props) {
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const [value, setValue] = useState<string>("");
 
-	const [accessToken] = useLocalStorage<string | null>("accessToken", null);
-
-	useEffect(() => {
-		if (accessToken) {
-			API.credential(accessToken);
-		}
-	}, [accessToken]);
-
 	const handleButtonClick = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		event.preventDefault();
 
@@ -40,9 +30,9 @@ export default function QuizModal({ code, question, onSuccess }: Props) {
 			})
 			.catch((error) => {
 				if (error.response && error.response.status === 401) {
-					setErrorMessage("정답이 아닙니다. 다시 시도해 주세요.");
+					setErrorMessage("권한이 없습니다. 로그인해주세요.");
 				}
-				setErrorMessage("권한이 없습니다. 로그인해주세요.");
+				setErrorMessage("정답이 아닙니다. 다시 시도해 주세요.");
 			});
 	};
 
@@ -50,7 +40,7 @@ export default function QuizModal({ code, question, onSuccess }: Props) {
 		<div className="flex flex-col">
 			<div className="flex flex-col items-center">
 				<div className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-gray-100">
-					<LockIcon width="20" height="20" />
+					<LockIcon width={20} height={20} />
 				</div>
 				<p className="mt-[10px] text-center text-md font-normal text-gray-400">
 					다음 퀴즈를 맞추고

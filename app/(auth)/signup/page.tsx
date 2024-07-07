@@ -1,24 +1,23 @@
 "use client";
 
 import API from "@/_api";
+import Toast from "@/_utilities/Toast";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 
-
-
-import useLocalStorage from "@/_hooks/useLocalStorage";
-
-
+import useCookie from "@/_hooks/useCookie";
 
 import Form from "@/_components/general/Form";
 
-
 export default function Page() {
-	const [accessToken, setAccessToken] = useLocalStorage<string | null>("accessToken", null);
+	const router = useRouter();
 
-	if (accessToken) {
-		redirect("/login");
+	const [accessToken, setAccessToken] = useCookie<string>("accessToken");
+	const [refreshoken, setRefreshToken] = useCookie<string>("refreshToken");
+
+	if (accessToken && refreshoken) {
+		router.push("/");
 	}
 
 	const handle = useCallback((data: FormData) => {
@@ -32,19 +31,18 @@ export default function Page() {
 		API["{teamId}/auth/signUp"]
 			.POST({}, payload)
 			.then((response) => {
-				alert("회원가입이 완료되었습니다");
-				setAccessToken(response.accessToken);
-				// redirect("/login");
+				Toast.success("회원가입이 완료되었습니다");
+				router.push("/login");
 			})
 			.catch((error) => {
-				alert("회원가입 실패");
+				Toast.error("회원가입 실패");
 			});
 	}, []);
 
 	return (
 		<main className="flex flex-col items-center">
-			<div className="mt-[48px] text-2xl font-semibold text-gray-500 tablet:mt-[203px] desktop:mt-[153px]">회원가입</div>
-			<div className="mt-[32px] tablet:mt-[48px] desktop:mt-[64px]">
+			<div className="mt-[170px] text-2xl font-semibold text-gray-500 tablet:mt-[212px] desktop:mt-[140px]">회원가입</div>
+			<div className="mt-[64px] flex w-full flex-col gap-[32px] px-[20px] tablet:max-w-[400px] tablet:px-0">
 				<Form onSubmit={handle}>
 					<div className="flex flex-col gap-[24px]">
 						<div className="flex flex-col gap-[10px]">
@@ -90,7 +88,7 @@ export default function Page() {
 					</div>
 				</Form>
 			</div>
-			<div className="mt-[40px] text-md font-normal text-gray-400 mb-[111px] tablet:mb-[263px] desktop:mb-[224px]">
+			<div className="mb-[111px] mt-[40px] text-md font-normal text-gray-400 tablet:mb-[263px] desktop:mb-[224px]">
 				이미 회원이신가요?{" "}
 				<Link href="/login" className="text-primary-200">
 					로그인

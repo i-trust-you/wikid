@@ -1,10 +1,4 @@
-interface IconProps {
-	width: string;
-	height: string;
-	color?: string;
-}
-
-export default function ArrowLeftIcon({ width, height, color = "#8F95B2" }: IconProps) {
+export default function ArrowLeftIcon({ width, height, color = "#8F95B2" }: { width: number; height: number; color?: string }) {
 	return (
 		<svg width={width} height={height} viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path

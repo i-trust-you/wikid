@@ -42,7 +42,9 @@ export default function Page() {
 	};
 
 	useEffect(() => {
-		getProfiles(page, name);
+		if (name !== "") {
+			getProfiles(page, name);
+		}
 	}, [page]);
 
 	return (
