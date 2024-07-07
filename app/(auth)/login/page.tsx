@@ -43,8 +43,8 @@ export default function Page() {
 
 	return (
 		<main className="flex flex-col items-center">
-			<div className="mt-[143px] text-2xl font-semibold text-gray-500 tablet:mt-[281px] desktop:mt-[261px]">로그인</div>
-			<div className="mt-[32px] tablet:mt-[48px] desktop:mt-[64px]">
+			<div className="mt-[170px] text-2xl font-semibold text-gray-500 tablet:mt-[212px] desktop:mt-[140px]">로그인</div>
+			<div className="mt-[64px] flex w-full flex-col gap-[32px] px-[20px] tablet:max-w-[400px] tablet:px-0">
 				<Form onSubmit={handle}>
 					<div className="flex flex-col gap-[24px]">
 						<div className="flex flex-col gap-[10px]">
