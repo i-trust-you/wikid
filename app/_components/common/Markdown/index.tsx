@@ -151,14 +151,23 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 		outline.current?.style.setProperty("border-color", null);
 	}, []);
 
-	const serialize = useCallback((html: HTMLElement) => {
-		return html.innerHTML
-			.replace(/<br>/g, "\n")
-			.replace(/&nbsp;/g, " ")
-			.replace(/&lt;/g, "<")
-			.replace(/&gt;/g, ">")
-			.replace(/&amp;/g, "&")
-			.replace(/&#035;/g, "#");
+	const unescape = useCallback((html: HTMLElement) => {
+		let buffer = html.innerHTML;
+
+		for (const [entity, character] of Object.entries({
+			"<br>": "\n",
+			"&nbsp;": " ",
+			"&lt;": "<",
+			"&gt;": ">",
+			"&amp;": "&",
+			"&#035;": "#",
+			"&quot;": '"',
+			"&#039;": "'",
+			"&apos;": "'",
+		})) {
+			buffer = buffer.replace(new RegExp(entity, "g"), character);
+		}
+		return buffer;
 	}, []);
 
 	const stack = useCallback(
@@ -221,7 +230,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 					}
 					// prettier-ignore
 					html.focus();
-					setData(serialize(html));
+					setData(unescape(html));
 				}
 			}
 		},
@@ -229,8 +238,6 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 	);
 
 	const render = useMemo(() => data && Parser.run(Scanner.run(data)).render(), [data]);
-
-	console.log(data);
 
 	return (
 		<div className="relative flex h-full min-h-max w-full rounded-[10px] border border-gray-300 bg-white drop-shadow-sm">
@@ -329,7 +336,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 									}}
 									onInput={(event) => {
 										// @ts-ignore
-										const text = serialize(event.target);
+										const text = unescape(event.target);
 
 										// @ts-ignore
 										if (event.target.children.length === 1 && event.target.lastChild.nodeName === "BR") {
