@@ -2,8 +2,8 @@
 
 import API from "@/_api";
 import Modal from "@/_utilities/Modal";
+import EditProfile from "@/wiki/[code]/_components/EditProfile";
 import Profile from "@/wiki/[code]/_components/Profile";
-import ProfileForm from "@/wiki/[code]/_components/ProfileForm";
 import QuizModal from "@/wiki/[code]/_components/QuizModal";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -15,6 +15,7 @@ import Parser from "@/_components/common/Markdown/parser";
 import Scanner from "@/_components/common/Markdown/scanner";
 
 type WikiType = Awaited<ReturnType<(typeof API)["{teamId}/profiles/{code}"]["GET"]>>;
+type ProfileType = Omit<Awaited<Parameters<(typeof API)["{teamId}/profiles/{code}"]["PATCH"]>[1]>, "securityAnswer" | "securityQuestion">;
 
 export default function Page() {
 	const params = useParams();
@@ -24,10 +25,36 @@ export default function Page() {
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [isMe, setIsMe] = useState<boolean>();
 
+	const [formData, setFormData] = useState<ProfileType | undefined>();
+	const [imageFile, setImageFile] = useState<File>();
+
+	const handleSubmit = async () => {
+		const imageString = imageFile ? await API["{teamId}/images/upload"].POST({}, imageFile).then((response) => response.url) : null;
+
+		if (formData) {
+			await setFormData((prev) => ({ ...prev, image: imageString }));
+			await API["{teamId}/profiles/{code}"].PATCH({ code }, formData);
+			window.location.reload();
+		}
+	};
+
 	useEffect(() => {
 		const getWiki = async () => {
-			await API["{teamId}/profiles/{code}"].GET({ code: code }).then((response) => {
+			await API["{teamId}/profiles/{code}"].GET({ code }).then((response) => {
 				setWiki(response);
+				setFormData({
+					birthday: response.birthday,
+					bloodType: response.bloodType,
+					city: response.city,
+					content: response.content,
+					family: response.family,
+					image: response.image,
+					mbti: response.mbti,
+					nationality: response.nationality,
+					nickname: response.nickname,
+					sns: response.sns,
+					job: response.job,
+				});
 			});
 			await API["{teamId}/users/me"].GET({}).then((response) => {
 				setIsMe(code === response.profile.code);
@@ -70,7 +97,7 @@ export default function Page() {
 								</Button>
 							</div>
 							<div className="h-10 w-[70px]">
-								<Button>저장</Button>
+								<Button onClick={handleSubmit}>저장</Button>
 							</div>
 						</div>
 					</div>
@@ -78,12 +105,13 @@ export default function Page() {
 						{!isMe ? (
 							<Profile profile={wiki} />
 						) : (
-							<ProfileForm
-								profile={wiki}
-								onCancle={() => {
-									setIsEditing(false);
-								}}
-							/>
+							formData && (
+								<EditProfile
+									setProfile={setFormData as React.Dispatch<React.SetStateAction<ProfileType>>}
+									profile={formData}
+									setImageFile={setImageFile as React.Dispatch<React.SetStateAction<File>>}
+								/>
+							)
 						)}
 					</div>
 					<div className="mt-[15px] flex flex-col">

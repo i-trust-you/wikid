@@ -200,7 +200,7 @@ export default abstract class API {
 			return API.GET<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}`);
 		}
 
-		public override PATCH({ teamId = "6-11", code, ...query }: { teamId?: string; code: string }, body: UpdateProfileBody) {
+		public override PATCH({ teamId = "6-11", code, ...query }: { teamId?: string; code: string }, body: Partial<UpdateProfileBody>) {
 			return API.PATCH<ProfileDetailType>(MIME.JSON, `${BASE_URL}/${teamId}/profiles/${code}`, body);
 		}
 	})();
@@ -382,13 +382,14 @@ interface UpdateProfileBody {
 	city: string;
 	content: string;
 	family: string;
-	image: string;
+	image: string | null;
 	mbti: string;
 	nationality: string;
 	nickname: string;
 	securityAnswer: string;
 	securityQuestion: string;
 	sns: string;
+	job: string;
 }
 
 interface ProfileDetailType {
