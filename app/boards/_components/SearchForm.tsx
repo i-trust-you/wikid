@@ -25,7 +25,7 @@ export default function SearchForm({ onSubmit }: SearchFormProps) {
 					<SearchIcon width="22" height="22" />
 				</div>
 				<input
-					className="h-full w-full rounded-[10px] bg-gray-100 py-[10px] pl-[57px] pr-[20px] text-lg font-medium text-gray-500 placeholder:text-gray-400"
+					className="h-full w-full rounded-[10px] bg-gray-100 py-[10px] pl-[57px] pr-[20px] text-lg font-medium text-gray-500 outline-primary-200 placeholder:text-gray-400"
 					placeholder="제목을 검색해 주세요"
 					value={value}
 					onChange={(e) => setValue(e.target.value)}
