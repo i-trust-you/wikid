@@ -1,5 +1,4 @@
 import capsule from "@/_utilities/capsule";
-import Image from "next/image";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import ArrowLeftIcon from "../../../public/icons/ArrowLeftIcon";
