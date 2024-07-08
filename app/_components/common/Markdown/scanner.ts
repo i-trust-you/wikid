@@ -1,4 +1,4 @@
-const enum Context {
+export const enum Context {
 	// HTML = "html",
 	BLOCK = "block",
 	STACK = "stack",
@@ -270,7 +270,7 @@ export default class Scanner {
 			}
 		}
 
-		main: for (const char of input.replace(/\r?\n/g, "\n")) {
+		main: for (const char of input.replace(/\r\n?/g, "\n")) {
 			//
 			// <escape>
 			//

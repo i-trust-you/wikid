@@ -1,9 +1,13 @@
 import API from "@/_api";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
+
+
 import Parser from "@/_components/common/Markdown/parser";
 import Scanner, { Token } from "@/_components/common/Markdown/scanner";
 import Switch from "@/_components/general/Switch";
+
+
 
 import AddPhotoIcon from "../../../../public/icons/AddPhotoIcon";
 import BoldIcon from "../../../../public/icons/BoldIcon";
@@ -12,6 +16,7 @@ import OrderedIcon from "../../../../public/icons/OrderedIcon";
 import StrikeIcon from "../../../../public/icons/StrikeIcon";
 import UnderlineIcon from "../../../../public/icons/UnderlineIcon";
 import UnorderedIcon from "../../../../public/icons/UnorderedIcon";
+
 
 const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|gif|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
@@ -125,7 +130,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 							// unseal
 							setReadOnly(false);
 							// reflect
-							setData([data, ...buffer].join("\n"));
+							setData((0 < data.length ? [data, ...buffer] : buffer).join("\n") );
 						}
 					});
 				}
@@ -149,6 +154,25 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 		event.stopPropagation();
 
 		outline.current?.style.setProperty("border-color", null);
+	}, []);
+
+	const unescape = useCallback((html: HTMLElement) => {
+		let buffer = html.innerHTML;
+
+		for (const [entity, character] of Object.entries({
+			"<br>": "\n",
+			"&nbsp;": " ",
+			"&lt;": "<",
+			"&gt;": ">",
+			"&amp;": "&",
+			"&#035;": "#",
+			"&quot;": '"',
+			"&#039;": "'",
+			"&apos;": "'",
+		})) {
+			buffer = buffer.replace(new RegExp(entity, "g"), character);
+		}
+		return buffer;
 	}, []);
 
 	const stack = useCallback(
@@ -211,7 +235,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 					}
 					// prettier-ignore
 					html.focus();
-					setData(html.innerHTML.replace(/<br>/g, "\n"));
+					setData(unescape(html));
 				}
 			}
 		},
@@ -284,7 +308,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 									ref={editor}
 									contentEditable={!readonly}
 									data-placeholder={props.placeholder}
-									className="inline-block h-full min-h-[130px] w-full grow resize-y overflow-auto break-all rounded-[10px] border border-gray-300 bg-white px-[10px] py-[10px] text-lg text-gray-500 before:text-gray-300 [&:not(:focus):empty]:before:content-[attr(data-placeholder)]"
+									className="inline-block h-full min-h-[130px] w-full grow resize-y overflow-auto whitespace-pre-wrap break-all rounded-[10px] border border-gray-300 bg-white px-[10px] py-[10px] text-lg text-gray-500 before:text-gray-300 [&:not(:focus):empty]:before:content-[attr(data-placeholder)]"
 									//
 									// feat: drop & drop
 									//
@@ -317,15 +341,12 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 									}}
 									onInput={(event) => {
 										// @ts-ignore
-										const text = event.target.innerHTML.replace(/<br>/g, "\n");
-
-										// @ts-ignore
-										if (event.target.children.length === 1 && event.target.lastChild.nodeName === "BR") {
+										if (event.target.children.length === 1 && event.target.firstChild.nodeName === "BR") {
 											// @ts-ignore
 											event.target.lastChild.remove();
 										}
-										// phew...
-										setData(text);
+										// @ts-ignore
+										setData(unescape(event.target));
 									}}
 								/>
 								<div ref={outline} className="pointer-events-none absolute inset-[5px] rounded-[10px] border-[2.5px] border-dashed border-transparent" />

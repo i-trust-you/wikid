@@ -1,4 +1,4 @@
-import Scanner, { Token } from "./scanner";
+import Scanner, { Context, Token } from "./scanner";
 
 const EOF = Symbol();
 
@@ -166,7 +166,7 @@ class BACKLINK extends AST {
 	}
 
 	override render() {
-		return `<a href="${this.href}">${this.text}</>`;
+		return `<a href="${this.href}">${this.text}</a>`;
 	}
 }
 
@@ -214,7 +214,19 @@ export default class Parser {
 		main: switch (this.peek()) {
 			case Token.BREAK: {
 				this.consume();
+				// reset pointer
 				this.node = this.origin;
+
+				if (this.peek() instanceof Token) {
+					if (this.peek() === Token.BREAK) {
+						// edge case - itself
+						return new BR();
+					}
+					if ((this.peek() as Token).ctx === Context.INLINE) {
+						// general case - inline
+						return new BR();
+					}
+				}
 				return null;
 			}
 			case Token.H1: {

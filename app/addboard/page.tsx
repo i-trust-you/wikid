@@ -33,7 +33,7 @@ export default function Page() {
 		(event: React.FormEvent<HTMLFormElement>) => {
 			event.preventDefault();
 
-			API["{teamId}/articles"].POST({}, { image, title, content }).then((response) => {
+			API["{teamId}/articles"].POST({}, 0 < image.length ? { image, title, content } : { title, content }).then((response) => {
 				router.push(`/boards/${response.id}`);
 			});
 		},
@@ -43,8 +43,8 @@ export default function Page() {
 	const [disabled, setDisabled] = useState(true);
 
 	useEffect(() => {
-		setDisabled(0 < image.length && !(1 <= title.length && title.length <= 30));
-	}, [image, title, content]);
+		setDisabled(!(1 <= title.length && title.length <= 30));
+	}, [title, content]);
 
 	const outline = useRef<HTMLDivElement>(null);
 
@@ -101,7 +101,7 @@ export default function Page() {
 
 	return (
 		<main className="flex w-full flex-col items-center tablet:px-[60px] tablet:py-[30px] desktop:pt-[60px]">
-			<form className="tablet:shadow-lg h-full w-full overflow-hidden desktop:container tablet:rounded-[10px]" onSubmit={onSubmit}>
+			<form className="h-full w-full overflow-hidden desktop:container tablet:rounded-[10px] tablet:shadow-lg" onSubmit={onSubmit}>
 				<div
 					onClick={() => modal.open()}
 					onDrop={onDrop}
