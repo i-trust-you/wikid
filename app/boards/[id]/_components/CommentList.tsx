@@ -46,7 +46,7 @@ export default function CommentList({ articleId }: { articleId: number }) {
 				<span className="text-primary-200">{commentData ? commentData.length : 0}</span>
 			</div>
 			<CommentForm articleId={articleId} />
-			<div className="m-auto flex w-[335px] flex-col gap-[14px] tablet:w-[624px] tablet:gap-4 desktop:w-[1060px] desktop:gap-6">
+			<div className="m-auto mt-4 flex w-[335px] flex-col gap-[14px] tablet:w-[624px] tablet:gap-4 desktop:w-[1060px] desktop:gap-6">
 				{commentData && commentData.length > 0 ? (
 					<>
 						{commentData.map((comment) => (
