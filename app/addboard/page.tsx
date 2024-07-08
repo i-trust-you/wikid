@@ -101,7 +101,7 @@ export default function Page() {
 
 	return (
 		<main className="flex w-full flex-col items-center tablet:px-[60px] tablet:py-[30px] desktop:pt-[60px]">
-			<form className="h-full w-full overflow-hidden desktop:container tablet:rounded-[10px] tablet:shadow-lg" onSubmit={onSubmit}>
+			<form className="h-full w-full desktop:container tablet:rounded-[10px] tablet:shadow-lg" onSubmit={onSubmit}>
 				<div
 					onClick={() => modal.open()}
 					onDrop={onDrop}
