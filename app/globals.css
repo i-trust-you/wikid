@@ -61,4 +61,8 @@
 	.md ul {
 		@apply list-disc pl-[20px];
 	}
+
+	.md a {
+		@apply text-primary-200;
+	}
 }

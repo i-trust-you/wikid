@@ -303,7 +303,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 									ref={editor}
 									contentEditable={!readonly}
 									data-placeholder={props.placeholder}
-									className="inline-block h-full min-h-[130px] w-full grow resize-y overflow-auto whitespace-pre break-all rounded-[10px] border border-gray-300 bg-white px-[10px] py-[10px] text-lg text-gray-500 before:text-gray-300 [&:not(:focus):empty]:before:content-[attr(data-placeholder)]"
+									className="inline-block h-full min-h-[130px] w-full grow resize-y overflow-auto whitespace-pre-wrap break-all rounded-[10px] border border-gray-300 bg-white px-[10px] py-[10px] text-lg text-gray-500 before:text-gray-300 [&:not(:focus):empty]:before:content-[attr(data-placeholder)]"
 									//
 									// feat: drop & drop
 									//
