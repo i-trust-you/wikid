@@ -29,10 +29,11 @@ function useCTX() {
 export default function Pagination(props: Readonly<React.PropsWithChildren & Props & { onChange: (_: number) => void }>) {
 	const [page, setPage] = useState(props.page);
 
+	// two-way binding
 	useEffect(() => {
-		props.onChange(page);
-	}, [page]);
-
+		setTimeout(() => props.onChange(page), 16);
+	}, [page, props.onChange]);
+	// two-way binding
 	useEffect(() => {
 		setPage(Math.min(Math.max(0, props.page), props.length - 1));
 	}, [props.page, props.length]);

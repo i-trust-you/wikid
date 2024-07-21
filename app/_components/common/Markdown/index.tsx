@@ -1,13 +1,9 @@
 import API from "@/_api";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
-
-
 import Parser from "@/_components/common/Markdown/parser";
 import Scanner, { Token } from "@/_components/common/Markdown/scanner";
 import Switch from "@/_components/general/Switch";
-
-
 
 import AddPhotoIcon from "../../../../public/icons/AddPhotoIcon";
 import BoldIcon from "../../../../public/icons/BoldIcon";
@@ -16,7 +12,6 @@ import OrderedIcon from "../../../../public/icons/OrderedIcon";
 import StrikeIcon from "../../../../public/icons/StrikeIcon";
 import UnderlineIcon from "../../../../public/icons/UnderlineIcon";
 import UnorderedIcon from "../../../../public/icons/UnorderedIcon";
-
 
 const [FILE_NAME, FILE_SIZE] = [/^[a-zA-Z0-9._\-\s]+\.(?:png|gif|webp|jpe?g)$/, 1024 /* 1KB = 1024byte */ * 1024 /* 1MB = 1024KB */ * 5];
 
@@ -35,8 +30,14 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 		}
 	}, []);
 
-	useEffect(() => setData(props.data ?? ""), [props.data]); // two-way binding
-	useEffect(() => props.onChange?.(data), [data, props.onChange]); // two-way binding
+	 // two-way binding
+	useEffect(() => {
+		setData(props.data ?? "");
+	}, [props.data]);
+	 // two-way binding
+	useEffect(() => {
+		setTimeout(() => props.onChange?.(data), 16);
+	}, [data, props.onChange]);
 
 	const [style, setStyle] = useState<React.CSSProperties>({ opacity: 0, pointerEvents: "none" });
 
@@ -130,7 +131,7 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 							// unseal
 							setReadOnly(false);
 							// reflect
-							setData((0 < data.length ? [data, ...buffer] : buffer).join("\n") );
+							setData((0 < data.length ? [data, ...buffer] : buffer).join("\n"));
 						}
 					});
 				}
@@ -233,8 +234,9 @@ export default function Markdown(props: Readonly<{ data?: string; placeholder?: 
 							inline(token, html, start, end);
 							break;
 					}
-					// prettier-ignore
+					// ..!
 					html.focus();
+					// reflect
 					setData(unescape(html));
 				}
 			}
